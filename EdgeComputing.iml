@@ -1,0 +1,16 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<module type="JAVA_MODULE" version="4">
+  <component name="NewModuleRootManager" inherit-compiler-output="true">
+    <exclude-output />
+    <content url="file://$MODULE_DIR$">
+      <sourceFolder url="file://$MODULE_DIR$/src" isTestSource="false" />
+      <sourceFolder url="file://$MODULE_DIR$/tessdata" type="java-resource" />
+    </content>
+    <orderEntry type="inheritedJdk" />
+    <orderEntry type="sourceFolder" forTests="false" />
+    <orderEntry type="library" exported="" name="net.sourceforge.tess4j" level="project" />
+    <orderEntry type="library" exported="" name="slf4j.simple" level="project" />
+    <orderEntry type="library" exported="" name="commons.net" level="project" />
+    <orderEntry type="library" exported="" name="apache.ftpserver.core" level="project" />
+  </component>
+</module>
