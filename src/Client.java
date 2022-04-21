@@ -30,7 +30,7 @@ public class Client
         try {
 
             //sets up FTP client
-            ftpClient.connect("192.168.1.23", 2221);
+            ftpClient.connect("75.128.103.105", 2221);
             ftpClient.login("user", "");
             ftpClient.enterLocalPassiveMode();
             ftpClient.setFileType(FTP.BINARY_FILE_TYPE);
@@ -85,6 +85,6 @@ public class Client
 
 
         public static void main(String[] args) throws TesseractException, IOException {
-        Client client = new Client("192.168.1.23", 5000);
+        Client client = new Client("35.40.254.5", 5000);
     }
 }
