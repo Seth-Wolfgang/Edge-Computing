@@ -1,5 +1,5 @@
-import org.apache.commons.net.ftp.FTP;
-import org.apache.commons.net.ftp.FTPClient;
+package Network;
+
 import org.apache.ftpserver.ConnectionConfigFactory;
 import org.apache.ftpserver.FtpServer;
 import org.apache.ftpserver.FtpServerFactory;
@@ -16,8 +16,9 @@ import java.util.List;
 
 public class EdgeServer {
 
-    public EdgeServer(String ip, int port){
+    public EdgeServer(){
 
+        //instantiates the factories for the FTP server
         FtpServer ftpServer = null;
         FtpServerFactory serverFactory = new FtpServerFactory();
         ListenerFactory lFactory = new ListenerFactory();
@@ -25,25 +26,30 @@ public class EdgeServer {
         ConnectionConfigFactory cFactory = new ConnectionConfigFactory();
         cFactory.setAnonymousLoginEnabled(true);
 
+        //sets port and listener
         lFactory.setPort(2221); //static port
         serverFactory.addListener("default", lFactory.createListener());
         serverFactory.setConnectionConfig(cFactory.createConnectionConfig());
 
         try {
+
+            //basic user authorities
             List<Authority> authorities = new ArrayList<Authority>();
             authorities.add(new WritePermission());
             BaseUser user = new BaseUser();
             user.setAuthorities(authorities);
 
+            //basic user settings
             user.setName("user");
             user.setPassword("");
             user.setHomeDirectory("ftpResources");
 
+            //configures and creates FTP server
             serverFactory.setFileSystem(fsf);
             serverFactory.getUserManager().save(user);
             ftpServer = serverFactory.createServer();
             ftpServer.start();
-            
+
         } catch (FtpException e) {
             e.printStackTrace();
         }
@@ -52,7 +58,8 @@ public class EdgeServer {
 
     static public void main(String[] args){
 
-        EdgeServer edgeServer = new EdgeServer("35.40.254.5", 5001);
+        //simply creates the FTP server, program does not end
+        EdgeServer edgeServer = new EdgeServer();
 
     }
 

@@ -12,5 +12,14 @@
     <orderEntry type="library" exported="" name="slf4j.simple" level="project" />
     <orderEntry type="library" exported="" name="commons.net" level="project" />
     <orderEntry type="library" exported="" name="apache.ftpserver.core" level="project" />
+    <orderEntry type="module-library">
+      <library>
+        <CLASSES />
+        <JAVADOC />
+        <SOURCES>
+          <root url="file://$MODULE_DIR$/src" />
+        </SOURCES>
+      </library>
+    </orderEntry>
   </component>
 </module>

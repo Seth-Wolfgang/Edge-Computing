@@ -1,3 +1,5 @@
+package Network;
+
 import java.io.*;
 import java.net.ServerSocket;
 import java.net.Socket;
@@ -13,28 +15,28 @@ public class Server
     private DataInputStream in       =  null;
 
     // constructor with port
-    public Server(int port) throws FtpException, EOFException {
+    public Server(int port) throws Exception {
 
 
         // starts server and waits for a connection
         try {
 
             server = new ServerSocket(port);
-            System.out.println("Server started");
+            System.out.println("Network.Server started");
             System.out.println("Waiting for a client ...");
             socket = server.accept();
-            System.out.println("Client accepted");
+            System.out.println("Network.Client accepted");
 
             in = new DataInputStream(new BufferedInputStream(socket.getInputStream()));
             String line = "";
 
             // reads message from client until "Over" is sent
-            while (!line.equals("Over")) {
+            while (!socket.isClosed()) {
                 try {
                     line = in.readUTF();
                     System.out.println(line);
                 } catch (IOException e) {
-                    System.out.println(e);
+                   e.printStackTrace();
                 }
             }
             System.out.println("Closing connection");
@@ -43,14 +45,12 @@ public class Server
 
             socket.close();
             in.close();
-        } catch (EOFException e) {
-            throw new EOFException();
-        } catch (IOException i) {
-            System.out.println(i);
+        } catch (Exception e) {
+            throw new Exception();
         }
     }
 
-    public static void main(String[] args) throws FtpException, EOFException {
+    public static void main(String[] args) throws Exception {
         Server server = new Server(5000);
     }
 }
