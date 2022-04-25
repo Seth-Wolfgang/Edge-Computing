@@ -84,6 +84,7 @@ public class Client
 
 
         public static void main(String[] args) throws TesseractException, IOException {
+        //todo replace client with separate classes for each benchmark
         Client client = new Client("127.0.0.1", 5000);
     }
 }

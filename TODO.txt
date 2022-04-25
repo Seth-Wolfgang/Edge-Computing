@@ -6,7 +6,7 @@ create a way of timing each benchmark
     create class for timing
 
 create more benchmarks
-    THIS CAN WAIT
+    [[[THIS CAN WAIT]]]
     Smith-Waterman gene sequencing
 
 clean up code

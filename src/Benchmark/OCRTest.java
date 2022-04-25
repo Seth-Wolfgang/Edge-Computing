@@ -7,7 +7,6 @@
 
 package Benchmark;
 
-import Benchmark.Timer;
 import net.sourceforge.tess4j.ITesseract;
 import net.sourceforge.tess4j.Tesseract;
 import net.sourceforge.tess4j.TesseractException;
@@ -21,6 +20,7 @@ public class OCRTest {
     private final String dataPath;
     private File image;
     private String output;
+    private ArrayList<String> manyOutput = new ArrayList<>();
 
     public OCRTest(String dataDir, File imagePath){
         dataPath = dataDir;
@@ -95,6 +95,24 @@ public class OCRTest {
     }
 
     /**
+     * Performs the optical character recognition of the image provided
+     * for as many iterations as specified
+     * @return ArrayList
+     * @throws TesseractException
+     */
+
+    public ArrayList<String> bulkOCR(int iteration){
+        try {
+            for(int i = 0; i < iteration; i++)
+                manyOutput.add(tesseract.doOCR(image));
+        } catch (TesseractException e) {
+            System.out.println("OCR FAILED");
+            e.printStackTrace();
+        }
+        return manyOutput;
+    }
+
+    /**
      * Getter method for the image's path
      * @return String
      */
@@ -103,5 +121,21 @@ public class OCRTest {
         return image.getPath();
     }
 
+    /**
+     * Getter method for manyOutput of bulkOCR
+     * @return ArrayList
+     */
 
+    public ArrayList<String> getManyOutput() {
+        return manyOutput;
+    }
+
+    /**
+     * Getter method for the output of OCR
+     * @return String
+     */
+
+    public String getOutput() {
+        return output;
+    }
 }
