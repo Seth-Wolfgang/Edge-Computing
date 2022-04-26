@@ -1,18 +1,1 @@
-Open up program to allow for more benchmark tests
-    refactor OCR out of client
-            create new class
-
-create a way of timing each benchmark
-    create class for timing
-
-create more benchmarks
-    [[[THIS CAN WAIT]]]
-    Smith-Waterman gene sequencing
-
-clean up code
-    just make it tidy
-
-Create arguments for:
-    How many iterations
-    what test is being performed
-    ??compact or standard test??
+https://trello.com/b/y01w4qjI/research-tasks
