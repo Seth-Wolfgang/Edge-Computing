@@ -18,15 +18,14 @@ import java.util.ArrayList;
 public class Client
 {
 
+    ArrayList<Long> runTimes = new ArrayList<>();
+    ArrayList<Long> transmitTimes = new ArrayList<>(); //maybe remove?
+
     // constructor to put ip address and port
     public Client(String address, int port, int ftpPort) throws IOException, TesseractException {
 
-        OCRTest ocrTest = new OCRTest("tessdata");
-        ArrayList<Long> runTimes = new ArrayList<>();
-        ArrayList<Long> transmitTimes = new ArrayList<>();
-        String imageText = null;
         easyFTP ftpClient = new easyFTP(address, ftpPort);
-        String remoteFile = "woahman.png";
+
 
         try {
             //establish connection to Server.java
@@ -34,28 +33,10 @@ public class Client
             DataOutputStream out = new DataOutputStream(socket.getOutputStream());
             System.out.println("Connected");
 
-            //grabs file for OCR
-            File image = new File("woahman.png");
-            BufferedOutputStream outputStream = new BufferedOutputStream(new FileOutputStream(image));
-            boolean success = ftpClient.retrieveFile(remoteFile, outputStream);
-            outputStream.flush();
+            //temporary -> require args in future?
+            OCRBench(ftpClient, "woahman.png");
 
-            if (success){
-                System.out.println("File transferred");
-                ocrTest.setImage(image);
-            }
-
-            //performs and calculates times for benchmark (not transmission times)
-            runTimes = ocrTest.performCompactBenchmark(1);
-            
-            long total = 0;
-            for (Long runTime : runTimes) {
-                System.out.println(runTime / 1000000000.0);
-                total = total + runTime;
-
-            }
-            System.out.println(total / 1000000000.0);
-            out.writeUTF(ocrTest.doOCR());
+            //out.writeUTF(ocrTest.doOCR());
 
             //if test done
             //todo create a way to know when to stop
@@ -76,6 +57,40 @@ public class Client
         } catch (IOException e) {
             e.printStackTrace();
         }
+    }
+
+
+    public void OCRBench(easyFTP ftpClient, String imageName){
+        OCRTest ocrTest = new OCRTest("tessdata");
+        String imageText = null;
+        String remoteFile = imageName;
+        long total = 0;
+
+        try{
+            File image = new File("woahman.png");
+            BufferedOutputStream outputStream = new BufferedOutputStream(new FileOutputStream(image));
+            boolean success = ftpClient.retrieveFile(remoteFile, outputStream);
+
+            if (success){
+                System.out.println("File transferred");
+                ocrTest.setImage(image);
+            }
+            outputStream.flush();
+
+        } catch (IOException e) {
+            System.out.println("Grabbing image Failed!");
+            e.printStackTrace();
+        }
+
+        runTimes = ocrTest.performCompactBenchmark(1);
+
+        //performs and calculates times for benchmark (not transmission times)
+        for (Long runTime : runTimes) {
+            System.out.println(runTime / 1000000000.0);
+            total = total + runTime;
+
+        }
+        System.out.println(total / 1000000000.0);
     }
 
     public static void main(String[] args) throws TesseractException, IOException {
