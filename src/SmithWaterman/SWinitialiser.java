@@ -7,22 +7,17 @@ package SmithWaterman;
 
 import java.util.*;
 
-public class initialiser {
-    public static void main(String[] args) throws Exception {
+public class SWinitialiser {
+    public void run(String queryFile, String databaseFile, String alphabetFile, String scoreMatrixFile, int k, int m) throws Exception {
         helper h = new helper();
         PriorityQueue<Integer> pq = new PriorityQueue<Integer>(Collections.reverseOrder());
-        Scanner in = new Scanner(System.in);
-        int selector = 2;
-        String queryFile = "src\\SmithWaterman\\query.txt";
-        String databaseFile = "src\\SmithWaterman\\database.txt";
-        String alphabetFile = "src\\SmithWaterman\\alphabet.txt";
-        String scorematrixFile = "src\\SmithWaterman\\scoringmatrix.txt";
+
+
         String[] queryRecords = h.getrecords(queryFile);
         String[] databaseRecords = h.getrecords(databaseFile);
         String alphabets = h.getalphabet(alphabetFile);
-        int[][] matrix = h.getmatrix(scorematrixFile);
-        int k = 10; //these neeg args
-        int m = 1;
+        int[][] matrix = h.getmatrix(scoreMatrixFile);
+
         String[] qids = h.getids(queryFile);
         String[] dids = h.getids(databaseFile);
         Map<Integer, String[]> smap = new HashMap<Integer, String[]>();

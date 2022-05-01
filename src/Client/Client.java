@@ -9,7 +9,7 @@ package Client;
  */
 
 import Benchmark.OCRTest;
-import Benchmark.SmithWaterman;
+import SmithWaterman.SWinitialiser;
 import net.sourceforge.tess4j.TesseractException;
 
 import java.io.*;
@@ -21,32 +21,55 @@ public class Client
 
     ArrayList<Long> runTimes = new ArrayList<>();
     ArrayList<Long> transmitTimes = new ArrayList<>(); //maybe remove?
-
+    int test;
     // constructor to put ip address and port
     public Client(String address, int port, int ftpPort) throws IOException, TesseractException {
 
         easyFTP ftpClient = new easyFTP(address, ftpPort);
 
+        switch (test){
+            case 1: //OCR Test
+                try {
+                    //establish connection to Server.java
+                    Socket socket = new Socket(address, port);
+                    DataOutputStream out = new DataOutputStream(socket.getOutputStream());
+                    System.out.println("Connected");
 
-        try {
-            //establish connection to Server.java
-            Socket socket = new Socket(address, port);
-            DataOutputStream out = new DataOutputStream(socket.getOutputStream());
-            System.out.println("Connected");
+                    //temporary -> require args in future?
+                    OCRBench(ftpClient, "woahman.png");
 
-            //temporary -> require args in future?
-            OCRBench(ftpClient, "woahman.png");
+                    //out.writeUTF(ocrTest.doOCR());
 
-            //out.writeUTF(ocrTest.doOCR());
+                    //if test done
+                    //todo create a way to know when to stop
+                    closeConnection(out, socket);
 
-            //if test done
-            //todo create a way to know when to stop
-            closeConnection(out, socket);
+                    // close the connection
+                } catch (IOException e) {
+                    e.printStackTrace();
+                }
+                break;
 
-            // close the connection
-        } catch (IOException e) {
-            e.printStackTrace();
+                case 2: //Smith-Waterman Test
+
+                    String queryFile = "src\\SmithWaterman\\query.txt";
+                    String databaseFile = "src\\SmithWaterman\\database.txt";
+                    String alphabetFile = "src\\SmithWaterman\\alphabet.txt";
+                    String scorematrixFile = "src\\SmithWaterman\\scoringmatrix.txt";
+                    int m = 1; //todo replace with args
+                    int k = 1;
+                    try {
+                        new SWinitialiser().run(queryFile, databaseFile, alphabetFile, scorematrixFile, m, k);
+                    } catch (Exception e) {
+                        e.printStackTrace();
+                    }
+
+
+                    break;
+
+
         }
+
 
     }
 
@@ -96,11 +119,11 @@ public class Client
 
     public static void main(String[] args) throws TesseractException, IOException {
         //todo replace client with separate classes for each benchmark
-       // Client client = new Client("127.0.0.1", 5000, 2221);
+        //Client client = new Client("127.0.0.1", 5000, 2221);
+        SWinitialiser SW = new SWinitialiser();
 
         int[][] h = new int[100][100];
-        SmithWaterman b = new SmithWaterman("tcat", "gcat", h, "gcat", 1);
-        b.dynamic();
+
     }
 
 }
