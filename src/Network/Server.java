@@ -1,10 +1,10 @@
 package Network;
 
-import java.io.*;
+import java.io.BufferedInputStream;
+import java.io.DataInputStream;
+import java.io.IOException;
 import java.net.ServerSocket;
 import java.net.Socket;
-
-import org.apache.ftpserver.ftplet.FtpException;
 
 
 public class Server
@@ -13,6 +13,7 @@ public class Server
     private Socket          socket   = null;
     private ServerSocket    server   = null;
     private DataInputStream in       =  null;
+    String line = "";
 
     // constructor with port
     public Server(int port) throws Exception {
@@ -22,13 +23,12 @@ public class Server
         try {
 
             server = new ServerSocket(port);
-            System.out.println("Network.Server started");
+            System.out.println("Server started");
             System.out.println("Waiting for a client ...");
             socket = server.accept();
-            System.out.println("Network.Client accepted");
+            System.out.println("Client accepted");
 
             in = new DataInputStream(new BufferedInputStream(socket.getInputStream()));
-            String line = "";
 
             // reads message from client until "Over" is sent
             while (!socket.isClosed()) {
@@ -39,12 +39,13 @@ public class Server
                    e.printStackTrace();
                 }
             }
+
             System.out.println("Closing connection");
 
             // close connection
-
             socket.close();
             in.close();
+
         } catch (Exception e) {
             throw new Exception();
         }

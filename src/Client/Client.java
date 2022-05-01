@@ -9,6 +9,7 @@ package Client;
  */
 
 import Benchmark.OCRTest;
+import Benchmark.SmithWaterman;
 import net.sourceforge.tess4j.TesseractException;
 
 import java.io.*;
@@ -95,7 +96,11 @@ public class Client
 
     public static void main(String[] args) throws TesseractException, IOException {
         //todo replace client with separate classes for each benchmark
-        Client client = new Client("127.0.0.1", 5000, 2221);
+       // Client client = new Client("127.0.0.1", 5000, 2221);
+
+        int[][] h = new int[100][100];
+        SmithWaterman b = new SmithWaterman("tcat", "gcat", h, "gcat", 1);
+        b.dynamic();
     }
 
 }
