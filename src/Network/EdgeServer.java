@@ -27,7 +27,7 @@ public class EdgeServer {
         cFactory.setAnonymousLoginEnabled(true);
 
         //sets port and listener
-        lFactory.setPort(2221); //static port
+        lFactory.setPort(2221);
         serverFactory.addListener("default", lFactory.createListener());
         serverFactory.setConnectionConfig(cFactory.createConnectionConfig());
 

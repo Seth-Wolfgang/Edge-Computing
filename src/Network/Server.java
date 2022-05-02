@@ -1,5 +1,7 @@
 package Network;
 
+import Benchmark.Timer;
+
 import java.io.BufferedInputStream;
 import java.io.DataInputStream;
 import java.io.IOException;
@@ -7,13 +9,15 @@ import java.net.ServerSocket;
 import java.net.Socket;
 
 
-public class Server
-{
+public class Server extends Thread {
+
     //initialize socket and input stream
     private Socket          socket   = null;
     private ServerSocket    server   = null;
     private DataInputStream in       =  null;
     String line = "";
+    int counter = 0;
+    Timer timer = new Timer();
 
     // constructor with port
     public Server(int port) throws Exception {
@@ -30,25 +34,39 @@ public class Server
 
             in = new DataInputStream(new BufferedInputStream(socket.getInputStream()));
 
-            // reads message from client until "Over" is sent
-            while (!socket.isClosed()) {
-                try {
-                    line = in.readUTF();
-                    System.out.println(line);
-                } catch (IOException e) {
-                   e.printStackTrace();
-                }
-            }
+            timer.start();
 
+            while (!socket.isClosed()) {
+               try {
+                   line = in.readUTF();
+                   if(line.compareTo("") != 0){
+                       counter++;
+                       System.out.println(line);
+                       if(counter == 10){
+                           timer.stop();
+                           stopServer(socket, in);
+                       }
+                   }
+
+               } catch (IOException e) {
+                   stopServer(socket, in);
+                   e.printStackTrace();
+               }
+            }
+            System.out.println(timer.getTotalTime()/ 1000000000.0);
             System.out.println("Closing connection");
 
             // close connection
-            socket.close();
-            in.close();
+
 
         } catch (Exception e) {
             throw new Exception();
         }
+    }
+
+    public void stopServer(Socket socket, DataInputStream in) throws IOException {
+        socket.close();
+        in.close();
     }
 
     public static void main(String[] args) throws Exception {

@@ -21,7 +21,8 @@ public class Client
 
     ArrayList<Long> runTimes = new ArrayList<>();
     ArrayList<Long> transmitTimes = new ArrayList<>(); //maybe remove?
-    int test;
+
+    int test = 1; //test refers to the benchmark performed
     // constructor to put ip address and port
     public Client(String address, int port, int ftpPort) throws IOException, TesseractException {
 
@@ -35,14 +36,15 @@ public class Client
                     DataOutputStream out = new DataOutputStream(socket.getOutputStream());
                     System.out.println("Connected");
 
+                    File image = new File("woahman.png");
+                    BufferedOutputStream outputStream = new BufferedOutputStream(new FileOutputStream(image));
                     //temporary -> require args in future?
-                    OCRBench(ftpClient, "woahman.png");
+                    OCRBench(socket, ftpClient, "woahman.png", image, outputStream);
 
-                    //out.writeUTF(ocrTest.doOCR());
 
                     //if test done
                     //todo create a way to know when to stop
-                    closeConnection(out, socket);
+                    //closeConnection(out, socket);
 
                     // close the connection
                 } catch (IOException e) {
@@ -56,7 +58,7 @@ public class Client
                     String databaseFile = "src\\SmithWaterman\\database.txt";
                     String alphabetFile = "src\\SmithWaterman\\alphabet.txt";
                     String scorematrixFile = "src\\SmithWaterman\\scoringmatrix.txt";
-                    int m = 1; //todo replace with args
+                    int m = 1; //todo replace with args?
                     int k = 1;
                     try {
                         new SWinitialiser().run(queryFile, databaseFile, alphabetFile, scorematrixFile, m, k);
@@ -64,8 +66,7 @@ public class Client
                         e.printStackTrace();
                     }
 
-
-                    break;
+                    break; //end of OCRTest
 
 
         }
@@ -84,29 +85,22 @@ public class Client
     }
 
 
-    public void OCRBench(easyFTP ftpClient, String imageName){
+    public void OCRBench(Socket socket, easyFTP ftpClient, String imageName, File image, BufferedOutputStream outputStream){
         OCRTest ocrTest = new OCRTest("tessdata");
         String imageText = null;
-        String remoteFile = imageName;
         long total = 0;
 
         try{
-            File image = new File("woahman.png");
-            BufferedOutputStream outputStream = new BufferedOutputStream(new FileOutputStream(image));
-            boolean success = ftpClient.retrieveFile(remoteFile, outputStream);
 
-            if (success){
-                System.out.println("File transferred");
-                ocrTest.setImage(image);
-            }
-            outputStream.flush();
+            image = ftpClient.getFile("woahman.png", outputStream);
+            ocrTest.setImage(image);
 
         } catch (IOException e) {
             System.out.println("Grabbing image Failed!");
             e.printStackTrace();
         }
 
-        runTimes = ocrTest.performCompactBenchmark(1);
+        runTimes = ocrTest.performCompactBenchmark(10);
 
         //performs and calculates times for benchmark (not transmission times)
         for (Long runTime : runTimes) {
@@ -119,10 +113,10 @@ public class Client
 
     public static void main(String[] args) throws TesseractException, IOException {
         //todo replace client with separate classes for each benchmark
-        //Client client = new Client("127.0.0.1", 5000, 2221);
-        SWinitialiser SW = new SWinitialiser();
+        Client client = new Client("127.0.0.1", 5000, 2222);
+        //SWinitialiser SW = new SWinitialiser();
 
-        int[][] h = new int[100][100];
+
 
     }
 
