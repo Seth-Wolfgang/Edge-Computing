@@ -42,7 +42,7 @@ public class Server extends Thread {
                    if(line.compareTo("") != 0){
                        counter++;
                        System.out.println(line);
-                       if(counter == 10){
+                       if(counter == 10){ //todo: this is a placeholder (replace with args)
                            timer.stop();
                            stopServer(socket, in);
                        }
@@ -50,7 +50,7 @@ public class Server extends Thread {
 
                } catch (IOException e) {
                    stopServer(socket, in);
-                   e.printStackTrace();
+                   throw new Exception();
                }
             }
             System.out.println(timer.getTotalTime()/ 1000000000.0);
