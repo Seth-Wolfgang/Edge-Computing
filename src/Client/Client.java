@@ -9,6 +9,7 @@ package Client;
  */
 
 import Benchmark.OCRTest;
+import Benchmark.Timer;
 import SmithWaterman.SWinitialiser;
 import net.sourceforge.tess4j.TesseractException;
 
@@ -124,10 +125,16 @@ public class Client {
         }
 
         System.out.println(total / 1000000000.0);
+        Timer timer = new Timer();
 
+        timer.start();
         for (String out : manyOutput){
             dataOutput.writeUTF(out);
+            timer.newLap();
         }
+        timer.stop();
+        System.out.println("Total Transmission time: " + timer.getTotalTime() / 1000000000.0);
+
 
     }
 

@@ -68,8 +68,4 @@ public class Server extends Thread {
         socket.close();
         in.close();
     }
-
-    public static void main(String[] args) throws Exception {
-        Server server = new Server(5000);
-    }
 }
