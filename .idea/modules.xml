@@ -2,7 +2,7 @@
 <project version="4">
   <component name="ProjectModuleManager">
     <modules>
-      <module fileurl="file://$PROJECT_DIR$/EdgeComputing.iml" filepath="$PROJECT_DIR$/EdgeComputing.iml" />
+      <module fileurl="file://$PROJECT_DIR$/EdgeBench.iml" filepath="$PROJECT_DIR$/EdgeBench.iml" />
     </modules>
   </component>
 </project>
