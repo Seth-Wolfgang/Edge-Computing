@@ -20,12 +20,10 @@ public class Client {
 
     ArrayList<Long> runTimes = new ArrayList<>();
     ArrayList<Long> transmitTimes = new ArrayList<>(); //maybe remove?
-
     int test = 1; //test refers to the benchmark performed
 
     // constructor to put ip address and port
     public Client(String address, int port, int ftpPort) throws IOException, TesseractException {
-
         Socket socket = new Socket(address, port);
         easyFTP ftpClient = new easyFTP(address, ftpPort);
 
@@ -41,8 +39,6 @@ public class Client {
                     BufferedOutputStream outputStream = new BufferedOutputStream(new FileOutputStream(image));
                     //temporary -> require args in future?
                     OCRBench(socket, ftpClient, "woahman.png", image, outputStream);
-
-
                     //if test done
                     //todo create a way to know when to stop
                     //closeConnection(out, socket);
@@ -71,12 +67,6 @@ public class Client {
 
         }
     }// end of client
-
-    public static void main(String[] args) throws TesseractException, IOException {
-        //todo replace client with separate classes for each benchmark
-        Client client = new Client("127.0.0.1", 5000, 2221);
-
-    }
 
     /**
      * Method for easily and cleanly closing connection
@@ -107,8 +97,10 @@ public class Client {
      * @param outputStream BufferedOutputStream
      */
 
-    public void OCRBench(Socket socket, easyFTP ftpClient, String imageName, File image, BufferedOutputStream outputStream) {
+    public void OCRBench(Socket socket, easyFTP ftpClient, String imageName, File image, BufferedOutputStream outputStream) throws IOException {
+        ArrayList<String> manyOutput = new ArrayList<>(); //output of the image. Arraylist for many iterations of this test
         OCRTest ocrTest = new OCRTest("tessdata");
+        DataOutputStream dataOutput = new DataOutputStream(socket.getOutputStream());
         String imageText = null;
         long total = 0;
 
@@ -123,14 +115,20 @@ public class Client {
         }
 
         runTimes = ocrTest.performCompactBenchmark(10);
-
+        manyOutput = ocrTest.getManyOutput(); // returns the output
         //performs and calculates times for benchmark (not transmission times)
         for (Long runTime : runTimes) {
             System.out.println(runTime / 1000000000.0);
             total = total + runTime;
 
         }
+
         System.out.println(total / 1000000000.0);
+
+        for (String out : manyOutput){
+            dataOutput.writeUTF(out);
+        }
+
     }
 
 }

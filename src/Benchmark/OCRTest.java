@@ -20,7 +20,7 @@ public class OCRTest {
     private final String dataPath;
     private File image;
     private String output;
-    private final ArrayList<String> manyOutput = new ArrayList<>();
+    private ArrayList<String> manyOutput = new ArrayList<String>();
 
     public OCRTest(String dataDir, File imagePath){
         dataPath = dataDir;
@@ -50,11 +50,11 @@ public class OCRTest {
         timer.start();
 
         for(int i = 0; i < iterations; i++){
-            doOCR();
+            manyOutput.add(doOCR());
             timer.newLap();
         }
         timer.stop();
-
+        System.out.println(manyOutput);
         return timer.getLaps();
     }
 
