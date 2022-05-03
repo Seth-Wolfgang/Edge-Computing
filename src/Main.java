@@ -16,6 +16,10 @@ import java.util.concurrent.TimeUnit;
 
 public class Main extends Thread implements Runnable  {
 
+    static int port = 5000;
+    static int ftpPort = 2221;
+    static String address = "127.0.0.1";
+
     public static void main(String[] args) {
         Thread eThread = null;
         Thread sThread = null;
@@ -23,7 +27,7 @@ public class Main extends Thread implements Runnable  {
             new Thread(new Runnable() {
                 @Override
                 public void run() {
-                    new EdgeServer(2221);
+                    new EdgeServer(ftpPort);
                 }
             }).start();
             new Thread(new Runnable() {
@@ -31,13 +35,13 @@ public class Main extends Thread implements Runnable  {
                 public void run() {
                     try {
                         TimeUnit.SECONDS.sleep(2);
-                        new Client("127.0.0.1", 5000, 2221);
+                        new Client(address, port, ftpPort);
                     } catch (IOException | TesseractException | InterruptedException e) {
                         e.printStackTrace();
                     }
                 }
             }).start();
-            new Thread(new Server(5000)).start();
+            new Thread(new Server(port)).start();
             sThread.start();
 
 
