@@ -12,6 +12,7 @@ import net.sourceforge.tess4j.Tesseract;
 import net.sourceforge.tess4j.TesseractException;
 
 import java.io.File;
+import java.io.IOException;
 import java.util.ArrayList;
 
 public class OCRTest {
@@ -46,7 +47,7 @@ public class OCRTest {
      * @return
      */
 
-    public ArrayList performCompactBenchmark(int iterations){
+    public ArrayList performCompactBenchmark(int iterations) throws IOException {
         timer.start();
 
         for(int i = 0; i < iterations; i++){
@@ -55,6 +56,7 @@ public class OCRTest {
         }
         timer.stop();
         System.out.println(manyOutput);
+        timer.printResults("test");
         return timer.getLaps();
     }
 

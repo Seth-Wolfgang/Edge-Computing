@@ -5,6 +5,10 @@ package Benchmark; /**
  * This class is a simple timer for the purpose of benchmarking programs
  */
 
+import java.io.File;
+import java.io.FileWriter;
+import java.io.IOException;
+import java.io.PrintWriter;
 import java.util.ArrayList;
 
 public class Timer {
@@ -125,6 +129,7 @@ public class Timer {
      *  Displays all times to the console in nanoseconds.
      */
 
+    //todo maybe delete? method is unfinished
     public void showTable(){
         System.out.println("TABLE OF LAPS AND TOTAL TIME");
 
@@ -135,4 +140,39 @@ public class Timer {
         System.out.printf("Total time: \t %d", totalTime);
     }
 
+    /**
+     * Prints the results of timer to a file for ease of use
+     *
+     * @throws IOException
+     */
+
+    public void printResults () throws IOException {
+        File results = new File("Results.txt");
+        PrintWriter writer = new PrintWriter(new FileWriter(results, true));
+
+        System.out.println("Output file create: Results.txt");
+        writer.append("Test performed at: " + System.currentTimeMillis() + "\n");
+
+        for(Long time : laps)
+            writer.append(String.valueOf(time) + "\t");
+
+        writer.append("\nTotal: " + getTotalTime() + "\n");
+        writer.close();
+    }
+
+    /**
+     * Overload of printResults() method, used to add a descriptive name
+     * before results are printed.
+     *
+     * @param tag a name for the method to print before reulst are printed
+     * @throws IOException
+     */
+
+    public void printResults (String tag) throws IOException {
+        File results = new File("Results.txt");
+        PrintWriter writer = new PrintWriter(new FileWriter(results, true));
+        writer.append("Test name: " + tag + "\n");
+        writer.close();
+        printResults();
+    }
 }//end of class
