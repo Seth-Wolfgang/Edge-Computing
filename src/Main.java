@@ -21,8 +21,6 @@ public class Main extends Thread implements Runnable  {
     static String address = "127.0.0.1";
 
     public static void main(String[] args) throws Exception {
-        Thread eThread = null;
-        Thread sThread = null;
         try {
             new Thread(new Runnable() {
                 @Override
@@ -42,8 +40,6 @@ public class Main extends Thread implements Runnable  {
                 }
             }).start();
             new Thread(new Server(port)).start();
-
-
 
         } catch (Exception e) {
             e.printStackTrace();

@@ -117,8 +117,8 @@ public class Client {
 
         runTimes = ocrTest.performCompactBenchmark(10);
         manyOutput = ocrTest.getManyOutput(); // returns the output
-        timer.start();
 
+        timer.start();
         for (String out : manyOutput){
             dataOutput.writeUTF(out);
             timer.newLap();

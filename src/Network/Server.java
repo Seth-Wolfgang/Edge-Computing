@@ -37,8 +37,9 @@ public class Server extends Thread {
 
             timer.start();
 
-            while (!socket.isClosed()) {
+            while (!socket.isClosed()) { //Replace with lambda
                try {
+                   timer.start();
                    line = in.readUTF();
                    if(line.compareTo("") != 0){
                        counter++;
