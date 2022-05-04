@@ -110,36 +110,6 @@ public class Timer extends Thread {
     }
 
     /**
-     * Displays all times to the console. Method can reduce nanoseconds
-     * to a more readable format with the `digits` parameter.
-     *
-     * @param digits
-     */
-
-    public void showTable(int digits){
-        System.out.println("TABLE OF LAPS AND TOTAL TIME");
-
-        for(int i = 0; i < laps.size(); i++)
-            System.out.printf("%d \t : %d \t\n", i, laps.get(i) / digits);
-        System.out.printf("Total time: \t %d",totalTime / digits);
-    }
-
-    /**
-     *  Displays all times to the console in nanoseconds.
-     */
-
-    //todo maybe delete? method is unfinished
-    public void showTable(){
-        System.out.println("TABLE OF LAPS AND TOTAL TIME");
-
-        for(int i = 0; i < laps.size(); i++)
-            System.out.printf("%d \t : %d \t", i, laps.get(i));
-
-
-        System.out.printf("Total time: \t %d", totalTime);
-    }
-
-    /**
      * Prints the results of the timer in nanoseconds to a text file called
      * Results.txt.
      *
