@@ -26,10 +26,8 @@ public class Timer extends Thread {
      */
 
     public void start() {
-        new Thread(() -> {
-            initialTime = System.nanoTime();
-            initialLapTime = initialTime;
-        });
+        initialTime = System.nanoTime();
+        initialLapTime = initialTime;
     }
 
     /**
