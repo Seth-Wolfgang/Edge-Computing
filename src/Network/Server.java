@@ -43,7 +43,7 @@ public class Server extends Thread {
                        counter++;
                        System.out.println(line);
                        if(counter == 10){ //todo: this is a placeholder (replace with args)
-                           timer.stop();
+                           timer.stopTimer();
                            stopServer(socket, in);
                        }
                    }
@@ -53,7 +53,7 @@ public class Server extends Thread {
                    throw new Exception();
                }
             }
-            timer.printResults("Transmission");
+            timer.printResults();
             System.out.println("Closing connection");
 
             // close connection

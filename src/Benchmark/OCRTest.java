@@ -15,8 +15,9 @@ import java.io.File;
 import java.io.IOException;
 import java.util.ArrayList;
 
-public class OCRTest {
+public class OCRTest extends Thread{
     Timer timer = new Timer();
+
     ITesseract tesseract = new Tesseract();
     private final String dataPath;
     private File image;
@@ -54,7 +55,7 @@ public class OCRTest {
             manyOutput.add(doOCR());
             timer.newLap();
         }
-        timer.stop();
+        timer.stopTimer();
         System.out.println(manyOutput);
         timer.printResults("test");
         return timer.getLaps();

@@ -103,6 +103,7 @@ public class Client {
         OCRTest ocrTest = new OCRTest("tessdata");
         DataOutputStream dataOutput = new DataOutputStream(socket.getOutputStream());
         String imageText = null;
+        Timer timer = new Timer();
         long total = 0;
 
         try {
@@ -117,22 +118,13 @@ public class Client {
 
         runTimes = ocrTest.performCompactBenchmark(10);
         manyOutput = ocrTest.getManyOutput(); // returns the output
-        //performs and calculates times for benchmark (not transmission times)
-        for (Long runTime : runTimes) {
-            System.out.println(runTime / 1000000000.0);
-            total = total + runTime;
-
-        }
-
-        System.out.println(total / 1000000000.0);
-        Timer timer = new Timer();
 
         timer.start();
         for (String out : manyOutput){
             dataOutput.writeUTF(out);
             timer.newLap();
         }
-        timer.stop();
+        timer.stopTimer();
         System.out.println("Total Transmission time: " + timer.getTotalTime() / 1000000000.0);
 
 

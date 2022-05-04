@@ -11,7 +11,7 @@ import java.io.IOException;
 import java.io.PrintWriter;
 import java.util.ArrayList;
 
-public class Timer {
+public class Timer extends Thread {
 
     private long initialTime = 0; //for use in getting total time
     private long initialLapTime = 0; //for use in laps
@@ -26,8 +26,10 @@ public class Timer {
      */
 
     public void start() {
-        initialTime = System.nanoTime();
-        initialLapTime = initialTime;
+        new Thread(() -> {
+            initialTime = System.nanoTime();
+            initialLapTime = initialTime;
+        });
     }
 
     /**
@@ -38,7 +40,7 @@ public class Timer {
      * Time is represented in nanoseconds
      */
 
-    public void stop(){
+    public void stopTimer(){
         if(initialTime > 0) {
             totalTime = System.nanoTime() - initialTime;
             initialTime = 0; //"stops" timer
@@ -162,7 +164,8 @@ public class Timer {
 
     /**
      * Overload of printResults() method, used to add a descriptive name
-     * before results are printed.
+     * before results are printed. Performes printResults() after writing
+     * the tag.
      *
      * @param tag a name for the method to print before reulst are printed
      * @throws IOException
@@ -175,4 +178,5 @@ public class Timer {
         writer.close();
         printResults();
     }
+
 }//end of class
