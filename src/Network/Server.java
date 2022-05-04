@@ -8,6 +8,7 @@ import java.io.File;
 import java.io.IOException;
 import java.net.ServerSocket;
 import java.net.Socket;
+import java.util.ArrayList;
 
 
 public class Server extends Thread {
@@ -15,10 +16,11 @@ public class Server extends Thread {
     //initialize socket and input stream
     private Socket          socket   = null;
     private ServerSocket    server   = null;
-    private DataInputStream in       =  null;
+    private DataInputStream in       = null;
     String line = "";
     int counter = 0;
     Timer timer = new Timer();
+    ArrayList<String> input = new ArrayList<>();
 
     // constructor with port
     public Server(int port) throws Exception {
@@ -35,11 +37,14 @@ public class Server extends Thread {
 
             in = new DataInputStream(new BufferedInputStream(socket.getInputStream()));
 
-            timer.start();
+            boolean notRunning = true;
 
             while (!socket.isClosed()) { //Replace with lambda
                try {
-                   timer.start();
+                   if(notRunning){
+                       timer.start();
+                       notRunning = false;
+                   }
                    line = in.readUTF();
                    if(line.compareTo("") != 0){
                        counter++;
