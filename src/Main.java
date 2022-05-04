@@ -1,5 +1,5 @@
 /**
- * This is meant as a place holder for a real Main.java file. Used to easily
+ * This is meant as a placeholder for a real Main.java file. Used to easily
  * run every part of the program from a single file.
  *
  * Author: Seth Wolfgang
@@ -20,7 +20,7 @@ public class Main extends Thread implements Runnable  {
     static int ftpPort = 2221;
     static String address = "127.0.0.1";
 
-    public static void main(String[] args) {
+    public static void main(String[] args) throws Exception {
         Thread eThread = null;
         Thread sThread = null;
         try {
@@ -42,13 +42,12 @@ public class Main extends Thread implements Runnable  {
                 }
             }).start();
             new Thread(new Server(port)).start();
-            sThread.start();
+
 
 
         } catch (Exception e) {
-            //eThread.stop();
-            //sThread.stop();
             e.printStackTrace();
+            throw new Exception();
         }
     }
 }
