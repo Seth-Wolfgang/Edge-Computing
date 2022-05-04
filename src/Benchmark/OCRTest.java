@@ -56,8 +56,7 @@ public class OCRTest extends Thread{
             timer.newLap();
         }
         timer.stopTimer();
-        System.out.println(manyOutput);
-        timer.printResults("test");
+        timer.printResults("OCR Compact");
         return timer.getLaps();
     }
 

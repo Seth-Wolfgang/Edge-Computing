@@ -4,6 +4,7 @@ import Benchmark.Timer;
 
 import java.io.BufferedInputStream;
 import java.io.DataInputStream;
+import java.io.File;
 import java.io.IOException;
 import java.net.ServerSocket;
 import java.net.Socket;
@@ -41,7 +42,7 @@ public class Server extends Thread {
                    line = in.readUTF();
                    if(line.compareTo("") != 0){
                        counter++;
-                       System.out.println(line);
+                       timer.newLap();
                        if(counter == 10){ //todo: this is a placeholder (replace with args)
                            timer.stopTimer();
                            stopServer(socket, in);
@@ -53,7 +54,7 @@ public class Server extends Thread {
                    throw new Exception();
                }
             }
-            timer.printResults();
+            File results = new File("Results.txt");
             System.out.println("Closing connection");
 
             // close connection
@@ -62,6 +63,7 @@ public class Server extends Thread {
         } catch (Exception e) {
             throw new Exception();
         }
+        timer.printResults("Transmission Received");
     }
 
     public void stopServer(Socket socket, DataInputStream in) throws IOException {

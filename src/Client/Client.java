@@ -40,9 +40,10 @@ public class Client {
                     BufferedOutputStream outputStream = new BufferedOutputStream(new FileOutputStream(image));
                     //temporary -> require args in future?
                     OCRBench(socket, ftpClient, "woahman.png", image, outputStream);
+
                     //if test done
                     //todo create a way to know when to stop
-                    //closeConnection(out, socket);
+                    closeConnection(out, socket);
 
                     // close the connection
                 } catch (IOException e) {
@@ -107,10 +108,8 @@ public class Client {
         long total = 0;
 
         try {
-
             image = ftpClient.getFile("woahman.png", outputStream);
             ocrTest.setImage(image);
-
         } catch (IOException e) {
             System.out.println("Grabbing image Failed!");
             e.printStackTrace();
@@ -118,16 +117,14 @@ public class Client {
 
         runTimes = ocrTest.performCompactBenchmark(10);
         manyOutput = ocrTest.getManyOutput(); // returns the output
-
         timer.start();
+
         for (String out : manyOutput){
             dataOutput.writeUTF(out);
             timer.newLap();
         }
+        //records the start of transmission
         timer.stopTimer();
-        System.out.println("Total Transmission time: " + timer.getTotalTime() / 1000000000.0);
-
-
+        timer.printResults("Transmission Start");
     }
-
 }

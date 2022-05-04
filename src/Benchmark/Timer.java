@@ -1,14 +1,13 @@
-package Benchmark; /**
+/**
  * Author: Seth Wolfgang
  * Date: 4/23/2022
  *
  * This class is a simple timer for the purpose of benchmarking programs
  */
 
-import java.io.File;
-import java.io.FileWriter;
-import java.io.IOException;
-import java.io.PrintWriter;
+package Benchmark;
+
+import java.io.*;
 import java.util.ArrayList;
 
 public class Timer extends Thread {
@@ -141,17 +140,18 @@ public class Timer extends Thread {
     }
 
     /**
-     * Prints the results of timer to a file for ease of use
+     * Prints the results of the timer in nanoseconds to a text file called
+     * Results.txt.
      *
+     * @param tag a name for the method to print before results are printed
      * @throws IOException
      */
 
-    public void printResults () throws IOException {
+    public void printResults (String tag) throws IOException {
         File results = new File("Results.txt");
         PrintWriter writer = new PrintWriter(new FileWriter(results, true));
-
-        System.out.println("Output file create: Results.txt");
-        writer.append("Test performed at: " + System.currentTimeMillis() + "\n");
+        writer.append("\nTest name: " + tag);
+        writer.append("\nTest performed at: " + System.currentTimeMillis() + "\n");
 
         for(Long time : laps)
             writer.append(String.valueOf(time) + "\t");
@@ -160,21 +160,5 @@ public class Timer extends Thread {
         writer.close();
     }
 
-    /**
-     * Overload of printResults() method, used to add a descriptive name
-     * before results are printed. Performes printResults() after writing
-     * the tag.
-     *
-     * @param tag a name for the method to print before reulst are printed
-     * @throws IOException
-     */
-
-    public void printResults (String tag) throws IOException {
-        File results = new File("Results.txt");
-        PrintWriter writer = new PrintWriter(new FileWriter(results, true));
-        writer.append("Test name: " + tag + "\n");
-        writer.close();
-        printResults();
-    }
 
 }//end of class
