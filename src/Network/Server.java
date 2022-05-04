@@ -53,7 +53,7 @@ public class Server extends Thread {
                    throw new Exception();
                }
             }
-            System.out.println(timer.getTotalTime()/ 1000000000.0);
+            timer.printResults("Transmission");
             System.out.println("Closing connection");
 
             // close connection
