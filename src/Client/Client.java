@@ -21,19 +21,19 @@ public class Client {
 
     ArrayList<Long> runTimes = new ArrayList<>();
     ArrayList<Long> transmitTimes = new ArrayList<>(); //maybe remove?
-    int test = 1; //test refers to the benchmark performed
+    int test = 2; //test refers to the benchmark performed
 
     // constructor to put ip address and port
     public Client(String address, int port, int ftpPort) throws IOException, TesseractException {
         Socket socket = new Socket(address, port);
         easyFTP ftpClient = new easyFTP(address, ftpPort);
+        DataOutputStream out = new DataOutputStream(socket.getOutputStream());
+
 
         switch (test) {
             case 1: //OCR Test
                 try {
                     //establish connection to Server.java
-
-                    DataOutputStream out = new DataOutputStream(socket.getOutputStream());
                     System.out.println("Connected");
 
                     File image = new File("woahman.png");
@@ -52,18 +52,8 @@ public class Client {
                 break;
 
             case 2: //Smith-Waterman Test
+                SWBench(socket, ftpClient);
 
-                String queryFile = "src\\SmithWaterman\\query.txt";
-                String databaseFile = "src\\SmithWaterman\\database.txt";
-                String alphabetFile = "src\\SmithWaterman\\alphabet.txt";
-                String scorematrixFile = "src\\SmithWaterman\\scoringmatrix.txt";
-                int m = 1; //todo replace with args?
-                int k = 1;
-                try {
-                    new SWinitialiser().run(queryFile, databaseFile, alphabetFile, scorematrixFile, m, k);
-                } catch (Exception e) {
-                    e.printStackTrace();
-                }
                 break; //End of Smith-Waterman test
 
 
@@ -102,13 +92,11 @@ public class Client {
     public void OCRBench(Socket socket, easyFTP ftpClient, String imageName, File image, BufferedOutputStream outputStream) throws IOException {
         ArrayList<String> manyOutput = new ArrayList<>(); //output of the image. Arraylist for many iterations of this test
         OCRTest ocrTest = new OCRTest("tessdata");
-        DataOutputStream dataOutput = new DataOutputStream(socket.getOutputStream());
         String imageText = null;
-        Timer timer = new Timer();
         long total = 0;
 
         try {
-            image = ftpClient.getFile("woahman.png", outputStream);
+            image = ftpClient.getFile("woahman.png");
             ocrTest.setImage(image);
         } catch (IOException e) {
             System.out.println("Grabbing image Failed!");
@@ -118,13 +106,64 @@ public class Client {
         runTimes = ocrTest.performCompactBenchmark(10);
         manyOutput = ocrTest.getManyOutput(); // returns the output
 
+        individualTransmission(socket, manyOutput);
+        //todo compactTransmission(socket, manyOutput);
+        //records the start of transmission
+
+        //cleanup
+        image.delete();
+    }
+
+    /**
+     * Performs the Smith-Waterman algorithm after retrieving files from ftp server.
+     *
+     * @param socket socket used for data transmission to server
+     * @param ftpClient easyFTP client
+     * @throws IOException
+     */
+
+
+    public void SWBench(Socket socket, easyFTP ftpClient) throws IOException {
+        String[] inputFiles = {"query.txt","database.txt","alphabet.txt","scoringmatrix.txt"};
+        File file;
+
+        for(String path : inputFiles){
+            ftpClient.getFile(path);
+        }
+
+        int m = 1; //todo replace with args?
+        int k = 1;
+        try {
+            new SWinitialiser().run(inputFiles[0], inputFiles[1], inputFiles[2], inputFiles[3], m, k);
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+
+        //cleanup
+        for(String path : inputFiles){
+            file = new File(path);
+            file.delete();
+        }
+    }
+
+    public void individualTransmission(Socket socket, ArrayList<String> manyOutput) throws IOException {
+        DataOutputStream dataOutput = new DataOutputStream(socket.getOutputStream());
+        Timer timer = new Timer();
         timer.start();
         for (String out : manyOutput){
             dataOutput.writeUTF(out);
             timer.newLap();
         }
-        //records the start of transmission
         timer.stopTimer();
-        timer.printResults("Transmission Start");
+        timer.printResults("Transmission Start: Individual");
+    }
+
+    public void compactTransmission(Socket socket, ArrayList<String> manyOutput) throws IOException {
+        ObjectOutputStream dataOutput = new ObjectOutputStream(socket.getOutputStream());
+        Timer timer = new Timer();
+        timer.start();
+        dataOutput.writeObject(manyOutput);
+        timer.stopTimer();
+        timer.printResults("Transmission Start: Compact");
     }
 }

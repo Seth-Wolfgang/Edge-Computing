@@ -1,4 +1,10 @@
 /**
+ * Changes by Seth Wolfgang
+ * Date: 5/5/2022
+ *
+ * Slightly modified version taken from source. Returns output instead of
+ * printing to console. (NOT DONE)
+ *
  * Source: https://github.com/JayakrishnaThota/Sequence-Alignment
  */
 

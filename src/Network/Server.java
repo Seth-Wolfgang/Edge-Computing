@@ -38,13 +38,13 @@ public class Server extends Thread {
             in = new DataInputStream(new BufferedInputStream(socket.getInputStream()));
 
             boolean notRunning = true;
-
             while (!socket.isClosed()) { //Replace with lambda
                try {
                    if(notRunning){
                        timer.start();
                        notRunning = false;
                    }
+                   //todo if arg <compact> read objects, not UTF  input = in.readObject
                    line = in.readUTF();
                    if(line.compareTo("") != 0){
                        counter++;
