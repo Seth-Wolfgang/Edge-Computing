@@ -21,7 +21,7 @@ public class Client {
 
     ArrayList<Long> runTimes = new ArrayList<>();
     ArrayList<Long> transmitTimes = new ArrayList<>(); //maybe remove?
-    int test = 1; //test refers to the benchmark performed
+    int test = 2; //test refers to the benchmark performed
 
     // constructor to put ip address and port
     public Client(String address, int port, int ftpPort) throws IOException, TesseractException {
@@ -39,11 +39,16 @@ public class Client {
                     File image = new File("woahman.png");
                     BufferedOutputStream outputStream = new BufferedOutputStream(new FileOutputStream(image));
                     //temporary -> require args in future?
-                    OCRBench(socket, ftpClient, "woahman.png", image, outputStream);
+                    OCRBench(socket, ftpClient, "woahman.png", image);
 
                     //if test done
-
+                    outputStream.close();
                     closeConnection(out, socket);
+
+                    //cleanup
+                    File file = new File(image.getAbsolutePath());
+                    file.delete();
+
 
                 } catch (IOException e) {
                     e.printStackTrace();
@@ -86,10 +91,9 @@ public class Client {
      * @param ftpClient easyFTP class client
      * @param imageName String
      * @param image File
-     * @param outputStream BufferedOutputStream
      */
 
-    public void OCRBench(Socket socket, easyFTP ftpClient, String imageName, File image, BufferedOutputStream outputStream) throws IOException {
+    public void OCRBench(Socket socket, easyFTP ftpClient, String imageName, File image) throws IOException {
         ArrayList<String> manyOutput = new ArrayList<>(); //output of the image. Arraylist for many iterations of this test
         OCRTest ocrTest = new OCRTest("tessdata");
         String imageText = null;
@@ -108,10 +112,6 @@ public class Client {
 
         //individualTransmission(socket, manyOutput);
         compactTransmission(socket, manyOutput);
-
-        //cleanup
-        File file = new File(image.getAbsolutePath());
-        file.delete();
     }
 
     /**
