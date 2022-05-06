@@ -58,9 +58,11 @@ public class easyFTP extends FTPClient{
         if (success){
             System.out.println("\033[1;32m" + fileName + " transferred \033[0m");
             outputStream.flush();
+            outputStream.close();
             return file;
 
         } else{
+            outputStream.close();
             System.out.println("File transfer failed!");
             return null;
         }
