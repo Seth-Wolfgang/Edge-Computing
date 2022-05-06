@@ -12,7 +12,7 @@ resources
 lib
 out
 /inspectionProfiles/Project_Default.xml
-
+Results.txt
 /out/production/EdgeComputing/Network/Client.class
 /lib/commons-io-2.11.0.jar
 /lib/commons-logging-1.2.jar
