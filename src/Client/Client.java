@@ -21,7 +21,7 @@ public class Client {
 
     ArrayList<Long> runTimes = new ArrayList<>();
     ArrayList<Long> transmitTimes = new ArrayList<>(); //maybe remove?
-    int test = 2; //test refers to the benchmark performed
+    int test = 1; //test refers to the benchmark performed
 
     // constructor to put ip address and port
     public Client(String address, int port, int ftpPort) throws IOException, TesseractException {
@@ -42,14 +42,13 @@ public class Client {
                     OCRBench(socket, ftpClient, "woahman.png", image, outputStream);
 
                     //if test done
-                    //todo create a way to know when to stop
+
                     closeConnection(out, socket);
 
-                    // close the connection
                 } catch (IOException e) {
                     e.printStackTrace();
                 }
-                break;
+                break; //end of OCR test
 
             case 2: //Smith-Waterman Test
                 SWBench(socket, ftpClient);
@@ -69,6 +68,7 @@ public class Client {
 
     public void closeConnection(DataOutputStream out, Socket socket) {
         try {
+            out.writeUTF("over"); //tells the server when to close connection for safe stop
             out.close();
             socket.close();
 
@@ -82,8 +82,8 @@ public class Client {
      * the time of each OCR performed and give the total time for each iteration to be performed.
      *
      *
-     * @param socket Socket
-     * @param ftpClient easyFTP
+     * @param socket Socket used to connect to Server.java
+     * @param ftpClient easyFTP class client
      * @param imageName String
      * @param image File
      * @param outputStream BufferedOutputStream
@@ -96,7 +96,7 @@ public class Client {
         long total = 0;
 
         try {
-            image = ftpClient.getFile("woahman.png");
+            image = ftpClient.getFile(imageName);
             ocrTest.setImage(image);
         } catch (IOException e) {
             System.out.println("Grabbing image Failed!");
@@ -106,12 +106,12 @@ public class Client {
         runTimes = ocrTest.performCompactBenchmark(10);
         manyOutput = ocrTest.getManyOutput(); // returns the output
 
-        individualTransmission(socket, manyOutput);
-        //todo compactTransmission(socket, manyOutput);
-        //records the start of transmission
+        //individualTransmission(socket, manyOutput);
+        compactTransmission(socket, manyOutput);
 
         //cleanup
-        image.delete();
+        File file = new File(image.getAbsolutePath());
+        file.delete();
     }
 
     /**
@@ -129,6 +129,8 @@ public class Client {
 
         for(String path : inputFiles){
             ftpClient.getFile(path);
+            file = new File(path);
+            file.deleteOnExit();
         }
 
         int m = 1; //todo replace with args?
@@ -146,9 +148,19 @@ public class Client {
         }
     }
 
+    /**
+     * Individual transmission sends each value of the ArrayList input separately
+     * from one another.
+     *
+     * @param socket
+     * @param manyOutput
+     * @throws IOException
+     */
+
     public void individualTransmission(Socket socket, ArrayList<String> manyOutput) throws IOException {
         DataOutputStream dataOutput = new DataOutputStream(socket.getOutputStream());
         Timer timer = new Timer();
+
         timer.start();
         for (String out : manyOutput){
             dataOutput.writeUTF(out);
@@ -158,11 +170,33 @@ public class Client {
         timer.printResults("Transmission Start: Individual");
     }
 
+    /**
+     * Compact transmission sends all data at once by inputting an ArrayList and
+     * turning the ArrayList into a semicolon seperated string.
+     *
+     * @param socket socket to connect to Server.java
+     * @param manyOutput ArrayList<String>
+     * @throws IOException
+     */
+
     public void compactTransmission(Socket socket, ArrayList<String> manyOutput) throws IOException {
-        ObjectOutputStream dataOutput = new ObjectOutputStream(socket.getOutputStream());
+        DataOutputStream dataOutput = new DataOutputStream(socket.getOutputStream());
+        String outputString = manyOutput.get(0); //Semicolon seperated values of manyOutput
         Timer timer = new Timer();
+
+        //allows for proper formatting
+        manyOutput.remove(0);
+        //Converts ArrayList to semicolon seperated values
+        for(String output : manyOutput) {
+            outputString = outputString + ";" + output;
+        }
+
+        //removes unnecessary new lines
+        outputString = outputString.replace("\n", "").replace("\r", "");
+
+        //times the transmission until it is done
         timer.start();
-        dataOutput.writeObject(manyOutput);
+        dataOutput.writeUTF(outputString);
         timer.stopTimer();
         timer.printResults("Transmission Start: Compact");
     }
