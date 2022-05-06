@@ -2,10 +2,7 @@ package Network;
 
 import Benchmark.Timer;
 
-import java.io.BufferedInputStream;
-import java.io.DataInputStream;
-import java.io.File;
-import java.io.IOException;
+import java.io.*;
 import java.net.ServerSocket;
 import java.net.Socket;
 import java.util.ArrayList;
@@ -23,7 +20,7 @@ public class Server extends Thread {
     ArrayList<String> input = new ArrayList<>();
 
     // constructor with port
-    public Server(int port) throws Exception {
+    public Server(int port) throws IOException {
 
 
         // starts server and waits for a connection
@@ -39,40 +36,37 @@ public class Server extends Thread {
 
             boolean notRunning = true;
             while (!socket.isClosed()) { //Replace with lambda
-               try {
-                   if(notRunning){
-                       timer.start();
-                       notRunning = false;
-                   }
-                   //todo if arg <compact> read objects, not UTF  input = in.readObject
-                   line = in.readUTF();
-                   if(line.compareTo("") != 0){
-                       counter++;
-                       timer.newLap();
-                       if(counter == 10){ //todo: this is a placeholder (replace with args)
-                           timer.stopTimer();
-                           stopServer(socket, in);
-                       }
-                   }
+                try {
+                    if (notRunning) {
+                        timer.start();
+                        notRunning = false;
+                    }
+                    line = in.readUTF();
+                    if (line.compareTo("") != 0 && !line.equals("over")) {
+                        counter++;
+                        timer.newLap();
+                        if (counter == 10) { //todo: this is a placeholder (replace with args)
+                            timer.stopTimer();
+                            stopServer(socket, in);
+                        }
+                    }
+                    else if(line.equals("over")){
+                        stopServer(socket, in);
+                    }
 
-               } catch (IOException e) {
-                   stopServer(socket, in);
-                   throw new Exception();
-               }
+                } catch (IOException e) {
+                    throw new IOException(e);
+                }
             }
+
+        } finally {
             File results = new File("Results.txt");
-            System.out.println("Closing connection");
-
-            // close connection
-
-
-        } catch (Exception e) {
-            throw new Exception();
+            timer.printResults("Transmission Received");
         }
-        timer.printResults("Transmission Received");
-    }
+    } //end of server
 
     public void stopServer(Socket socket, DataInputStream in) throws IOException {
+        System.out.println("Closing connection");
         socket.close();
         in.close();
     }
