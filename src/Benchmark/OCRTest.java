@@ -15,7 +15,7 @@ import java.io.File;
 import java.io.IOException;
 import java.util.ArrayList;
 
-public class OCRTest extends Thread{
+public class OCRTest {
     Timer timer = new Timer();
 
     ITesseract tesseract = new Tesseract();
