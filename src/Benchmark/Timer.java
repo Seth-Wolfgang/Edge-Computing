@@ -130,5 +130,16 @@ public class Timer extends Thread {
         writer.close();
     }
 
+    /**
+     * Quality of life method to stop timer and run printResults() method
+     *
+     * @param tag a name for the method to print before results are printed
+     * @throws IOException
+     */
+
+    public void stopAndPrint(String tag) throws IOException {
+        stopTimer();
+        printResults(tag);
+    }
 
 }//end of class
