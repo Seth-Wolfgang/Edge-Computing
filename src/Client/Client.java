@@ -1,12 +1,12 @@
-package Client;
 /**
  * Author: Seth Wolfgang
  * Date: 4/19/2022
- * <p>
  * This program serves as the client/worker of the network.
  * It receives an image from the `middle` layer, reads the text on the image,
  * and sends the text back to the middle layer.
  */
+
+package Client;
 
 import Benchmark.OCRTest;
 import Benchmark.Timer;
@@ -124,19 +124,31 @@ public class Client {
 
 
     public void SWBench(Socket socket, easyFTP ftpClient) throws IOException {
-        String[] inputFiles = {"query.txt","database.txt","alphabet.txt","scoringmatrix.txt"};
+        //NOTE: run time is affected most by query
+        String[] inputFiles = {"smallQuery.txt","database.txt","alphabet.txt","scoringmatrix.txt"};
+        Timer timer = new Timer();
         File file;
+        ArrayList<String> SWOutput = new ArrayList<>();
+        int m = 1; //todo replace with args?
+        int k = 1;
 
+        timer.start();
         for(String path : inputFiles){
             ftpClient.getFile(path);
             file = new File(path);
             file.deleteOnExit();
         }
+        timer.stopAndPrint("SW File Requests");
 
-        int m = 1; //todo replace with args?
-        int k = 1;
         try {
-            new SWinitialiser().run(inputFiles[0], inputFiles[1], inputFiles[2], inputFiles[3], m, k);
+            timer.start();
+            SWOutput.add(new SWinitialiser().run(inputFiles[0], inputFiles[1], inputFiles[2], inputFiles[3], m, k));
+            timer.stopAndPrint("SW run");
+
+            timer.start();
+            compactTransmission(socket, SWOutput);
+            timer.stopAndPrint("SW Transmission");
+
         } catch (Exception e) {
             e.printStackTrace();
         }
@@ -146,6 +158,7 @@ public class Client {
             file = new File(path);
             file.delete();
         }
+        System.out.println("SW Done");
     }
 
     /**
@@ -197,7 +210,6 @@ public class Client {
         //times the transmission until it is done
         timer.start();
         dataOutput.writeUTF(outputString);
-        timer.stopTimer();
-        timer.printResults("Transmission Start: Compact");
+        timer.stopAndPrint("Transmission Start: Compact");
     }
 }
