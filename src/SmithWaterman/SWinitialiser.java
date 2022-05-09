@@ -3,7 +3,7 @@
  * Date: 5/5/2022
  *
  * Slightly modified version taken from source. Returns output instead of
- * printing to console. (NOT DONE)
+ * printing to console.
  *
  * Source: https://github.com/JayakrishnaThota/Sequence-Alignment
  */
@@ -14,10 +14,10 @@ package SmithWaterman;
 import java.util.*;
 
 public class SWinitialiser {
-    public void run(String queryFile, String databaseFile, String alphabetFile, String scoreMatrixFile, int k, int m) throws Exception {
+    public String run(String queryFile, String databaseFile, String alphabetFile, String scoreMatrixFile, int k, int m) throws Exception {
         helper h = new helper();
         PriorityQueue<Integer> pq = new PriorityQueue<Integer>(Collections.reverseOrder());
-
+        String output = null;
 
         String[] queryRecords = h.getrecords(queryFile);
         String[] databaseRecords = h.getrecords(databaseFile);
@@ -44,9 +44,10 @@ public class SWinitialiser {
         }
         for (int i = 0; i < k; i++) {
             int temp = pq.poll();
-            System.out.println("score = " + temp);
-            System.out.println("id1 " + idmap.get(temp)[0] + " " + offsetmap.get(temp)[0] + " " + offsetmap.get(temp)[1] + " " + smap.get(temp)[0]);
-            System.out.println("id2 " + idmap.get(temp)[1] + " " + offsetmap.get(temp)[2] + " " + offsetmap.get(temp)[3] + " " + smap.get(temp)[1]);
+            output =  "score = " + temp +
+                    "\n" + "id1 " + idmap.get(temp)[0] + " " + offsetmap.get(temp)[0] + " " + offsetmap.get(temp)[1] + " " + smap.get(temp)[0] +
+                    "\n" + "id2 " + idmap.get(temp)[1] + " " + offsetmap.get(temp)[2] + " " + offsetmap.get(temp)[3] + " " + smap.get(temp)[1];
         }
+        return output;
     }
 }
