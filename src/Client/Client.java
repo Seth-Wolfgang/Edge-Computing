@@ -21,7 +21,7 @@ public class Client {
 
     ArrayList<Long> runTimes = new ArrayList<>();
     ArrayList<Long> transmitTimes = new ArrayList<>(); //maybe remove?
-    int test = 2; //test refers to the benchmark performed
+    int test = 1; //test refers to the benchmark performed
 
     // constructor to put ip address and port
     public Client(String address, int port, int ftpPort) throws IOException, TesseractException {
@@ -43,7 +43,7 @@ public class Client {
 
                     //if test done
                     outputStream.close();
-                    closeConnection(out, socket);
+                    closeConnection(socket, out);
 
                     //cleanup
                     File file = new File(image.getAbsolutePath());
@@ -57,7 +57,7 @@ public class Client {
 
             case 2: //Smith-Waterman Test
                 SWBench(socket, ftpClient);
-
+                closeConnection(socket, out);
                 break; //End of Smith-Waterman test
 
 
@@ -71,14 +71,14 @@ public class Client {
      * @param socket Socket
      */
 
-    public void closeConnection(DataOutputStream out, Socket socket) {
+    public void closeConnection(Socket socket, DataOutputStream out) throws IOException {
         try {
             out.writeUTF("over"); //tells the server when to close connection for safe stop
             out.close();
             socket.close();
 
         } catch (IOException e) {
-            e.printStackTrace();
+            throw new IOException();
         }
     }
 
