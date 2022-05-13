@@ -5,4 +5,5 @@
 #For use in getting all required software for running of this project
 sudo apt-get install tesseract-ocr -y
 sudo apt-get install openjdk-17-jre -y
-
+sudo apt-get install git-all -y
+sudo git clone https://github.com/poockyy/EdgeComputing.git
