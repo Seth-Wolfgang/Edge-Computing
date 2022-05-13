@@ -13,7 +13,7 @@ lib
 out
 /inspectionProfiles/Project_Default.xml
 Results.txt
-/out/production/EdgeComputing/Network/Client.class
+/out/
 /lib/commons-io-2.11.0.jar
 /lib/commons-logging-1.2.jar
 /lib/commons-net-3.8.0.jar
