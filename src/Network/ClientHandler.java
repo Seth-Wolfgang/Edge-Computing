@@ -11,11 +11,13 @@ class ClientHandler extends Thread {
     final Timer timer = new Timer();
     final DataInputStream in;
     final Socket socket;
+    final int clientNum;
 
     // Constructor
-    public ClientHandler(Socket s, DataInputStream dis) {
+    public ClientHandler(Socket s, DataInputStream dis, int clientNum) {
         this.socket = s;
         this.in = dis;
+        this.clientNum = clientNum;
     }
 
     @Override
@@ -38,6 +40,7 @@ class ClientHandler extends Thread {
                 number of inputs or receive an input reading 'over' */
                 if (line.compareTo("") != 0 && !line.equals("over")) {
                     counter++;
+                    System.out.println("\033[1;34mClient "+ this.clientNum +" iteration # " + counter + " done.\033[0m");
                     timer.newLap();
                     if (counter == 10) { //todo: this is a placeholder (replace with args)
                         timer.stopTimer();
