@@ -23,7 +23,7 @@ public class Client {
     ArrayList<Long> transmitTimes = new ArrayList<>(); //maybe remove?
     int test = 1; //test refers to the benchmark performed
     int counter = 0;
-    final int iterations = 1; //controls how many times this class performs a bench
+    final int iterations = 3; //controls how many times this class performs a bench
 
 
     // constructor to put ip address and port
