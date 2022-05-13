@@ -9,7 +9,7 @@ This project is for research/learning purposes.
 To run correctly:
 1. Run ServerMain
 2. Run EdgeServerMain
-3. Run Client
+3. Run ClientMain
 
 Dependencies can be installed by running the dependencyInstaller.sh file. This will install
 git, tesseract-ocr, and openjdk-17. It is meant to be any easy to use download tool for not only
