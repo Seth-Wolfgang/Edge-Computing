@@ -22,6 +22,9 @@ public class Client {
     ArrayList<Long> runTimes = new ArrayList<>();
     ArrayList<Long> transmitTimes = new ArrayList<>(); //maybe remove?
     int test = 1; //test refers to the benchmark performed
+    int counter = 0;
+    final int iterations = 1; //controls how many times this class performs a bench
+
 
     // constructor to put ip address and port
     public Client(String address, int port, int ftpPort) throws IOException, TesseractException {
@@ -39,7 +42,7 @@ public class Client {
                     File image = new File("woahman.png");
                     BufferedOutputStream outputStream = new BufferedOutputStream(new FileOutputStream(image));
                     //temporary -> require args in future?
-                    OCRBench(socket, ftpClient, "woahman.png", image);
+                    iteratedOCRBench(socket, ftpClient, "woahman.png", image);
 
                     //if test done
                     outputStream.close();
@@ -56,7 +59,7 @@ public class Client {
                 break; //end of OCR test
 
             case 2: //Smith-Waterman Test
-                SWBench(socket, ftpClient);
+                iteratedSWBench(socket, ftpClient);
                 closeConnection(socket, out);
                 break; //End of Smith-Waterman test
 
@@ -79,6 +82,21 @@ public class Client {
 
         } catch (IOException e) {
             throw new IOException();
+        }
+    }
+
+    /**
+     * Runs method OCRBench as many times as specified by `iterations`
+     *
+     * @param socket
+     * @param ftpClient
+     * @throws IOException
+     */
+
+    public void iteratedOCRBench(Socket socket, easyFTP ftpClient, String imageName, File image) throws IOException {
+        for(int i = 0; i < iterations; i++) {
+            OCRBench(socket, ftpClient, imageName, image);
+            counter++;
         }
     }
 
@@ -107,12 +125,28 @@ public class Client {
             e.printStackTrace();
         }
 
-        runTimes = ocrTest.performCompactBenchmark(10);
+        runTimes = ocrTest.performCompactBenchmark(iterations);
         manyOutput = ocrTest.getManyOutput(); // returns the output
 
         //individualTransmission(socket, manyOutput);
         compactTransmission(socket, manyOutput);
     }
+
+    /**
+     * Runs method SWBench as many times as specified by `iterations`
+     *
+     * @param socket
+     * @param ftpClient
+     * @throws IOException
+     */
+
+    public void iteratedSWBench(Socket socket, easyFTP ftpClient) throws IOException {
+        for (int i = 0; i < iterations; i++){
+            SWBench(socket, ftpClient);
+            counter++;
+        }
+    }
+
 
     /**
      * Performs the Smith-Waterman algorithm after retrieving files from ftp server.
@@ -158,7 +192,6 @@ public class Client {
             file = new File(path);
             file.delete();
         }
-        System.out.println("SW Done");
     }
 
     /**
