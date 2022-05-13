@@ -1,5 +1,5 @@
 /**
- * This is meant as a placeholder for a real Main.java file. Used to easily
+ * This is meant as a placeholder for a real NodeMains.CloudMain.java file. Used to easily
  * run every part of the program from a single file.
  *
  * Author: Seth Wolfgang
