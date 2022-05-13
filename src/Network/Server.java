@@ -15,6 +15,7 @@ public class Server extends Thread {
 
     // constructor with port
     public Server(int port) throws IOException {
+        int clientNum = 1; // assigns client number
 
         server = new ServerSocket(port);
         System.out.println("Server started");
@@ -31,8 +32,9 @@ public class Server extends Thread {
                 System.out.println("Client accepted");
                 in = new DataInputStream(new BufferedInputStream(socket.getInputStream()));
 
-                Thread newClient = new ClientHandler(socket, in);
+                Thread newClient = new ClientHandler(socket, in, clientNum);
                 newClient.start();
+                clientNum++;
 
             } catch (IOException e) {
                 throw new IOException(e);
@@ -46,9 +48,9 @@ public class Server extends Thread {
         in.close();
     }
 
-    public void allowNewClient(Socket socket, DataInputStream in) {
+    public void allowNewClient(Socket socket, DataInputStream in, int clientNum) {
         try {
-            Thread clientThread = new Thread(new ClientHandler(socket, in));
+            Thread clientThread = new Thread(new ClientHandler(socket, in, clientNum));
             clientThread.start();
         } catch (Exception e) {
             e.printStackTrace();
