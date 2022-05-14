@@ -16,7 +16,7 @@ import java.util.List;
 
 public class EdgeServer {
 
-    public EdgeServer(int port){
+    public EdgeServer(String address, int port){
 
         //instantiates the factories for the FTP server
         FtpServer ftpServer = null;
@@ -28,7 +28,7 @@ public class EdgeServer {
 
         //sets port and listener
         lFactory.setPort(port);
-        lFactory.setServerAddress("127.0.0.1");
+        lFactory.setServerAddress(address);
         serverFactory.addListener("default", lFactory.createListener());
         serverFactory.setConnectionConfig(cFactory.createConnectionConfig());
 
