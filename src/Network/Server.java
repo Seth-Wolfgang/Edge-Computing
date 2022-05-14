@@ -3,8 +3,7 @@ package Network;
 import java.io.BufferedInputStream;
 import java.io.DataInputStream;
 import java.io.IOException;
-import java.net.ServerSocket;
-import java.net.Socket;
+import java.net.*;
 
 
 public class Server extends Thread {
@@ -41,6 +40,14 @@ public class Server extends Thread {
             }
         }
     } //end of server
+
+    /**
+     * Method to stop server.
+     *
+     * @param socket
+     * @param in
+     * @throws IOException
+     */
 
     public void stopServer(Socket socket, DataInputStream in) throws IOException {
         System.out.println("Closing connection");
