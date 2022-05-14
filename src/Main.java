@@ -12,7 +12,6 @@ import Network.Server;
 import net.sourceforge.tess4j.TesseractException;
 
 import java.io.IOException;
-import java.util.concurrent.TimeUnit;
 
 public class Main extends Thread implements Runnable  {
 
@@ -21,23 +20,22 @@ public class Main extends Thread implements Runnable  {
 
     static int port = 5000;
     static int ftpPort = 2221;
-    static String address = "127.0.0.1";
+    static String address = "192.168.1.34";
 
     public static void main(String[] args) throws Exception {
         try {
             new Thread(new Runnable() { //FTP
                 @Override
                 public void run() {
-                    new EdgeServer(ftpPort);
+                    new EdgeServer(address ,ftpPort);
                 }
             }).start();
             new Thread(new Runnable() { //CLIENT
                 @Override
                 public void run() {
                     try {
-                        TimeUnit.SECONDS.sleep(2);
                         new Client(address, port, ftpPort);
-                    } catch (IOException | TesseractException | InterruptedException e) {
+                    } catch (IOException | TesseractException e) {
                         e.printStackTrace();
                     }
                 }
@@ -46,9 +44,8 @@ public class Main extends Thread implements Runnable  {
                 @Override
                 public void run() {
                     try {
-                        TimeUnit.SECONDS.sleep(2);
                         new Client(address, port, ftpPort);
-                    } catch (IOException | TesseractException | InterruptedException e) {
+                    } catch (IOException | TesseractException e) {
                         e.printStackTrace();
                     }
                 }
