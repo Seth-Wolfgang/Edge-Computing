@@ -16,9 +16,13 @@ import java.io.IOException;
 public class EdgeServerMain {
     public static void main(String[] args) throws IOException {
 
+        if(args.length != 1) {
+            System.out.println("Please enter an IP address in args");
+        }
+
         final int ftpPort = 2221; //todo make arg?
 
-        EdgeServer edgeServer = new EdgeServer(ftpPort);
+        EdgeServer edgeServer = new EdgeServer(args[0], ftpPort);
 
     }
 }

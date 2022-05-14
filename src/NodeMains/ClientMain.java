@@ -17,9 +17,13 @@ import java.io.IOException;
 public class ClientMain {
     public static void main(String[] args) throws IOException, TesseractException {
 
+        if(args.length != 1) {
+            System.out.println("Please enter an IP address in args");
+        }
+
         final int port = 5000;
         final int ftpPort = 2221; //todo make args?
-        final String address = "127.0.0.1";
+        final String address = args[0];
 
         Client client = new Client(address, port, ftpPort);
 
