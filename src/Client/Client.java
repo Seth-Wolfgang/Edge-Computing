@@ -14,6 +14,7 @@ import SmithWaterman.SWinitialiser;
 import net.sourceforge.tess4j.TesseractException;
 
 import java.io.*;
+import java.net.InetSocketAddress;
 import java.net.Socket;
 import java.util.ArrayList;
 
@@ -23,12 +24,15 @@ public class Client {
     ArrayList<Long> transmitTimes = new ArrayList<>(); //maybe remove?
     int test = 1; //test refers to the benchmark performed
     int counter = 0;
-    final int iterations = 3; //controls how many times this class performs a bench
+    final int iterations = 1; //controls how many times this class performs a bench
 
 
     // constructor to put ip address and port
     public Client(String address, int port, int ftpPort) throws IOException, TesseractException {
-        Socket socket = new Socket(address, port);
+        Socket socket = new Socket();
+        InetSocketAddress sa = new InetSocketAddress(address, port);
+        socket.connect(sa, 5000);
+
         easyFTP ftpClient = new easyFTP(address, ftpPort);
         DataOutputStream out = new DataOutputStream(socket.getOutputStream());
 
@@ -36,9 +40,7 @@ public class Client {
         switch (test) {
             case 1: //OCR Test
                 try {
-                    //establish connection to Server.java
                     System.out.println("Connected");
-
                     File image = new File("woahman.png");
                     BufferedOutputStream outputStream = new BufferedOutputStream(new FileOutputStream(image));
                     //temporary -> require args in future?
@@ -51,7 +53,6 @@ public class Client {
                     //cleanup
                     File file = new File(image.getAbsolutePath());
                     file.delete();
-
 
                 } catch (IOException e) {
                     e.printStackTrace();
