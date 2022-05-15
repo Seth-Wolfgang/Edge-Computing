@@ -5,7 +5,7 @@
  * Creates a streamlined OCR class for the purpose benchmarking
  */
 
-package Benchmark;
+package OCR;
 
 import net.sourceforge.tess4j.ITesseract;
 import net.sourceforge.tess4j.Tesseract;
@@ -16,7 +16,7 @@ import java.io.IOException;
 import java.util.ArrayList;
 
 public class OCRTest {
-    Timer timer = new Timer();
+    OCR.Timer timer = new Timer();
 
     ITesseract tesseract = new Tesseract();
     private final String dataPath;
@@ -56,7 +56,7 @@ public class OCRTest {
             timer.newLap();
         }
         timer.stopTimer();
-        timer.printResults("OCR Compact");
+        timer.printResultsToFile("OCR Compact");
         return timer.getLaps();
     }
 
