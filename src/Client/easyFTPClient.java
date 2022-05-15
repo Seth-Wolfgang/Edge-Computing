@@ -13,7 +13,7 @@ import org.apache.commons.net.ftp.FTPClient;
 
 import java.io.*;
 
-public class easyFTP extends FTPClient{
+public class easyFTPClient extends FTPClient{
 
     /**
      * Constructor for the easy FTP Client
@@ -22,7 +22,7 @@ public class easyFTP extends FTPClient{
      */
     FTPClient ftpClient = new FTPClient();
 
-    public easyFTP(String address, int port){
+    public easyFTPClient(String address, int port){
 
         try{
             ftpClient.connect(address, port);

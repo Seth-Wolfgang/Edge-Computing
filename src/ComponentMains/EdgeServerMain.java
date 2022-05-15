@@ -7,7 +7,7 @@
  *
  */
 
-package NodeMains;
+package ComponentMains;
 
 import Network.EdgeServer;
 
@@ -21,7 +21,6 @@ public class EdgeServerMain {
         }
 
         final int ftpPort = 2221; //todo make arg?
-
         EdgeServer edgeServer = new EdgeServer(args[0], ftpPort);
 
     }

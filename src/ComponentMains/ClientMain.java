@@ -7,7 +7,7 @@
  *
  */
 
-package NodeMains;
+package ComponentMains;
 
 import Client.Client;
 import net.sourceforge.tess4j.TesseractException;

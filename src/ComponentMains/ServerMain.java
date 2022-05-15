@@ -7,7 +7,7 @@
  *
  */
 
-package NodeMains;
+package ComponentMains;
 
 import Network.Server;
 
@@ -17,7 +17,6 @@ public class ServerMain {
 
     public static void main(String[] args) throws IOException {
         final int port = 5000; //todo make arg?
-
         Server server = new Server(port);
 
     }

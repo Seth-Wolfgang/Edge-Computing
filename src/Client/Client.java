@@ -8,8 +8,8 @@
 
 package Client;
 
-import Benchmark.OCRTest;
-import Benchmark.Timer;
+import OCR.OCRTest;
+import OCR.Timer;
 import SmithWaterman.SWinitialiser;
 import net.sourceforge.tess4j.TesseractException;
 
@@ -33,7 +33,7 @@ public class Client {
         InetSocketAddress sa = new InetSocketAddress(address, port);
         socket.connect(sa, 5000);
 
-        easyFTP ftpClient = new easyFTP(address, ftpPort);
+        easyFTPClient ftpClient = new easyFTPClient(address, ftpPort);
         DataOutputStream out = new DataOutputStream(socket.getOutputStream());
 
 
@@ -94,7 +94,7 @@ public class Client {
      * @throws IOException
      */
 
-    public void iteratedOCRBench(Socket socket, easyFTP ftpClient, String imageName, File image) throws IOException {
+    public void iteratedOCRBench(Socket socket, easyFTPClient ftpClient, String imageName, File image) throws IOException {
         for(int i = 0; i < iterations; i++) {
             OCRBench(socket, ftpClient, imageName, image);
             counter++;
@@ -112,7 +112,7 @@ public class Client {
      * @param image File
      */
 
-    public void OCRBench(Socket socket, easyFTP ftpClient, String imageName, File image) throws IOException {
+    public void OCRBench(Socket socket, easyFTPClient ftpClient, String imageName, File image) throws IOException {
         ArrayList<String> manyOutput = new ArrayList<>(); //output of the image. Arraylist for many iterations of this test
         OCRTest ocrTest = new OCRTest("tessdata");
         String imageText = null;
@@ -141,7 +141,7 @@ public class Client {
      * @throws IOException
      */
 
-    public void iteratedSWBench(Socket socket, easyFTP ftpClient) throws IOException {
+    public void iteratedSWBench(Socket socket, easyFTPClient ftpClient) throws IOException {
         for (int i = 0; i < iterations; i++){
             SWBench(socket, ftpClient);
             counter++;
@@ -158,7 +158,7 @@ public class Client {
      */
 
 
-    public void SWBench(Socket socket, easyFTP ftpClient) throws IOException {
+    public void SWBench(Socket socket, easyFTPClient ftpClient) throws IOException {
         //NOTE: run time is affected most by query
         String[] inputFiles = {"smallQuery.txt","database.txt","alphabet.txt","scoringmatrix.txt"};
         Timer timer = new Timer();
@@ -214,7 +214,7 @@ public class Client {
             timer.newLap();
         }
         timer.stopTimer();
-        timer.printResults("Transmission Start: Individual");
+        timer.printResultsToFile("Individual Transmission Start");
     }
 
     /**
@@ -244,6 +244,6 @@ public class Client {
         //times the transmission until it is done
         timer.start();
         dataOutput.writeUTF(outputString);
-        timer.stopAndPrint("Transmission Start: Compact");
+        timer.stopAndPrint("Compact Transmission Start");
     }
 }
