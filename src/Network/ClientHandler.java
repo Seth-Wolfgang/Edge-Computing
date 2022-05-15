@@ -1,6 +1,6 @@
 package Network;
 
-import Benchmark.Timer;
+import OCR.Timer;
 
 import java.io.DataInputStream;
 import java.io.File;
@@ -47,6 +47,7 @@ class ClientHandler extends Thread {
                         break;
                     }
                 } else if (line.equals("over")) {
+                    timer.stopTimer();
                     break;
                 }
             } catch (IOException e) {
@@ -58,7 +59,7 @@ class ClientHandler extends Thread {
             this.in.close();
             File results = new File("Results.txt");
             System.out.println("Transmission received from: " + this.socket);
-            timer.printResults("Transmission Received");
+            timer.printResultsToFile("Transmission Received");
         } catch (IOException e) {
             e.printStackTrace();
         }
