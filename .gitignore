@@ -8,6 +8,7 @@
 /dataSources.local.xml
 *.jar
 *.class
+*.txt
 resources
 lib
 out
