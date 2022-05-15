@@ -5,7 +5,7 @@
  * This class is a simple timer for the purpose of benchmarking programs
  */
 
-package Benchmark;
+package OCR;
 
 import java.io.*;
 import java.util.ArrayList;
@@ -117,8 +117,13 @@ public class Timer extends Thread {
      * @throws IOException
      */
 
-    public void printResults (String tag) throws IOException {
-        File results = new File("Results.txt");
+    public void printResultsToFile(String tag) throws IOException {
+        File results = new File("Results\\" + tag + ".txt");
+        int i = 0;
+        if(results.createNewFile()){
+            System.out.println("Created " + results.getPath());
+        }
+
         PrintWriter writer = new PrintWriter(new FileWriter(results, true));
         writer.append("\nTest name: " + tag);
         writer.append("\nTest performed at: " + System.currentTimeMillis() + "\n");
@@ -131,7 +136,7 @@ public class Timer extends Thread {
     }
 
     /**
-     * Quality of life method to stop timer and run printResults() method
+     * Quality of life method to stop timer and run printResultsToFile() method
      *
      * @param tag a name for the method to print before results are printed
      * @throws IOException
@@ -139,7 +144,7 @@ public class Timer extends Thread {
 
     public void stopAndPrint(String tag) throws IOException {
         stopTimer();
-        printResults(tag);
+        printResultsToFile(tag);
     }
 
 }//end of class
