@@ -1,5 +1,5 @@
 /**
- * This is meant as a placeholder for a real NodeMains.CloudMain.java file. Used to easily
+ * This is meant as a placeholder for a real ComponentMains.CloudMain.java file. Used to easily
  * run every part of the program from a single file.
  *
  * Author: Seth Wolfgang
@@ -8,7 +8,6 @@
 
 import Client.Client;
 import Network.EdgeServer;
-import Network.Server;
 import net.sourceforge.tess4j.TesseractException;
 
 import java.io.IOException;
@@ -50,7 +49,7 @@ public class Main extends Thread implements Runnable  {
                     }
                 }
             }).start();
-            new Thread(new Server(port)).start();
+           // new Thread(new Server(port)).start();
 
 
         } catch (Exception e) {

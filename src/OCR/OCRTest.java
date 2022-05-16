@@ -24,6 +24,13 @@ public class OCRTest {
     private String output;
     private ArrayList<String> manyOutput = new ArrayList<String>();
 
+    /**
+     * Constructor for OCRTest with a given image.
+     *
+     * @param dataDir path of `tessdata` folder
+     * @param imagePath path of image to perform OCR
+     */
+
     public OCRTest(String dataDir, File imagePath){
         dataPath = dataDir;
         image = imagePath;
@@ -31,6 +38,11 @@ public class OCRTest {
         tesseract.setVariable("user_defined_dpi", "100");
         tesseract.setDatapath("tessdata");
     }
+
+    /**
+     * Constructor for OCRTest for when no image is given.
+     * @param dataDir path of `tessdata` folder
+     */
 
     public OCRTest(String dataDir){
         dataPath = dataDir;
@@ -50,7 +62,6 @@ public class OCRTest {
 
     public ArrayList performCompactBenchmark(int iterations) throws IOException {
         timer.start();
-
         for(int i = 0; i < iterations; i++){
             manyOutput.add(doOCR());
             timer.newLap();

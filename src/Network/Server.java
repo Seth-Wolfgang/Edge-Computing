@@ -20,7 +20,7 @@ public class Server extends Thread {
         System.out.println("Server started");
         System.out.println("Waiting for a client ...");
 
-
+        //
         while (true) {
             try {
                 // starts server and waits for a connection
@@ -33,6 +33,7 @@ public class Server extends Thread {
                 newClient.start();
                 clientNum++;
 
+                //todo loop does not end, however it seems to sleep
             } catch (IOException e) {
                 throw new IOException(e);
             }

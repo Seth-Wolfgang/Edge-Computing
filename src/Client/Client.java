@@ -20,31 +20,38 @@ import java.util.ArrayList;
 
 public class Client {
 
+    //Initial vars
     ArrayList<Long> runTimes = new ArrayList<>();
-    ArrayList<Long> transmitTimes = new ArrayList<>(); //maybe remove?
-    int test = 1; //test refers to the benchmark performed
+    int test = 1; //test refers to the benchmark performed todo create a better way of handling this
     int counter = 0;
-    final int iterations = 1; //controls how many times this class performs a bench
+    final int iterations = 100; //controls how many times this class performs a bench
 
 
     // constructor to put ip address and port
     public Client(String address, int port, int ftpPort) throws IOException, TesseractException {
+
+        //Setup before connection occurs
         Socket socket = new Socket();
         InetSocketAddress sa = new InetSocketAddress(address, port);
-        socket.connect(sa, 5000);
-
         easyFTPClient ftpClient = new easyFTPClient(address, ftpPort);
-        DataOutputStream out = new DataOutputStream(socket.getOutputStream());
 
+        //initial connection to server
+        socket.connect(sa, 5000);
+        System.out.println("Connected");
+
+        //connects to EdgeServer
+        DataOutputStream out = new DataOutputStream(socket.getOutputStream());
 
         switch (test) {
             case 1: //OCR Test
                 try {
-                    System.out.println("Connected");
+
+                    //grabbing image file
                     File image = new File("woahman.png");
                     BufferedOutputStream outputStream = new BufferedOutputStream(new FileOutputStream(image));
-                    //temporary -> require args in future?
-                    iteratedOCRBench(socket, ftpClient, "woahman.png", image);
+
+                    //todo temporary -> require args in future?
+                    OCRBench(socket, ftpClient, "woahman.png", image);
 
                     //if test done
                     outputStream.close();
@@ -87,21 +94,6 @@ public class Client {
     }
 
     /**
-     * Runs method OCRBench as many times as specified by `iterations`
-     *
-     * @param socket
-     * @param ftpClient
-     * @throws IOException
-     */
-
-    public void iteratedOCRBench(Socket socket, easyFTPClient ftpClient, String imageName, File image) throws IOException {
-        for(int i = 0; i < iterations; i++) {
-            OCRBench(socket, ftpClient, imageName, image);
-            counter++;
-        }
-    }
-
-    /**
      * Method for performing a benchmark using Optical Character Recognition. This will record
      * the time of each OCR performed and give the total time for each iteration to be performed.
      *
@@ -116,9 +108,9 @@ public class Client {
         ArrayList<String> manyOutput = new ArrayList<>(); //output of the image. Arraylist for many iterations of this test
         OCRTest ocrTest = new OCRTest("tessdata");
         String imageText = null;
-        long total = 0;
 
         try {
+            //grabs image from EdgeServer and sets it as the image for OCR to run with
             image = ftpClient.getFile(imageName);
             ocrTest.setImage(image);
         } catch (IOException e) {
@@ -126,6 +118,7 @@ public class Client {
             e.printStackTrace();
         }
 
+        //runs the test
         runTimes = ocrTest.performCompactBenchmark(iterations);
         manyOutput = ocrTest.getManyOutput(); // returns the output
 
@@ -167,6 +160,7 @@ public class Client {
         int m = 1; //todo replace with args?
         int k = 1;
 
+        //File grabbing
         timer.start();
         for(String path : inputFiles){
             ftpClient.getFile(path);
@@ -176,10 +170,12 @@ public class Client {
         timer.stopAndPrint("SW File Requests");
 
         try {
+            //Running Smith-Waterman
             timer.start();
             SWOutput.add(new SWinitialiser().run(inputFiles[0], inputFiles[1], inputFiles[2], inputFiles[3], m, k));
             timer.stopAndPrint("SW run");
 
+            //Sending results of Smith-Waterman
             timer.start();
             compactTransmission(socket, SWOutput);
             timer.stopAndPrint("SW Transmission");

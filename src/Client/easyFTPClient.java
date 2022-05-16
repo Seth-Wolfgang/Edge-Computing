@@ -25,6 +25,7 @@ public class easyFTPClient extends FTPClient{
     public easyFTPClient(String address, int port){
 
         try{
+            //connects to EdgeServer
             ftpClient.connect(address, port);
             ftpClient.login("user", "");
             ftpClient.enterLocalPassiveMode();
@@ -54,6 +55,7 @@ public class easyFTPClient extends FTPClient{
         boolean success = ftpClient.retrieveFile(fileName, outputStream);
 
         if (success){
+            //Grabs file from server and ends stream
             System.out.println("\033[1;32m" + fileName + " transferred \033[0m");
             outputStream.flush();
             outputStream.close();
