@@ -26,17 +26,37 @@ public class easyFTPClient extends FTPClient{
 
         try{
             //connects to EdgeServer
+            ftpClient.setConnectTimeout(5000);
             ftpClient.connect(address, port);
             ftpClient.login("user", "");
             ftpClient.enterLocalPassiveMode();
             ftpClient.setFileType(FTP.BINARY_FILE_TYPE);
             ftpClient.addProtocolCommandListener(new PrintCommandListener(new PrintWriter(System.out), true));
-
         } catch (IOException e) {
             System.out.println("FTP Setup Failed");
             e.printStackTrace();
         }
 
+    }
+
+    public void sendFile(String fileName) throws IOException {
+        File file = new File(fileName);
+        sendFile(file);
+    }
+
+    public void sendFile(File file) throws IOException {
+        BufferedInputStream inputStream = new BufferedInputStream(new FileInputStream(file));
+        boolean success = ftpClient.storeFile(file.getName(), inputStream);
+
+        if (success){
+            //Grabs file from server and ends stream
+            System.out.println("\033[1;32m" + file.getName() + " transferred \033[0m");
+            inputStream.close();
+
+        } else{
+            inputStream.close();
+            System.out.println("File transfer failed!");
+        }
     }
 
     /**

@@ -21,11 +21,10 @@ public class ClientMain {
             System.out.println("Please enter an IP address in args");
         }
 
-        final int port = 5000;
         final int ftpPort = 2221; //todo make args?
         final String address = args[0];
 
-        Client client = new Client(address, port, ftpPort);
+        Client client = new Client(address, ftpPort);
 
     }
 }

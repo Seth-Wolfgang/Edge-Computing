@@ -63,7 +63,7 @@ public class OCRTest {
     public ArrayList performCompactBenchmark(int iterations) throws IOException {
         timer.start();
         for(int i = 0; i < iterations; i++){
-            manyOutput.add(doOCR());
+            manyOutput.add(readImage());
             timer.newLap();
         }
         timer.stopTimer();
@@ -93,13 +93,29 @@ public class OCRTest {
     }
 
     /**
+     * Performs the optical character recognition of this.image provided
+     * @return String
+     * @throws TesseractException
+     */
+
+    public String readImage(){
+        try {
+            return tesseract.doOCR(image);
+        } catch (TesseractException e) {
+            e.printStackTrace();
+        }
+        return "OCR FAILED!";
+    }
+
+    /**
      * Performs the optical character recognition of the image provided
      * @return String
      * @throws TesseractException
      */
 
-    public String doOCR(){
+    public String readImage(File file){
         try {
+            setImage(file);
             return tesseract.doOCR(image);
         } catch (TesseractException e) {
             e.printStackTrace();
