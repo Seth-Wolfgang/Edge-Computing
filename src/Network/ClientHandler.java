@@ -35,14 +35,14 @@ class ClientHandler extends Thread {
 
                 //reads input from Client.java
                 line = in.readUTF();
-
+                System.out.println(line);
                 /*if statements break loop if they receive a certain
                 number of inputs or receive an input reading 'over' */
                 if (line.compareTo("") != 0 && !line.equals("over")) {
                     counter++;
                     System.out.println("\033[1;34mClient "+ this.clientNum +" iteration # " + counter + " done.\033[0m");
                     timer.newLap();
-                    if (counter == 10) { //todo: this is a placeholder (replace with args)
+                    if (counter == 1000) { //todo: this is a placeholder (replace with args)
                         timer.stopTimer();
                         break;
                     }

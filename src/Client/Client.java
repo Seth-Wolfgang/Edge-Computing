@@ -29,14 +29,14 @@ public class Client {
 
         //Setup before connection occurs
         easyFTPClient ftpClient = new easyFTPClient(address, ftpPort);
-        System.out.println("Connected");
+        System.out.println("Client connected to edge server");
 
 
         switch (test) {
             case 1: //OCR Test
                 try {
                     //sending image file
-                    for(int i = 0; i < 1000; i++) {
+                    for(int i = 0; i < 10; i++) {
                         File copiedImage = new File("ftpResources\\woahman" + i + ".png");
                         File image = new File("ftpResources\\woahman.png");
                         FileUtils.copyFile(image, copiedImage);

@@ -13,40 +13,23 @@ import java.util.ArrayList;
 
 public class EdgeServer {
 
-    public EdgeServer(String address, int port) throws IOException {
-        easyFTPServer ftpServer = new easyFTPServer(address, 2221);
+    ArrayList<String> processedText = new ArrayList<>();
+    File dir = new File("filesToProcess");
+    Timer timer = new Timer();
 
+    public EdgeServer(String address, int port) throws IOException {
+
+        //initial networking
+        easyFTPServer ftpServer = new easyFTPServer(address, 2221);
         Socket socket = new Socket();
         InetSocketAddress sa = new InetSocketAddress(address, port);
 
         //initial connection to server
-        socket.connect(sa, 50000);
+        socket.connect(sa, 10000);
         System.out.println("Edge server connected to server");
 
-        //connects to Server
-        DataOutputStream out = new DataOutputStream(socket.getOutputStream());
-
         int filesProcessed = 0;
-        int imagesToProcess = 1000;
-        File dir = new File("filesToProcess");
-        String text = null;
-
-        OCRTest ocr = new OCRTest("tessdata");
-        while(filesProcessed != 1000) {
-            for(File image : dir.listFiles()){
-
-                text = ocr.readImage(image);
-                text = text.replace("\n", "").replace("\r", "");
-                image.delete();
-                filesProcessed++;
-                System.out.println(text + " " + filesProcessed);
-
-                if(filesProcessed == imagesToProcess){
-                    break;
-                }
-            }
-        }
-
+        int imagesToProcess = 10;
 
 
     }
@@ -83,6 +66,27 @@ public class EdgeServer {
         timer.start();
         dataOutput.writeUTF(outputString);
         timer.stopAndPrint("Compact Transmission Start");
+    }
+
+    public void OCRBench(Socket socket, int imagesToProcess) throws IOException {
+        OCRTest ocr = new OCRTest("tessdata");
+        int filesProcessed = 0;
+        timer.start();
+        while(filesProcessed != 10) {
+            for(File image : dir.listFiles()){
+                timer.newLap();
+                this.processedText.add(ocr.readImage(image));
+                image.delete();
+                filesProcessed++;
+
+                if(filesProcessed == imagesToProcess){
+                    timer.stopAndPrint("OCR");
+                    break;
+                }
+            }
+        }
+        //individualTransmission(socket, processedText);
+        compactTransmission(socket, this.processedText);
     }
 
 }//end of class

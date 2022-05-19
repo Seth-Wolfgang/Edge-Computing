@@ -26,13 +26,14 @@ public class Server extends Thread {
                 // starts server and waits for a connection
                 socket = server.accept();
                 System.out.println("Client accepted");
+
                 in = new DataInputStream(new BufferedInputStream(socket.getInputStream()));
 
                 //Creates new thread when there is a new client
                 Thread newClient = new ClientHandler(socket, in, clientNum);
                 newClient.start();
-                clientNum++;
 
+                clientNum++;
                 //todo loop does not end, however it seems to sleep
             } catch (IOException e) {
                 throw new IOException(e);
