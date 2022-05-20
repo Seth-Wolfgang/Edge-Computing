@@ -14,7 +14,7 @@ import Network.EdgeServer;
 import java.io.IOException;
 
 public class EdgeServerMain {
-    public static void main(String[] args) throws IOException {
+    public static void main(String[] args) throws IOException, InterruptedException {
 
         if(args.length != 1) {
             System.out.println("Please enter an IP address in args");

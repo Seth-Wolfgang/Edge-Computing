@@ -32,6 +32,8 @@ public class Main extends Thread implements Runnable  {
                         new EdgeServer(address , port);
                     } catch (IOException e) {
                         e.printStackTrace();
+                    } catch (InterruptedException e) {
+                        e.printStackTrace();
                     }
                 }
             }).start();

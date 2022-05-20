@@ -19,7 +19,7 @@ public class Client {
 
     //Initial vars
     ArrayList<Long> runTimes = new ArrayList<>();
-    int test = 1; //test refers to the benchmark performed todo create a better way of handling this
+    int test = 2; //test refers to the benchmark performed todo create a better way of handling this
     int counter = 0;
     final int iterations = 100; //controls how many times this class performs a bench
 
@@ -53,7 +53,23 @@ public class Client {
                 }
 
             case 2: //Smith-Waterman Test
-                //iteratedSWBench(socket, ftpClient);
+                String[] inputFiles = {"smallQuery",
+                                       "database",
+                                       "alphabet",
+                                       "scoringmatrix"};
+                File copiedFile = null;
+                File file = null;
+
+                for(int i = 0; i < 10; i++) {
+                    for(int j = 0; j < 4; j++){
+                        copiedFile = new File("ftpResources\\"+ inputFiles[j] + i + ".txt");
+                        file = new File("ftpResources\\" + inputFiles[j]+ ".txt");
+                        FileUtils.copyFile(file, copiedFile);
+                        ftpClient.sendFile(copiedFile);
+                        copiedFile.delete();
+                    }//end of j loop
+                }//end of i loop
+
                 //closeConnection(socket, out);
                 break; //End of Smith-Waterman test
 
@@ -136,38 +152,7 @@ public class Client {
      */
 
 
-    //public void SWBench(Socket socket, easyFTPClient ftpClient) throws IOException {
-    //    //NOTE: run time is affected most by query
-    //    String[] inputFiles = {"smallQuery.txt","database.txt","alphabet.txt","scoringmatrix.txt"};
-    //    Timer timer = new Timer();
-    //    File file;
-    //    ArrayList<String> SWOutput = new ArrayList<>();
-    //    int m = 1; //todo replace with args?
-    //    int k = 1;
-//
-    //    //File grabbing
-    //    timer.start();
-    //    for(String path : inputFiles){
-    //        ftpClient.getFile(path);
-    //        file = new File(path);
-    //        file.deleteOnExit();
-    //    }
-    //    timer.stopAndPrint("SW File Requests");
-//
-    //    try {
-    //        //Running Smith-Waterman
-    //        timer.start();
-    //        SWOutput.add(new SWinitialiser().run(inputFiles[0], inputFiles[1], inputFiles[2], inputFiles[3], m, k));
-    //        timer.stopAndPrint("SW run");
-//
-    //        //Sending results of Smith-Waterman
-    //        timer.start();
-    //        compactTransmission(socket, SWOutput);
-    //        timer.stopAndPrint("SW Transmission");
-//
-    //    } catch (Exception e) {
-    //        e.printStackTrace();
-    //    }
+
 //
     //    //cleanup
     //    for(String path : inputFiles){

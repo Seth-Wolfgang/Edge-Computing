@@ -22,8 +22,10 @@ public class easyFTPClient extends FTPClient{
      */
     FTPClient ftpClient = new FTPClient();
 
-    public easyFTPClient(String address, int port){
+    private String address;
+    private int port;
 
+    public easyFTPClient(String address, int port){
         try{
             //connects to EdgeServer
             ftpClient.setConnectTimeout(5000);
@@ -36,13 +38,22 @@ public class easyFTPClient extends FTPClient{
             System.out.println("FTP Setup Failed");
             e.printStackTrace();
         }
-
     }
 
     public void sendFile(String fileName) throws IOException {
         File file = new File(fileName);
         sendFile(file);
     }
+
+
+    /**
+     * Sends file to FTP server. Very similar to .storeFile method
+     * in FTPClient, but does not require the use of an input stream
+     * for a method parameter.
+     *
+     * @param file
+     * @throws IOException
+     */
 
     public void sendFile(File file) throws IOException {
         BufferedInputStream inputStream = new BufferedInputStream(new FileInputStream(file));
@@ -57,7 +68,7 @@ public class easyFTPClient extends FTPClient{
             inputStream.close();
             System.out.println("File transfer failed!");
         }
-    }
+    }//end of sendFile
 
     /**
      * Returns a file from the FTP server using FTPClient's retrieveFile method
@@ -86,5 +97,6 @@ public class easyFTPClient extends FTPClient{
             System.out.println("File transfer failed!");
             return null;
         }
-    }
-}
+    }//end of getFile
+
+}//end of class

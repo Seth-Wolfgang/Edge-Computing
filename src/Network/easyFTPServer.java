@@ -14,11 +14,21 @@ import org.apache.ftpserver.usermanager.impl.WritePermission;
 import java.util.ArrayList;
 import java.util.List;
 
-public class easyFTPServer {
+public class easyFTPServer extends Thread implements Runnable {
+
+    private String address;
+    private int port;
 
     public easyFTPServer (String address, int port) {
 
-        //instantiates the factories for the FTP server
+        this.address = address;
+        this.port = port;
+
+    }
+
+    @Override
+    public void run() {
+        System.out.println("starting ftp");
         FtpServer ftpServer = null;
         FtpServerFactory serverFactory = new FtpServerFactory();
         ListenerFactory lFactory = new ListenerFactory();
