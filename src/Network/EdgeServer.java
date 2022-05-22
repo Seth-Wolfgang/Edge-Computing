@@ -10,6 +10,7 @@ import java.io.IOException;
 import java.net.InetSocketAddress;
 import java.net.Socket;
 import java.util.ArrayList;
+import java.util.Objects;
 import java.util.concurrent.TimeUnit;
 
 public class EdgeServer {
@@ -34,18 +35,29 @@ public class EdgeServer {
         int filesProcessed = 0;
         int imagesToProcess = 10;
 
-
         switch (test) {
             case 1:
                 OCRBench(socket, 10);
                 break;
             case 2:
-                SWBench(socket, 1);
+                SWBench(socket, 10);
+                break;
+            case 3:
+                //insert 3rd algorithm
                 break;
         }
 
 
     }
+
+    /**
+     * Performs the Optical Character Recognition Benchmark and sends the results
+     * to the server.
+     *
+     * @param socket
+     * @param imagesToProcess
+     * @throws IOException
+     */
 
     public void OCRBench(Socket socket, int imagesToProcess) throws IOException {
         OCRTest ocr = new OCRTest("tessdata");
@@ -68,6 +80,17 @@ public class EdgeServer {
         //compactTransmission(socket, this.processedText);
     }
 
+    /**
+     * Performs the Smith-Waterman algorithm to benchmark the system.
+     * This sends results to the server.
+     *
+     *
+     * @param socket
+     * @param iterations
+     * @throws IOException
+     * @throws InterruptedException
+     */
+
     public void SWBench(Socket socket, int iterations) throws IOException, InterruptedException {
         //NOTE: run time is affected most by query
         String[] inputFilesName = {"smallQuery", "database", "alphabet","scoringmatrix"};
@@ -79,7 +102,7 @@ public class EdgeServer {
         int k = 1;
 
         //File grabbing
-        TimeUnit.SECONDS.sleep(3);
+        TimeUnit.SECONDS.sleep(1);
         try {
             timer.start();
             for(int i = 0; i < iterations; i++){
@@ -94,19 +117,28 @@ public class EdgeServer {
 
             //cleanup
             File dir = new File("filesToProcess");
-            for(File file : dir.listFiles()){
+            for(File file : Objects.requireNonNull(dir.listFiles())){
                 file.delete();
             }
 
             //Sending results of Smith-Waterman
             timer.start();
-            compactTransmission(socket, SWOutput);
+            //compactTransmission(socket, SWOutput);
+            individualTransmission(socket, SWOutput);
             timer.stopAndPrint("SW Transmission");
 
         } catch (Exception e) {
             e.printStackTrace();
         }
     }
+
+    /**
+     * Sends data separately to the server.
+     *
+     * @param socket
+     * @param manyOutput
+     * @throws IOException
+     */
 
     public void individualTransmission(Socket socket, ArrayList<String> manyOutput) throws IOException {
         DataOutputStream dataOutput = new DataOutputStream(socket.getOutputStream());
@@ -120,6 +152,14 @@ public class EdgeServer {
         timer.stopTimer();
         timer.printResultsToFile("Individual Transmission Start");
     }
+
+    /**
+     * This sends all data at the same time. Each part is seperated by semicolons.
+     *
+     * @param socket
+     * @param manyOutput
+     * @throws IOException
+     */
 
     public void compactTransmission(Socket socket, ArrayList<String> manyOutput) throws IOException {
         DataOutputStream dataOutput = new DataOutputStream(socket.getOutputStream());
