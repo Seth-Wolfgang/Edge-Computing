@@ -54,13 +54,4 @@ public class Server extends Thread {
         socket.close();
         in.close();
     }
-
-   // public void allowNewClient(Socket socket, DataInputStream in, int clientNum) {
-   //     try {
-   //         Thread clientThread = new Thread(new ClientHandler(socket, in, clientNum));
-   //         clientThread.start();
-   //     } catch (Exception e) {
-   //         e.printStackTrace();
-   //     }
-   // }
 }

@@ -21,7 +21,7 @@ public class Client {
     ArrayList<Long> runTimes = new ArrayList<>();
     int test = 2; //test refers to the benchmark performed todo create a better way of handling this
     int counter = 0;
-    final int iterations = 100; //controls how many times this class performs a bench
+    final int iterations = 10; //controls how many times this class performs a bench
 
 
     // constructor to put ip address and port
@@ -30,13 +30,14 @@ public class Client {
         //Setup before connection occurs
         easyFTPClient ftpClient = new easyFTPClient(address, ftpPort);
         System.out.println("Client connected to edge server");
-
+        File copiedFile = null;
+        File file = null;
 
         switch (test) {
             case 1: //OCR Test
                 try {
                     //sending image file
-                    for(int i = 0; i < 10; i++) {
+                    for (int i = 0; i < iterations; i++) {
                         File copiedImage = new File("ftpResources\\woahman" + i + ".png");
                         File image = new File("ftpResources\\woahman.png");
                         FileUtils.copyFile(image, copiedImage);
@@ -49,17 +50,16 @@ public class Client {
                 }
 
             case 2: //Smith-Waterman Test
-                String[] inputFiles = {"smallQuery",
-                                       "database",
-                                       "alphabet",
-                                       "scoringmatrix"};
-                File copiedFile = null;
-                File file = null;
+                String[] SWinputFiles = {"smallQuery",
+                        "database",
+                        "alphabet",
+                        "scoringmatrix"};
 
-                for(int i = 0; i < 10; i++) {
-                    for(int j = 0; j < 4; j++){
-                        copiedFile = new File("ftpResources\\"+ inputFiles[j] + i + ".txt");
-                        file = new File("ftpResources\\" + inputFiles[j]+ ".txt");
+
+                for (int i = 0; i < iterations; i++) {
+                    for (int j = 0; j < SWinputFiles.length; j++) {
+                        copiedFile = new File("ftpResources\\" + SWinputFiles[j] + i + ".txt");
+                        file = new File("ftpResources\\" + SWinputFiles[j] + ".txt");
                         FileUtils.copyFile(file, copiedFile);
                         ftpClient.sendFile(copiedFile);
                         copiedFile.delete();
@@ -69,8 +69,20 @@ public class Client {
                 //closeConnection(socket, out);
                 break; //End of Smith-Waterman test
 
+            case 3: //logistic regression
+                String[] LGInputFiles = {"BreastCancer", "testData"};
 
-       }
+                for (int i = 0; i < iterations; i++) {
+                    for (int j = 0; j < LGInputFiles.length; j++) {
+                        copiedFile = new File("ftpResources\\" + LGInputFiles[j] + i + ".txt");
+                        file = new File("ftpResources\\" + LGInputFiles[j] + ".txt");
+                        FileUtils.copyFile(file, copiedFile);
+                        ftpClient.sendFile(copiedFile);
+                        copiedFile.delete();
+                        break;
+                    }
+                }
+        }
     }
 
 }    // end of client

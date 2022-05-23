@@ -1,5 +1,6 @@
 package Network;
 
+import LogisticRegression.LogRegressionMain;
 import OCR.OCRTest;
 import OCR.Timer;
 import SmithWaterman.SWinitialiser;
@@ -43,7 +44,7 @@ public class EdgeServer {
                 SWBench(socket, 10);
                 break;
             case 3:
-                //insert 3rd algorithm
+
                 break;
         }
 
@@ -130,6 +131,27 @@ public class EdgeServer {
         } catch (Exception e) {
             e.printStackTrace();
         }
+    }
+
+    public void logRegressionBench(Socket socket, int iterations) throws IOException{
+        LogRegressionMain logRegress = new LogRegressionMain();
+        ArrayList<String> logRegressOutput = new ArrayList<>();
+        String[] inputFilesName = {"BreastCancer", "testData"};
+        String[] inputFileString = new String[2];
+        File[] inputFiles = new File[2];
+
+        try {
+            timer.start();
+            for(int i = 0; i < iterations; i++){
+                timer.newLap();
+                for(int j = 0; j < inputFiles.length; j++){
+                    inputFiles[j] = new File("filesToProcess\\" + inputFilesName[j]+i+ ".txt");
+                    inputFileString[j] = "filesToProcess\\" + inputFilesName[j]+i+ ".txt";
+                }//end of j loop
+                logRegressOutput.add( logRegress.LogRegressionInitializer(inputFileString[0], inputFileString[2]));
+            }//end of i loop
+            timer.stopAndPrint("SW run");
+
     }
 
     /**
