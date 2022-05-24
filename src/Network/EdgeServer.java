@@ -1,6 +1,6 @@
 package Network;
 
-import LogisticRegression.LogRegressionMain;
+import LogisticRegression.LogRegressionInitializer;
 import OCR.OCRTest;
 import OCR.Timer;
 import SmithWaterman.SWinitialiser;
@@ -19,7 +19,7 @@ public class EdgeServer {
     ArrayList<String> processedText = new ArrayList<>();
     File dir = new File("filesToProcess");
     Timer timer = new Timer();
-    int test = 2;
+    int test = 3;
 
     public EdgeServer(String address, int port) throws IOException, InterruptedException {
 
@@ -44,7 +44,7 @@ public class EdgeServer {
                 SWBench(socket, 10);
                 break;
             case 3:
-
+                logRegressionBench(socket, 10);
                 break;
         }
 
@@ -134,24 +134,35 @@ public class EdgeServer {
     }
 
     public void logRegressionBench(Socket socket, int iterations) throws IOException{
-        LogRegressionMain logRegress = new LogRegressionMain();
+        LogRegressionInitializer logRegress = new LogRegressionInitializer();
         ArrayList<String> logRegressOutput = new ArrayList<>();
         String[] inputFilesName = {"BreastCancer", "testData"};
         String[] inputFileString = new String[2];
         File[] inputFiles = new File[2];
-
+        try {
+            TimeUnit.SECONDS.sleep(3);
+        } catch (InterruptedException e) {
+            e.printStackTrace();
+        }
         try {
             timer.start();
-            for(int i = 0; i < iterations; i++){
+            for (int i = 0; i < iterations; i++) {
                 timer.newLap();
-                for(int j = 0; j < inputFiles.length; j++){
-                    inputFiles[j] = new File("filesToProcess\\" + inputFilesName[j]+i+ ".txt");
-                    inputFileString[j] = "filesToProcess\\" + inputFilesName[j]+i+ ".txt";
+                for (int j = 0; j < inputFiles.length; j++) {
+                    inputFiles[j] = new File("filesToProcess\\" + inputFilesName[j] + i + ".txt");
+                    inputFileString[j] = "filesToProcess\\" + inputFilesName[j] + i + ".txt";
                 }//end of j loop
-                logRegressOutput.add( logRegress.LogRegressionInitializer(inputFileString[0], inputFileString[2]));
+                logRegressOutput.add(logRegress.LogRegressionInitializer(inputFileString[0], inputFileString[1]));
+                inputFiles[0].delete();
+                inputFiles[1].delete();
             }//end of i loop
             timer.stopAndPrint("SW run");
+            //compactTransmission(socket, logRegressOutput);
+            individualTransmission(socket, logRegressOutput);
 
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
     }
 
     /**

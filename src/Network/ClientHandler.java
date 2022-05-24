@@ -33,7 +33,7 @@ class ClientHandler extends Thread {
                     notRunning = false;
                 }
 
-                //reads input from Client.java
+                //reads input from EdgeServer.java
                 line = in.readUTF();
                 System.out.println(line);
                 /*if statements break loop if they receive a certain

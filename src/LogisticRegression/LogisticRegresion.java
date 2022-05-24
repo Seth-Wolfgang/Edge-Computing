@@ -1,7 +1,6 @@
 package LogisticRegression;
 
 import java.util.ArrayList;
-import java.util.Arrays;
  
 public class LogisticRegresion {
      
@@ -71,7 +70,7 @@ public class LogisticRegresion {
                 }
                 llh += getLogLikelihood(c,x);
             }
-            System.out.println("Epoch " + e + " weights " + Arrays.toString(this.weights) + " LogLikelihood " + llh);
+            //System.out.println("Epoch " + e + " weights " + Arrays.toString(this.weights) + " LogLikelihood " + llh);
         }
     }
      

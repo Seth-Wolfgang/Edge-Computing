@@ -19,7 +19,7 @@ public class Client {
 
     //Initial vars
     ArrayList<Long> runTimes = new ArrayList<>();
-    int test = 2; //test refers to the benchmark performed todo create a better way of handling this
+    int test = 3; //test refers to the benchmark performed todo create a better way of handling this
     int counter = 0;
     final int iterations = 10; //controls how many times this class performs a bench
 
@@ -73,15 +73,15 @@ public class Client {
                 String[] LGInputFiles = {"BreastCancer", "testData"};
 
                 for (int i = 0; i < iterations; i++) {
-                    for (int j = 0; j < LGInputFiles.length; j++) {
+                    for(int j = 0; j < 2; j++) {
                         copiedFile = new File("ftpResources\\" + LGInputFiles[j] + i + ".txt");
                         file = new File("ftpResources\\" + LGInputFiles[j] + ".txt");
                         FileUtils.copyFile(file, copiedFile);
                         ftpClient.sendFile(copiedFile);
                         copiedFile.delete();
-                        break;
                     }
                 }
+                break;
         }
     }
 
