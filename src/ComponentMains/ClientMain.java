@@ -24,7 +24,7 @@ public class ClientMain {
         final int ftpPort = 2221; //todo make args?
         final String address = args[0];
 
-        Client client = new Client(address, ftpPort);
+        Client client = new Client(address, ftpPort, 3);
 
     }
 }

@@ -62,12 +62,11 @@ public class OCRTest {
 
     public ArrayList performCompactBenchmark(int iterations) throws IOException {
         timer.start();
-        for(int i = 0; i < iterations; i++){
+        for(int i = 0; i < iterations; i++) {
             manyOutput.add(readImage());
             timer.newLap();
         }
-        timer.stopTimer();
-        timer.printResultsToFile("OCR Compact");
+        timer.stopAndPrint("OCR Compact");
         return timer.getLaps();
     }
 

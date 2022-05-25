@@ -29,7 +29,7 @@ public class Main extends Thread implements Runnable  {
                 @Override
                 public void run() {
                     try {
-                        new EdgeServer(address , port);
+                        new EdgeServer(address , port, 1);
                     } catch (IOException e) {
                         e.printStackTrace();
                     } catch (InterruptedException e) {
@@ -41,7 +41,7 @@ public class Main extends Thread implements Runnable  {
                 @Override
                 public void run() {
                     try {
-                        new Client(address, ftpPort);
+                        new Client(address, ftpPort, 3);
                     } catch (IOException | TesseractException e) {
                         e.printStackTrace();
                     }

@@ -19,13 +19,12 @@ public class Client {
 
     //Initial vars
     ArrayList<Long> runTimes = new ArrayList<>();
-    int test = 3; //test refers to the benchmark performed todo create a better way of handling this
     int counter = 0;
     final int iterations = 10; //controls how many times this class performs a bench
 
 
     // constructor to put ip address and port
-    public Client(String address, int ftpPort) throws IOException, TesseractException {
+    public Client(String address, int ftpPort, int test) throws IOException, TesseractException {
 
         //Setup before connection occurs
         easyFTPClient ftpClient = new easyFTPClient(address, ftpPort);
@@ -50,11 +49,7 @@ public class Client {
                 }
 
             case 2: //Smith-Waterman Test
-                String[] SWinputFiles = {"smallQuery",
-                        "database",
-                        "alphabet",
-                        "scoringmatrix"};
-
+                String[] SWinputFiles = {"smallQuery", "database", "alphabet", "scoringmatrix"};
 
                 for (int i = 0; i < iterations; i++) {
                     for (int j = 0; j < SWinputFiles.length; j++) {
@@ -66,7 +61,6 @@ public class Client {
                     }//end of j loop
                 }//end of i loop
 
-                //closeConnection(socket, out);
                 break; //End of Smith-Waterman test
 
             case 3: //logistic regression
@@ -82,7 +76,6 @@ public class Client {
                     }
                 }
                 break;
-        }
+        }//end of switch
     }
-
 }    // end of client

@@ -92,6 +92,7 @@ public class LogRegressionInitializer {
                 
             }
              output += ("\n The number of the wrong classified test examples is: "+a);
+            System.out.println(output);
             scanner.close();
         }catch(Exception ex){
             ex.printStackTrace();
