@@ -21,7 +21,7 @@ public class EdgeServer {
     int test = 3;
     ArrayList<String> outputString = new ArrayList<>();
 
-    public EdgeServer(String address, int port, int iterations) throws IOException, InterruptedException {
+    public EdgeServer(String address, int port, int test, int iterations) throws IOException, InterruptedException {
 
         //initial networking
         Thread ftpServer = new easyFTPServer(address, 2221);
@@ -33,6 +33,7 @@ public class EdgeServer {
         socket.connect(sa, 10000);
         System.out.println("Edge server connected to server");
 
+        //determines which test is to be done
         switch (test) {
             case 1 -> outputString = OCRBench(iterations);
             case 2 -> outputString = SWBench(iterations);

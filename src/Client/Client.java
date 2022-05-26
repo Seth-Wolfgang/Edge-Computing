@@ -20,33 +20,27 @@ public class Client {
     //Initial vars
     ArrayList<Long> runTimes = new ArrayList<>();
     int counter = 0;
-    final int iterations = 10; //controls how many times this class performs a bench
+    easyFTPClient ftpClient;
 
 
-    // constructor to put ip address and port
-    public Client(String address, int ftpPort, int test) throws IOException, TesseractException {
+    // constructor to put ip address, port, test, and iterations.
+    public Client(String address, int ftpPort, int test, int iterations) throws IOException, TesseractException {
 
         //Setup before connection occurs
-        easyFTPClient ftpClient = new easyFTPClient(address, ftpPort);
+        ftpClient = new easyFTPClient(address, ftpPort);
         System.out.println("Client connected to edge server");
         File copiedFile = null;
         File file = null;
 
         switch (test) {
             case 1: //OCR Test
-                try {
                     //sending image file
                     for (int i = 0; i < iterations; i++) {
-                        File copiedImage = new File("ftpResources\\woahman" + i + ".png");
-                        File image = new File("ftpResources\\woahman.png");
-                        FileUtils.copyFile(image, copiedImage);
-                        ftpClient.sendFile(copiedImage);
-                        copiedImage.delete();
+                         copiedFile = new File("ftpResources\\woahman" + i + ".png");
+                         file = new File("ftpResources\\woahman.png");
+                         copyAndSendFile(file, copiedFile);
                     }
-                    break; //end of OCR test
-                } catch (Exception e) {
-                    e.printStackTrace();
-                }
+                break; //end of OCR test
 
             case 2: //Smith-Waterman Test
                 String[] SWinputFiles = {"smallQuery", "database", "alphabet", "scoringmatrix"};
@@ -55,12 +49,9 @@ public class Client {
                     for (int j = 0; j < SWinputFiles.length; j++) {
                         copiedFile = new File("ftpResources\\" + SWinputFiles[j] + i + ".txt");
                         file = new File("ftpResources\\" + SWinputFiles[j] + ".txt");
-                        FileUtils.copyFile(file, copiedFile);
-                        ftpClient.sendFile(copiedFile);
-                        copiedFile.delete();
+                        copyAndSendFile(file, copiedFile);
                     }//end of j loop
                 }//end of i loop
-
                 break; //End of Smith-Waterman test
 
             case 3: //logistic regression
@@ -70,12 +61,28 @@ public class Client {
                     for(int j = 0; j < 2; j++) {
                         copiedFile = new File("ftpResources\\" + LGInputFiles[j] + i + ".txt");
                         file = new File("ftpResources\\" + LGInputFiles[j] + ".txt");
-                        FileUtils.copyFile(file, copiedFile);
-                        ftpClient.sendFile(copiedFile);
-                        copiedFile.delete();
+                        copyAndSendFile(file, copiedFile);
                     }
                 }
-                break;
+                break; //end of logistic regression
         }//end of switch
+    }
+
+    /**
+     * Method to copy and send a file. Created to reduce unnecessary lines of code
+     *
+     * @param file
+     * @param copiedFile
+     */
+
+    private void copyAndSendFile(File file, File copiedFile){
+        try {
+            FileUtils.copyFile(file, copiedFile);
+            this.ftpClient.sendFile(copiedFile);
+            copiedFile.delete();
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+
     }
 }    // end of client

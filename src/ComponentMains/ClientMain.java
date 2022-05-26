@@ -17,14 +17,19 @@ import java.io.IOException;
 public class ClientMain {
     public static void main(String[] args) throws IOException, TesseractException {
 
-        if(args.length != 1) {
-            System.out.println("Please enter an IP address in args");
+        if(args.length != 3) {
+            System.out.println("Please use format for arguments\n" +
+                               "[IPV4] [Test #] [# of Test Iterations]\n" +
+                               "Test #1 Tesseract OCR\nTest #2 Smith-Waterman\n" +
+                               "Test #3 Logistic Regression");
         }
 
         final int ftpPort = 2221; //todo make args?
         final String address = args[0];
+        final int test = Integer.parseInt(args[1]);
+        final int iterations = Integer.parseInt(args[2]);
 
-        Client client = new Client(address, ftpPort, 3);
+        Client client = new Client(address, ftpPort, 1, 10);
 
     }
 }

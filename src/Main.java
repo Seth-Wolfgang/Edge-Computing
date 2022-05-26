@@ -17,6 +17,8 @@ public class Main extends Thread implements Runnable  {
 
     int numOfPi;
     int numOfEdgeServers;
+    static int test = 3;
+    static int iterations = 10;
 
     static int port = 5000;
     static int ftpPort = 2221;
@@ -29,7 +31,7 @@ public class Main extends Thread implements Runnable  {
                 @Override
                 public void run() {
                     try {
-                        new EdgeServer(address , port, 1);
+                        new EdgeServer(address , port, test, iterations);
                     } catch (IOException e) {
                         e.printStackTrace();
                     } catch (InterruptedException e) {
@@ -41,7 +43,7 @@ public class Main extends Thread implements Runnable  {
                 @Override
                 public void run() {
                     try {
-                        new Client(address, ftpPort, 3);
+                        new Client(address, ftpPort,  test, iterations);
                     } catch (IOException | TesseractException e) {
                         e.printStackTrace();
                     }
