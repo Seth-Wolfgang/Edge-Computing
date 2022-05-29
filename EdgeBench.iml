@@ -10,5 +10,9 @@
     <orderEntry type="sourceFolder" forTests="false" />
     <orderEntry type="library" exported="" name="EdgeComputing" level="project" />
     <orderEntry type="library" exported="" name="lib" level="project" />
+    <orderEntry type="library" exported="" name="apache.ftpserver.core" level="project" />
+    <orderEntry type="library" exported="" name="commons.net" level="project" />
+    <orderEntry type="library" exported="" name="net.sourceforge.tess4j" level="project" />
+    <orderEntry type="library" exported="" name="slf4j.jdk14" level="project" />
   </component>
 </module>

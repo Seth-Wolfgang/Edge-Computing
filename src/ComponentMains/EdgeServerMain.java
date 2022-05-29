@@ -21,7 +21,7 @@ public class EdgeServerMain {
         }
 
         final int ftpPort = 2221; //todo make arg?
-        EdgeServer edgeServer = new EdgeServer(args[0], ftpPort, 1, 10);
+        EdgeServer edgeServer = new EdgeServer(args[0], ftpPort, Integer.parseInt(args[1]), 10);
 
     }
 }

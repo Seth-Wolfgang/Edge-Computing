@@ -17,12 +17,12 @@ public class Main extends Thread implements Runnable  {
 
     int numOfPi;
     int numOfEdgeServers;
-    static int test = 3;
+    static int test = 1;
     static int iterations = 10;
 
     static int port = 5000;
     static int ftpPort = 2221;
-    static String address = "192.168.1.34";
+    static String address = "127.0.0.1";
 
     public static void main(String[] args) throws Exception {
         try {

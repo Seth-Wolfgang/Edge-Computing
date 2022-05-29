@@ -14,6 +14,7 @@ import org.apache.commons.io.FileUtils;
 import java.io.File;
 import java.io.IOException;
 import java.util.ArrayList;
+import java.util.concurrent.TimeUnit;
 
 public class Client {
 
@@ -25,12 +26,17 @@ public class Client {
 
     // constructor to put ip address, port, test, and iterations.
     public Client(String address, int ftpPort, int test, int iterations) throws IOException, TesseractException {
-
+        try {
+            TimeUnit.SECONDS.sleep(2);
+        } catch (InterruptedException e) {
+            e.printStackTrace();
+        }
         //Setup before connection occurs
         ftpClient = new easyFTPClient(address, ftpPort);
         System.out.println("Client connected to edge server");
         File copiedFile = null;
         File file = null;
+
 
         switch (test) {
             case 1: //OCR Test
