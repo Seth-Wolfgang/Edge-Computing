@@ -10,14 +10,14 @@ import java.util.Scanner;
  
 public class LogRegressionInitializer {
      
-    private ArrayList<Example> readDataSet(String file){
+    private ArrayList<Example> readDataSet(File file){
         //ArrayList which contains the training examples;
         ArrayList<Example> dataList = new ArrayList<>();
         String outputString = "";
 
         try{
-            File file1 = new File(file);
-            Scanner scanner = new Scanner(file1);
+            //File file1 = new File(file);
+            Scanner scanner = new Scanner(file);
              
       
             //Read the 367 examples for the training
@@ -48,7 +48,7 @@ public class LogRegressionInitializer {
          
     }
      
-    public String LogRegressionInitializer(String inputFile1, String inputFile2){
+    public String LogRegressionInitializer(File inputFile1, File inputFile2){
         ArrayList<Example> examples = readDataSet(inputFile1); //should be BreastCancer.txt in ftpResources
         LogisticRegresion classifier = new LogisticRegresion(30,0.001);
         String output = "";
@@ -69,8 +69,8 @@ public class LogRegressionInitializer {
         //Test the classifier with 100 test examples (aproximately 20% of the dataset)
         output += ("\n The probabilities that the test examples are classified in category M are :\n");
          try{
-            File file1 = new File(inputFile2); //should be testData.txt in ftpResources
-            Scanner scanner = new Scanner(file1);
+            //File file1 = new File(inputFile2); //should be testData.txt in ftpResources
+            Scanner scanner = new Scanner(inputFile2);
              
             //Wrong classified test examples
             int a = 0;         

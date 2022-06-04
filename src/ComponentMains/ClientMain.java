@@ -29,7 +29,7 @@ public class ClientMain {
         final int test = Integer.parseInt(args[1]);
         final int iterations = Integer.parseInt(args[2]);
 
-        Client client = new Client(address, ftpPort, 1, 10);
+        Client client = new Client(address, ftpPort, 1, 10, 1);
 
     }
 }

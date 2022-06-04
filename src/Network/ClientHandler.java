@@ -42,7 +42,7 @@ class ClientHandler extends Thread {
                     timer.newLap();
                     counter++;
                     System.out.println("\033[1;34mClient "+ this.clientNum +" iteration # " + counter + " done.\033[0m");
-                    if (counter == 10) { //todo: this is a placeholder (replace with args)
+                    if (counter == 20) { //todo: this is a placeholder (replace with args)
                         timer.stopTimer();
                         break;
                     }

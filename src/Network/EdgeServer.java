@@ -4,6 +4,9 @@ import LogisticRegression.LogRegressionInitializer;
 import OCR.OCRTest;
 import OCR.Timer;
 import SmithWaterman.SWinitialiser;
+import org.apache.commons.io.FileUtils;
+import org.apache.commons.io.filefilter.DirectoryFileFilter;
+import org.apache.commons.io.filefilter.RegexFileFilter;
 
 import java.io.DataOutputStream;
 import java.io.File;
@@ -11,6 +14,7 @@ import java.io.IOException;
 import java.net.InetSocketAddress;
 import java.net.Socket;
 import java.util.ArrayList;
+import java.util.Collection;
 import java.util.Objects;
 import java.util.concurrent.TimeUnit;
 
@@ -41,7 +45,7 @@ public class EdgeServer {
         }
         individualTransmission(socket, outputString);
         compactTransmission(socket, outputString);
-        closeConnection(socket);
+        //closeConnection(socket);
     }
 
     /**
@@ -57,7 +61,7 @@ public class EdgeServer {
         ArrayList<String> processedText = new ArrayList<>();
         int filesProcessed = 0;
         timer.start();
-        while (filesProcessed != 10) {
+        while (filesProcessed != imagesToProcess) {
             for (File image : dir.listFiles()) {
                 timer.newLap();
                 processedText.add(ocr.readImage(image));
@@ -128,8 +132,6 @@ public class EdgeServer {
         public ArrayList<String> logRegressionBench (int iterations) throws IOException {
             LogRegressionInitializer logRegress = new LogRegressionInitializer();
             ArrayList<String> logRegressOutput = new ArrayList<>();
-            String[] inputFilesName = {"BreastCancer", "testData"};
-            String[] inputFileString = new String[2];
             File[] inputFiles = new File[2];
             try {
                 TimeUnit.SECONDS.sleep(3);
@@ -139,11 +141,11 @@ public class EdgeServer {
             timer.start();
             for (int i = 0; i < iterations; i++) {
                 timer.newLap();
-                for (int j = 0; j < inputFiles.length; j++) {
-                    inputFiles[j] = new File("filesToProcess\\" + inputFilesName[j] + i + ".txt");
-                    inputFileString[j] = "filesToProcess\\" + inputFilesName[j] + i + ".txt";
-                }//end of j loop
-                logRegressOutput.add(logRegress.LogRegressionInitializer(inputFileString[0], inputFileString[1]));
+                inputFiles[0] = grabFirstFile("B.*");
+                inputFiles[1] = grabFirstFile("t.*");
+                //inputFileString[j] = grabFirstFile("filesToProcess\\testData*");
+
+                logRegressOutput.add(logRegress.LogRegressionInitializer(inputFiles[0], inputFiles[1]));
                 inputFiles[0].delete();
                 inputFiles[1].delete();
             }//end of i loop
@@ -198,6 +200,24 @@ public class EdgeServer {
             dataOutput.writeUTF(outputString);
             timer.stopAndPrint("Compact Transmission Start");
         }
+
+    /**
+     * Grabs the first file to be processed. Allows easy use of regex
+     *
+     * @param regex
+     * @return File
+     * @throws IOException
+     */
+
+    public File grabFirstFile(String regex) throws IOException {
+        Collection files = FileUtils.listFiles( //todo VERY TEMPORARY...THIS IS AWFUL BUT WORKS
+                dir,
+                new RegexFileFilter(regex),
+                DirectoryFileFilter.DIRECTORY
+        );
+        System.out.println(files.toString());
+        return (File) files.toArray()[0]; //dir is a field
+    }
 
     /**
      * Sends the message to close connection with server and then closes the socket
