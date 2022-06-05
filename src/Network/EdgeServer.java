@@ -4,9 +4,6 @@ import LogisticRegression.LogRegressionInitializer;
 import OCR.OCRTest;
 import OCR.Timer;
 import SmithWaterman.SWinitialiser;
-import org.apache.commons.io.FileUtils;
-import org.apache.commons.io.filefilter.DirectoryFileFilter;
-import org.apache.commons.io.filefilter.RegexFileFilter;
 
 import java.io.DataOutputStream;
 import java.io.File;
@@ -14,9 +11,9 @@ import java.io.IOException;
 import java.net.InetSocketAddress;
 import java.net.Socket;
 import java.util.ArrayList;
-import java.util.Collection;
 import java.util.Objects;
 import java.util.concurrent.TimeUnit;
+import java.util.regex.Pattern;
 
 public class EdgeServer {
 
@@ -45,6 +42,7 @@ public class EdgeServer {
         }
         individualTransmission(socket, outputString);
         compactTransmission(socket, outputString);
+        cleanUp();
         //closeConnection(socket);
     }
 
@@ -132,22 +130,21 @@ public class EdgeServer {
         public ArrayList<String> logRegressionBench (int iterations) throws IOException {
             LogRegressionInitializer logRegress = new LogRegressionInitializer();
             ArrayList<String> logRegressOutput = new ArrayList<>();
-            File[] inputFiles = new File[2];
+            ArrayList<ArrayList<File>> inputFiles = new ArrayList<>(2);
             try {
-                TimeUnit.SECONDS.sleep(3);
+                TimeUnit.SECONDS.sleep(5);
             } catch (InterruptedException e) {
                 e.printStackTrace();
             }
             timer.start();
+            inputFiles.add(grabFiles("B.*"));
+            inputFiles.add(grabFiles("t.*"));
+            System.out.println(inputFiles.get(0).toString());
             for (int i = 0; i < iterations; i++) {
                 timer.newLap();
-                inputFiles[0] = grabFirstFile("B.*");
-                inputFiles[1] = grabFirstFile("t.*");
-                //inputFileString[j] = grabFirstFile("filesToProcess\\testData*");
-
-                logRegressOutput.add(logRegress.LogRegressionInitializer(inputFiles[0], inputFiles[1]));
-                inputFiles[0].delete();
-                inputFiles[1].delete();
+                logRegressOutput.add(logRegress.LogRegressionInitializer(inputFiles.get(0).get(0), inputFiles.get(1).get(0)));
+                //inputFiles.get(0).get(0).delete();
+                //inputFiles.get(1).get(0).delete();
             }//end of i loop
             return logRegressOutput;
         }
@@ -160,7 +157,7 @@ public class EdgeServer {
          * @throws IOException
          */
 
-        public void individualTransmission (Socket socket, ArrayList < String > manyOutput) throws IOException {
+        public void individualTransmission (Socket socket, ArrayList<String> manyOutput) throws IOException {
             DataOutputStream dataOutput = new DataOutputStream(socket.getOutputStream());
             Timer timer = new Timer();
 
@@ -180,7 +177,7 @@ public class EdgeServer {
          * @throws IOException
          */
 
-        public void compactTransmission (Socket socket, ArrayList < String > manyOutput) throws IOException {
+        public void compactTransmission (Socket socket, ArrayList<String> manyOutput) throws IOException {
             DataOutputStream dataOutput = new DataOutputStream(socket.getOutputStream());
             String outputString = manyOutput.get(0); //Semicolon seperated values of manyOutput
             Timer timer = new Timer();
@@ -209,14 +206,18 @@ public class EdgeServer {
      * @throws IOException
      */
 
-    public File grabFirstFile(String regex) throws IOException {
-        Collection files = FileUtils.listFiles( //todo VERY TEMPORARY...THIS IS AWFUL BUT WORKS
-                dir,
-                new RegexFileFilter(regex),
-                DirectoryFileFilter.DIRECTORY
-        );
+    public ArrayList<File> grabFiles(String regex) throws IOException {
+        Pattern pattern = Pattern.compile(regex);
+        ArrayList<File> files = new ArrayList<>();
+
+        for(File file : dir.listFiles()){
+            if(pattern.asPredicate().test(file.getName())){
+                files.add(file);
+            }
+        }
+
         System.out.println(files.toString());
-        return (File) files.toArray()[0]; //dir is a field
+        return files;
     }
 
     /**
@@ -234,8 +235,20 @@ public class EdgeServer {
             } catch (IOException e) {
                 e.printStackTrace();
             }
+    }
 
+    /**
+     * Removes temporary files
+     *
+     * todo (May add to this method later?)
+     */
 
+    private void cleanUp(){
+        for(File file : dir.listFiles()) {
+            file.delete();
         }
+    }
 
-    }//end of class
+}//end of class
+
+
