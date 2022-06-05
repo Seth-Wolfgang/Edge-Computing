@@ -87,7 +87,9 @@ public class LogRegressionInitializer {
                 for(int i=0; i<=attrs.length-1; i++){
                     attributes[i] = Double.parseDouble(attrs[i]);
                 }
-                output += ("Example belongs to category: " +cat + " "+ classifier.findProbability(attributes));
+                if(classifier.findProbability(attributes) > 0.05) {
+                    output += ("\nExample belongs to category: " +cat + " "+ classifier.findProbability(attributes));
+                }
                 if((classifier.findProbability(attributes)>0.5 && cat.equals("B")) ||classifier.findProbability(attributes)<0.5 && cat.equals("M") ) a++;
                 
             }
