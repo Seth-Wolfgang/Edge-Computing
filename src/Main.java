@@ -17,7 +17,7 @@ public class Main extends Thread implements Runnable  {
 
     int numOfPi;
     int numOfEdgeServers;
-    static int test = 3;
+    static int test = 2;
     static int iterations = 20;
 
     static int port = 5000;

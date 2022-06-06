@@ -56,18 +56,18 @@ public class LogRegressionInitializer {
         classifier.train(examples);
          
         //Print the probabilities that the training examples (first 367 of the  dataset) are classified in category M
-        output += ("\n The probabilities that the training examples are classified in category M are :\n");
+        output += (";");
         int o = 0;
         for(int i=0; i<examples.size(); i++){
-            output += ("Example belongs in category " + examples.get(i).getCategory() + " " + classifier.findProbability(examples.get(i).getAttributes()));
+            output += (";" + examples.get(i).getCategory() + " " + classifier.findProbability(examples.get(i).getAttributes()));
             if(((classifier.findProbability(examples.get(i).getAttributes())>0.5) && (examples.get(i).getCategory().equals("B"))) ||(classifier.findProbability(examples.get(i).getAttributes())<0.5)&& (examples.get(i).getCategory().equals("M")) ) o++;
         }
         //Wrong classified training examples
-        output += ("\n The number of the wrong classified training examples is: "+o);
+        output += (";"+o);
          
         
         //Test the classifier with 100 test examples (aproximately 20% of the dataset)
-        output += ("\n The probabilities that the test examples are classified in category M are :\n");
+        output += (";");
          try{
             //File file1 = new File(inputFile2); //should be testData.txt in ftpResources
             Scanner scanner = new Scanner(inputFile2);
@@ -88,13 +88,12 @@ public class LogRegressionInitializer {
                     attributes[i] = Double.parseDouble(attrs[i]);
                 }
                 if(classifier.findProbability(attributes) > 0.05) {
-                    output += ("\nExample belongs to category: " +cat + " "+ classifier.findProbability(attributes));
+                    output += (";" +cat + " "+ classifier.findProbability(attributes));
                 }
                 if((classifier.findProbability(attributes)>0.5 && cat.equals("B")) ||classifier.findProbability(attributes)<0.5 && cat.equals("M") ) a++;
                 
             }
-             output += ("\n The number of the wrong classified test examples is: "+a);
-            System.out.println(output);
+             output += (";"+a);
             scanner.close();
         }catch(Exception ex){
             ex.printStackTrace();
