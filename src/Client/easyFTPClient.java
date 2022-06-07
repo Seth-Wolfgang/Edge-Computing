@@ -7,7 +7,6 @@
 
 package Client;
 
-import org.apache.commons.net.PrintCommandListener;
 import org.apache.commons.net.ftp.FTP;
 import org.apache.commons.net.ftp.FTPClient;
 
@@ -33,7 +32,6 @@ public class easyFTPClient extends FTPClient{
             ftpClient.login("user", "");
             ftpClient.enterLocalPassiveMode();
             ftpClient.setFileType(FTP.BINARY_FILE_TYPE);
-            ftpClient.addProtocolCommandListener(new PrintCommandListener(new PrintWriter(System.out), true));
         } catch (IOException e) {
             System.out.println("FTP Setup Failed");
             e.printStackTrace();

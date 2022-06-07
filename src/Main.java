@@ -9,7 +9,6 @@
 import Client.Client;
 import Network.EdgeServer;
 import Network.Server;
-import net.sourceforge.tess4j.TesseractException;
 
 import java.io.IOException;
 
@@ -17,12 +16,13 @@ public class Main extends Thread implements Runnable  {
 
     int numOfPi;
     int numOfEdgeServers;
-    static int test = 2;
-    static int iterations = 20;
+    static int test = 3;
+    static int iterations = 10;
+    static int size = 3;
 
     static int port = 5000;
     static int ftpPort = 2221;
-    static String address = "127.0.0.1";
+    static String address = "127.0.0.1"; //likely should NOT change
 
     public static void main(String[] args) throws Exception {
         try {
@@ -43,8 +43,8 @@ public class Main extends Thread implements Runnable  {
                 @Override
                 public void run() {
                     try {
-                        new Client(address, ftpPort,  test, iterations, 1);
-                    } catch (IOException | TesseractException e) {
+                        new Client(address, ftpPort,  test, iterations, size,1);
+                    } catch (IOException e) {
                         e.printStackTrace();
                     }
                 }
@@ -53,8 +53,8 @@ public class Main extends Thread implements Runnable  {
                @Override
                public void run() {
                    try {
-                       new Client(address, ftpPort,  test, iterations, 2);
-                   } catch (IOException | TesseractException e) {
+                       new Client(address, ftpPort,  test, iterations, size,2);
+                   } catch (IOException e) {
                        e.printStackTrace();
                    }
                }

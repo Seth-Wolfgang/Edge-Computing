@@ -8,6 +8,7 @@ import SmithWaterman.SWinitialiser;
 import java.io.DataOutputStream;
 import java.io.File;
 import java.io.IOException;
+import java.io.UTFDataFormatException;
 import java.net.InetSocketAddress;
 import java.net.Socket;
 import java.util.ArrayList;
@@ -37,9 +38,9 @@ public class EdgeServer {
 
         //determines which test is to be done
         switch (test) {
-            case 1 -> outputString = OCRBench(iterations);
-            case 2 -> outputString = SWBench(iterations);
-            case 3 -> outputString = logRegressionBench(iterations);
+            case 1 -> outputString = OCRBench();
+            case 2 -> outputString = SWBench();
+            case 3 -> outputString = logRegressionBench();
         }
         individualTransmission(socket, outputString);
         compactTransmission(socket, outputString);
@@ -51,30 +52,25 @@ public class EdgeServer {
      * Performs the Optical Character Recognition Benchmark and sends the results
      * to the server.
      *
-     * @param imagesToProcess
      * @throws IOException
      */
 
-    public ArrayList<String> OCRBench(int imagesToProcess) throws IOException {
+    public ArrayList<String> OCRBench() throws IOException {
         OCRTest ocr = new OCRTest("tessdata");
         ArrayList<String> processedText = new ArrayList<>();
         ArrayList<File> images;
-        int filesProcessed = 0;
 
+        //waits for files to be sent to this device
+        //and adds them all to an array list for processing
         waitForFiles(1);
-        timer.start();
         images = grabFiles("woah.*");
-        while (filesProcessed != imagesToProcess) {
-                timer.newLap();
-                processedText.add(ocr.readImage(images.get(0)));
-                images.remove(0);
-                filesProcessed++;
 
-                if (filesProcessed == imagesToProcess) {
-                    timer.stopAndPrint("OCR");
-                    break;
-                }
+        timer.start();
+        for(int i = 0; i < iterations; i++){
+                timer.newLap();
+                processedText.add(ocr.readImage(images.get(i)));
             }
+        timer.stopAndPrint("OCR");
         return processedText;
     }
 
@@ -83,23 +79,24 @@ public class EdgeServer {
      * Performs the Smith-Waterman algorithm to benchmark the system.
      * This sends results to the server.
      *
-     * @param iterations
      * @throws IOException
      * @throws InterruptedException
      */
 
-    public ArrayList<String> SWBench(int iterations) throws IOException, InterruptedException {
+    public ArrayList<String> SWBench() throws IOException, InterruptedException {
         //NOTE: run time is affected most by query
-        String[] inputFilesName = {"smallQuery.*", "database.*", "alphabet.*", "scoringmatrix.*"};
+        String[] inputFilesName = {"query.*", "database.*", "alphabet.*", "scoringmatrix.*"};
         Timer timer = new Timer();
         ArrayList<ArrayList<File>> inputFiles = new ArrayList();
         ArrayList<String> SWOutput = new ArrayList<>();
 
+        //waits for files to be sent to this device
+        //and adds them all to an array list for processing
         waitForFiles(4);
-
         for (int i = 0; i < 4; i++) {
             inputFiles.add(grabFiles(inputFilesName[i]));
         }
+
         try {
             timer.start();
             for (int i = 0; i < iterations; i++) {
@@ -108,6 +105,7 @@ public class EdgeServer {
                                                      inputFiles.get(1).get(i).getAbsolutePath(),
                                                      inputFiles.get(2).get(i).getAbsolutePath(),
                                                      inputFiles.get(3).get(i).getAbsolutePath(), 1, 1));
+                System.out.println(SWOutput.toString());
             }//end of i loop
             timer.stopAndPrint("SW run");
 
@@ -118,26 +116,25 @@ public class EdgeServer {
     }
 
     /**
-     * @param iterations
-     * @return
+     * @return ArrayList<String>
      * @throws IOException
      */
 
-    public ArrayList<String> logRegressionBench(int iterations) throws IOException {
+    public ArrayList<String> logRegressionBench() throws IOException {
         LogRegressionInitializer logRegress = new LogRegressionInitializer();
         ArrayList<String> logRegressOutput = new ArrayList<>();
         ArrayList<ArrayList<File>> inputFiles = new ArrayList<>(2);
 
+        //waits for files to be sent to this device
+        //and adds them all to an array list for processing
         waitForFiles(2);
-
-        timer.start();
         inputFiles.add(grabFiles("B.*"));
         inputFiles.add(grabFiles("t.*"));
+
+        timer.start();
         for (int i = 0; i < iterations; i++) {
             timer.newLap();
-            logRegressOutput.add(logRegress.LogRegressionInitializer(inputFiles.get(0).get(0), inputFiles.get(1).get(0)));
-            //inputFiles.get(0).get(0).delete();
-            //inputFiles.get(1).get(0).delete();
+            logRegressOutput.add(logRegress.LogRegressionInitializer(inputFiles.get(0).get(i), inputFiles.get(1).get(i)));
         }//end of i loop
         return logRegressOutput;
     }
@@ -187,7 +184,11 @@ public class EdgeServer {
 
         //times the transmission until it is done
         timer.start();
-        dataOutput.writeUTF(outputString);
+        try{
+            dataOutput.writeUTF(outputString);
+        } catch (UTFDataFormatException e) {
+            throw new UTFDataFormatException("\033[1;30mOutput too big!\033[0m");
+        }
         timer.stopAndPrint("Compact Transmission Start");
     }
 
@@ -195,7 +196,7 @@ public class EdgeServer {
      * Grabs the first file to be processed. Allows easy use of regex
      *
      * @param regex
-     * @return ArrayList<File>
+     * @return ArrayList
      * @throws IOException
      */
 
@@ -242,10 +243,18 @@ public class EdgeServer {
         }
     }
 
+    /**
+     * Puts thread to sleep for .1 seconds if there are not
+     * iterations * numOfInputFiles in the directory for
+     * files to be processed.
+     *
+     * @param numOfInputFiles
+     */
+
     private void waitForFiles(int numOfInputFiles){
         while(dir.listFiles().length < (this.iterations * numOfInputFiles)) {
             try {
-                TimeUnit.MILLISECONDS.sleep(500);
+                TimeUnit.MILLISECONDS.sleep(100);
             } catch (InterruptedException e) {
                 e.printStackTrace();
             }

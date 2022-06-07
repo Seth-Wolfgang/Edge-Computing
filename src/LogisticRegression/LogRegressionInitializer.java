@@ -49,7 +49,7 @@ public class LogRegressionInitializer {
     }
      
     public String LogRegressionInitializer(File inputFile1, File inputFile2){
-        ArrayList<Example> examples = readDataSet(inputFile1); //should be BreastCancer.txt in ftpResources
+        ArrayList<Example> examples = readDataSet(inputFile1); //should be BreastCancerLarge.txt in ftpResources
         LogisticRegresion classifier = new LogisticRegresion(30,0.001);
         String output = "";
         //train the classifier

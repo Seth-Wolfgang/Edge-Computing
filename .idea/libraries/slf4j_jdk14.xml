@@ -14,4 +14,7 @@
       <root url="jar://$PROJECT_DIR$/lib/slf4j-api-1.7.36-sources.jar!/" />
     </SOURCES>
   </library>
+      <configuration>
+        <logger name="org.apache.ftpserver.listener.nio.FtpLoggingFilter" level="OFF" />
+    </configuration>
 </component>

@@ -8,9 +8,7 @@
 
 package Client;
 
-import net.sourceforge.tess4j.TesseractException;
 import org.apache.commons.io.FileUtils;
-
 import java.io.File;
 import java.io.IOException;
 import java.util.ArrayList;
@@ -20,12 +18,11 @@ public class Client {
 
     //Initial vars
     ArrayList<Long> runTimes = new ArrayList<>();
-    int counter = 0;
     easyFTPClient ftpClient;
-
+    String size;
 
     // constructor to put ip address, port, test, and iterations.
-    public Client(String address, int ftpPort, int test, int iterations, int ID) throws IOException, TesseractException {
+    public Client(String address, int ftpPort, int test, int iterations, int size, int ID) throws IOException {
         try {
             TimeUnit.SECONDS.sleep(2);
         } catch (InterruptedException e) {
@@ -37,24 +34,30 @@ public class Client {
         File copiedFile = null;
         File file = null;
 
+        //for size parameter -> used in input file names
+        switch (size){
+            case 1 -> this.size = "Small";
+            case 2 -> this.size = "Medium";
+            case 3 -> this.size = "Large";
+        }
 
         switch (test) {
             case 1: //OCR Test
                     //sending image file
                     for (int i = 0; i < iterations; i++) {
-                         copiedFile = new File("ftpResources\\woahman" + i + "C" + ID +".png");
-                         file = new File("ftpResources\\woahman.png");
+                         copiedFile = new File("ftpResources\\images\\woahman" + this.size + i + "C" + ID +".png");
+                         file = new File("ftpResources\\images\\woahman" + this.size + ".png");
                          copyAndSendFile(file, copiedFile);
                     }
                 break; //end of OCR test
 
             case 2: //Smith-Waterman Test
-                String[] SWinputFiles = {"smallQuery", "database", "alphabet", "scoringmatrix"};
+                String[] SWinputFiles = {"query", "databaseSmall", "alphabet", "scoringmatrix"};
 
                 for (int i = 0; i < iterations; i++) {
                     for (int j = 0; j < SWinputFiles.length; j++) {
-                        copiedFile = new File("ftpResources\\" + SWinputFiles[j] + i + "C" + ID + ".txt");
-                        file = new File("ftpResources\\" + SWinputFiles[j] + ".txt");
+                        copiedFile = new File("ftpResources\\SW\\" + SWinputFiles[j] + this.size + i + "C" + ID + ".txt");
+                        file = new File("ftpResources\\SW\\" + SWinputFiles[j] + this.size + ".txt");
                         copyAndSendFile(file, copiedFile);
                     }//end of j loop
                 }//end of i loop
@@ -65,8 +68,8 @@ public class Client {
 
                 for (int i = 0; i < iterations; i++) {
                     for(int j = 0; j < 2; j++) {
-                        copiedFile = new File("ftpResources\\" + LGInputFiles[j] + i + "C" + ID + ".txt");
-                        file = new File("ftpResources\\" + LGInputFiles[j] + ".txt");
+                        copiedFile = new File("ftpResources\\LogRegression\\" + LGInputFiles[j] + this.size + i + "C" + ID + ".txt");
+                        file = new File("ftpResources\\LogRegression\\" + LGInputFiles[j] + this.size + ".txt");
                         copyAndSendFile(file, copiedFile);
                     }
                 }

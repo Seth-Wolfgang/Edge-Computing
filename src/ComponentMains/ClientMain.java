@@ -23,13 +23,13 @@ public class ClientMain {
                                "Test #1 Tesseract OCR\nTest #2 Smith-Waterman\n" +
                                "Test #3 Logistic Regression");
         }
-
-        final int ftpPort = 2221; //todo make args?
+        //todo add size argument
+        final int ftpPort = 2221;
         final String address = args[0];
         final int test = Integer.parseInt(args[1]);
         final int iterations = Integer.parseInt(args[2]);
 
-        Client client = new Client(address, ftpPort, 1, 10, 1);
+        Client client = new Client(address, ftpPort, 1, 10, 1, 1);
 
     }
 }
