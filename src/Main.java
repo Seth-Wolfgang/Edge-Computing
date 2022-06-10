@@ -8,14 +8,11 @@
 
 import Client.Client;
 import Network.EdgeServer;
-import Network.Server;
 
 import java.io.IOException;
 
 public class Main extends Thread implements Runnable  {
 
-    int numOfPi;
-    int numOfEdgeServers;
     static int test = 3;
     static int iterations = 10;
     static int size = 3;
@@ -27,39 +24,31 @@ public class Main extends Thread implements Runnable  {
     public static void main(String[] args) throws Exception {
         try {
 
-            new Thread(new Runnable() { //Edge
-                @Override
-                public void run() {
-                    try {
-                        new EdgeServer(address , port, test, iterations);
-                    } catch (IOException e) {
-                        e.printStackTrace();
-                    } catch (InterruptedException e) {
-                        e.printStackTrace();
-                    }
+            //Edge
+            new Thread(() -> {
+                try {
+                    new EdgeServer(address , port, test, iterations);
+                } catch (IOException | InterruptedException e) {
+                    e.printStackTrace();
                 }
             }).start();
-            new Thread(new Runnable() { //CLIENT
-                @Override
-                public void run() {
-                    try {
-                        new Client(address, ftpPort,  test, iterations, size,1);
-                    } catch (IOException e) {
-                        e.printStackTrace();
-                    }
+            //CLIENT
+            new Thread(() -> {
+                try {
+                    new Client(address, ftpPort,  test, iterations*10, size,1);
+                } catch (IOException e) {
+                    e.printStackTrace();
                 }
             }).start();
-           new Thread(new Runnable() { //CLIENT
-               @Override
-               public void run() {
-                   try {
-                       new Client(address, ftpPort,  test, iterations, size,2);
-                   } catch (IOException e) {
-                       e.printStackTrace();
-                   }
-               }
-           }).start();
-           new Thread(new Server(port)).start();
+            //CLIENT
+            new Thread(() -> {
+                try {
+                    new Client(address, ftpPort,  test, iterations*20, size,2);
+                } catch (IOException e) {
+                    e.printStackTrace();
+                }
+            }).start();
+           //new Thread(new Server(port)).start();
 
 
         } catch (Exception e) {

@@ -11,6 +11,7 @@ import java.io.IOException;
 import java.io.UTFDataFormatException;
 import java.net.InetSocketAddress;
 import java.net.Socket;
+import java.net.SocketException;
 import java.util.ArrayList;
 import java.util.concurrent.TimeUnit;
 import java.util.regex.Pattern;
@@ -33,7 +34,25 @@ public class EdgeServer {
         InetSocketAddress sa = new InetSocketAddress(address, port);
 
         //initial connection to server
-        socket.connect(sa, 10000);
+        int counter = 0;
+        while(!socket.isConnected()) {
+            try {
+                counter++;
+                if(counter > 100){
+                    System.out.println("Failed to connect to server");
+                    cleanUp();
+                    System.exit(-1);
+                }
+                socket.connect(sa);
+
+            } catch (SocketException e) {
+                System.out.println("Connection failed! Trying again");
+                continue;
+            }
+        }
+
+
+
         System.out.println("Edge server connected to server");
 
         //determines which test is to be done
@@ -62,8 +81,10 @@ public class EdgeServer {
 
         //waits for files to be sent to this device
         //and adds them all to an array list for processing
+        timer.start();
         waitForFiles(1);
-        images = grabFiles("woah.*");
+        images = grabFiles("woah.*", 1);
+        timer.stopAndPrint("OCR Receive Files");
 
         timer.start();
         for(int i = 0; i < iterations; i++){
@@ -92,10 +113,12 @@ public class EdgeServer {
 
         //waits for files to be sent to this device
         //and adds them all to an array list for processing
+        timer.start();
         waitForFiles(4);
         for (int i = 0; i < 4; i++) {
-            inputFiles.add(grabFiles(inputFilesName[i]));
+            inputFiles.add(grabFiles(inputFilesName[i], 4));
         }
+        timer.stopAndPrint("SW Receive Files");
 
         try {
             timer.start();
@@ -127,15 +150,18 @@ public class EdgeServer {
 
         //waits for files to be sent to this device
         //and adds them all to an array list for processing
+        timer.start();
         waitForFiles(2);
-        inputFiles.add(grabFiles("B.*"));
-        inputFiles.add(grabFiles("t.*"));
+        inputFiles.add(grabFiles("B.*", 2));
+        inputFiles.add(grabFiles("t.*", 2));
+        timer.stopAndPrint("LR Receive Files");
 
         timer.start();
         for (int i = 0; i < iterations; i++) {
             timer.newLap();
             logRegressOutput.add(logRegress.LogRegressionInitializer(inputFiles.get(0).get(i), inputFiles.get(1).get(i)));
         }//end of i loop
+        timer.stopAndPrint("Logistic Regression");
         return logRegressOutput;
     }
 
@@ -153,8 +179,8 @@ public class EdgeServer {
 
         timer.start();
         for (String out : manyOutput) {
-            dataOutput.writeUTF(out);
             timer.newLap();
+            dataOutput.writeUTF(out);
         }
         timer.stopAndPrint("Individual Transmission Start");
     }
@@ -200,7 +226,7 @@ public class EdgeServer {
      * @throws IOException
      */
 
-    public ArrayList<File> grabFiles(String regex) throws IOException {
+    public ArrayList<File> grabFiles(String regex, int numOfInputs) throws IOException {
         Pattern pattern = Pattern.compile(regex);
         ArrayList<File> files = new ArrayList<>();
 
@@ -208,7 +234,11 @@ public class EdgeServer {
         //and adds them to the returned file ArrayList
         for (File file : dir.listFiles()) {
             if (pattern.asPredicate().test(file.getName())) {
-                files.add(file);
+                if(files.size() < iterations * numOfInputs){
+                    files.add(file);
+                } else {
+                    break;
+                }
             }
         }
         return files;
@@ -233,7 +263,6 @@ public class EdgeServer {
 
     /**
      * Removes temporary files
-     * <p>
      * todo (May add to this method later?)
      */
 

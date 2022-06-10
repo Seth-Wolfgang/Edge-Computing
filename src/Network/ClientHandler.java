@@ -41,11 +41,7 @@ class ClientHandler extends Thread {
                 if (line.compareTo("") != 0 && !line.equals("over")) {
                     timer.newLap();
                     counter++;
-                    System.out.println("\033[1;34mClient "+ this.clientNum +" iteration # " + counter + " done.\033[0m");
-                    if (counter == 20) { //todo: this is a placeholder (replace with args)
-                        timer.stopTimer();
-                        break;
-                    }
+                    System.out.println("\033[1;34mEdge Server "+ this.clientNum +" iteration # " + counter + " done.\033[0m");
                 } else if (line.equals("over")) {
                     timer.stopTimer();
                     break;

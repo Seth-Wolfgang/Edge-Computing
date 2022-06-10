@@ -15,6 +15,7 @@ public class Timer extends Thread {
     private long initialTime = 0; //for use in getting total time
     private long initialLapTime = 0; //for use in laps
     private long totalTime = 0;
+    private boolean running = false;
     ArrayList<Long> laps = new ArrayList<Long>();
 
     /**
@@ -27,6 +28,7 @@ public class Timer extends Thread {
     public void start() {
         initialTime = System.nanoTime();
         initialLapTime = initialTime;
+        running = true;
     }
 
     /**
@@ -38,10 +40,11 @@ public class Timer extends Thread {
      */
 
     public void stopTimer(){
-        if(initialTime > 0) {
+        if(running) {
             totalTime = System.nanoTime() - initialTime;
             initialTime = 0; //"stops" timer
             initialLapTime = 0;
+            running = false;
         } else {
             System.out.println("Must start timer calling `stop` method.");
         }
@@ -54,7 +57,7 @@ public class Timer extends Thread {
      */
 
     public void newLap(){
-        if(initialTime > 0) {
+        if(running) {
             laps.add(System.nanoTime() - initialLapTime);
             resetInitialLapTime();
         } else {
@@ -143,7 +146,9 @@ public class Timer extends Thread {
      */
 
     public void stopAndPrint(String tag) throws IOException {
-        stopTimer();
+        if(running){
+            stopTimer();
+        }
         printResultsToFile(tag);
     }
 

@@ -9,15 +9,14 @@
 package Client;
 
 import org.apache.commons.io.FileUtils;
+
 import java.io.File;
 import java.io.IOException;
-import java.util.ArrayList;
 import java.util.concurrent.TimeUnit;
 
 public class Client {
 
     //Initial vars
-    ArrayList<Long> runTimes = new ArrayList<>();
     easyFTPClient ftpClient;
     String size;
 
@@ -28,6 +27,7 @@ public class Client {
         } catch (InterruptedException e) {
             e.printStackTrace();
         }
+        iterations = iterations /2;
         //Setup before connection occurs
         ftpClient = new easyFTPClient(address, ftpPort);
         System.out.println("Client connected to edge server");
