@@ -50,9 +50,6 @@ public class EdgeServer {
                 continue;
             }
         }
-
-
-
         System.out.println("Edge server connected to server");
 
         //determines which test is to be done
@@ -128,7 +125,6 @@ public class EdgeServer {
                                                      inputFiles.get(1).get(i).getAbsolutePath(),
                                                      inputFiles.get(2).get(i).getAbsolutePath(),
                                                      inputFiles.get(3).get(i).getAbsolutePath(), 1, 1));
-                System.out.println(SWOutput.toString());
             }//end of i loop
             timer.stopAndPrint("SW run");
 

@@ -46,6 +46,7 @@ class ClientHandler extends Thread {
                     timer.stopTimer();
                     break;
                 }
+
             } catch (IOException e) {
                 e.printStackTrace();
             }

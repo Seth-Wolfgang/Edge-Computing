@@ -52,7 +52,7 @@ public class Client {
                 break; //end of OCR test
 
             case 2: //Smith-Waterman Test
-                String[] SWinputFiles = {"query", "databaseSmall", "alphabet", "scoringmatrix"};
+                String[] SWinputFiles = {"query", "database", "alphabet", "scoringmatrix"};
 
                 for (int i = 0; i < iterations; i++) {
                     for (int j = 0; j < SWinputFiles.length; j++) {

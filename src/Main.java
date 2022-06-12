@@ -8,6 +8,7 @@
 
 import Client.Client;
 import Network.EdgeServer;
+import Network.Server;
 
 import java.io.IOException;
 
@@ -23,8 +24,15 @@ public class Main extends Thread implements Runnable  {
 
     public static void main(String[] args) throws Exception {
         try {
-
-            //Edge
+            //SERVER
+            new Thread(() -> {
+                try {
+                    new Server(port);
+                } catch (IOException e) {
+                    e.printStackTrace();
+                }
+            }).start();
+            //EDGE
             new Thread(() -> {
                 try {
                     new EdgeServer(address , port, test, iterations);
@@ -35,7 +43,7 @@ public class Main extends Thread implements Runnable  {
             //CLIENT
             new Thread(() -> {
                 try {
-                    new Client(address, ftpPort,  test, iterations*10, size,1);
+                    new Client(address, ftpPort,  test, iterations, size,1);
                 } catch (IOException e) {
                     e.printStackTrace();
                 }
@@ -43,12 +51,11 @@ public class Main extends Thread implements Runnable  {
             //CLIENT
             new Thread(() -> {
                 try {
-                    new Client(address, ftpPort,  test, iterations*20, size,2);
+                    new Client(address, ftpPort,  test, iterations, size,2);
                 } catch (IOException e) {
                     e.printStackTrace();
                 }
             }).start();
-           //new Thread(new Server(port)).start();
 
 
         } catch (Exception e) {
