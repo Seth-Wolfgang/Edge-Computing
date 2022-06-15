@@ -1,7 +1,7 @@
 /**
  * This is meant as a placeholder for a real ComponentMains.CloudMain.java file. Used to easily
  * run every part of the program from a single file.
- *
+ * <p>
  * Author: Seth Wolfgang
  * Date 5/3/2022
  */
@@ -12,11 +12,12 @@ import Network.Server;
 
 import java.io.IOException;
 
-public class Main extends Thread implements Runnable  {
+public class Main extends Thread implements Runnable {
 
     static int test = 3;
     static int iterations = 10;
     static int size = 3;
+    static int clients = 2;
 
     static int port = 5000;
     static int ftpPort = 2221;
@@ -35,7 +36,7 @@ public class Main extends Thread implements Runnable  {
             //EDGE
             new Thread(() -> {
                 try {
-                    new EdgeServer(address , port, test, iterations);
+                    new EdgeServer(address, port, test, size, iterations, clients);
                 } catch (IOException | InterruptedException e) {
                     e.printStackTrace();
                 }
@@ -43,7 +44,7 @@ public class Main extends Thread implements Runnable  {
             //CLIENT
             new Thread(() -> {
                 try {
-                    new Client(address, ftpPort,  test, iterations, size,1);
+                    new Client(address, ftpPort);
                 } catch (IOException e) {
                     e.printStackTrace();
                 }
@@ -51,7 +52,7 @@ public class Main extends Thread implements Runnable  {
             //CLIENT
             new Thread(() -> {
                 try {
-                    new Client(address, ftpPort,  test, iterations, size,2);
+                    new Client(address, ftpPort);
                 } catch (IOException e) {
                     e.printStackTrace();
                 }

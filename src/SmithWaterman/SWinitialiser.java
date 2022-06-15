@@ -1,17 +1,20 @@
 /**
  * Changes by Seth Wolfgang
  * Date: 5/5/2022
- *
+ * <p>
  * Slightly modified version taken from source. Returns output instead of
  * printing to console.
- *
+ * <p>
  * Source: https://github.com/JayakrishnaThota/Sequence-Alignment
  */
 
 
 package SmithWaterman;
 
-import java.util.*;
+import java.util.Collections;
+import java.util.HashMap;
+import java.util.Map;
+import java.util.PriorityQueue;
 
 public class SWinitialiser {
     public String run(String queryFile, String databaseFile, String alphabetFile, String scoreMatrixFile, int k, int m) throws Exception {
@@ -44,7 +47,7 @@ public class SWinitialiser {
         }
         for (int i = 0; i < k; i++) {
             int temp = pq.poll();
-            output =  "score = " + temp +
+            output = "score = " + temp +
                     "\n" + "id1 " + idmap.get(temp)[0] + " " + offsetmap.get(temp)[0] + " " + offsetmap.get(temp)[1] + " " + smap.get(temp)[0] +
                     "\n" + "id2 " + idmap.get(temp)[1] + " " + offsetmap.get(temp)[2] + " " + offsetmap.get(temp)[3] + " " + smap.get(temp)[1];
         }

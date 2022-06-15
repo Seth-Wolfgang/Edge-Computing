@@ -16,10 +16,10 @@ import java.util.List;
 
 public class easyFTPServer extends Thread implements Runnable {
 
-    private String address;
-    private int port;
+    private final String address;
+    private final int port;
 
-    public easyFTPServer (String address, int port) {
+    public easyFTPServer(String address, int port) {
 
         this.address = address;
         this.port = port;

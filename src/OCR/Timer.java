@@ -1,22 +1,25 @@
 /**
  * Author: Seth Wolfgang
  * Date: 4/23/2022
- *
+ * <p>
  * This class is a simple timer for the purpose of benchmarking programs
  */
 
 package OCR;
 
-import java.io.*;
+import java.io.File;
+import java.io.FileWriter;
+import java.io.IOException;
+import java.io.PrintWriter;
 import java.util.ArrayList;
 
 public class Timer extends Thread {
 
+    ArrayList<Long> laps = new ArrayList<Long>();
     private long initialTime = 0; //for use in getting total time
     private long initialLapTime = 0; //for use in laps
     private long totalTime = 0;
     private boolean running = false;
-    ArrayList<Long> laps = new ArrayList<Long>();
 
     /**
      * Starts the timer by setting the initialTime and
@@ -39,8 +42,8 @@ public class Timer extends Thread {
      * Time is represented in nanoseconds
      */
 
-    public void stopTimer(){
-        if(running) {
+    public void stopTimer() {
+        if (running) {
             totalTime = System.nanoTime() - initialTime;
             initialTime = 0; //"stops" timer
             initialLapTime = 0;
@@ -56,8 +59,8 @@ public class Timer extends Thread {
      * after a new lap is created.
      */
 
-    public void newLap(){
-        if(running) {
+    public void newLap() {
+        if (running) {
             laps.add(System.nanoTime() - initialLapTime);
             resetInitialLapTime();
         } else {
@@ -69,7 +72,7 @@ public class Timer extends Thread {
      * Sets initialLapTime to System.nanotime() for use in newLap()
      */
 
-    private void resetInitialLapTime(){
+    private void resetInitialLapTime() {
         initialLapTime = System.nanoTime();
     }
 
@@ -77,7 +80,7 @@ public class Timer extends Thread {
      * Clears out any values in lap
      */
 
-    public void clearLaps(){
+    public void clearLaps() {
         laps.clear();
     }
 
@@ -98,7 +101,7 @@ public class Timer extends Thread {
      * @return long
      */
 
-    public long getTotalTime(){
+    public long getTotalTime() {
         return totalTime;
     }
 
@@ -108,7 +111,7 @@ public class Timer extends Thread {
      * @return ArrayList
      */
 
-    public ArrayList<Long> getLaps(){
+    public ArrayList<Long> getLaps() {
         return laps;
     }
 
@@ -123,7 +126,7 @@ public class Timer extends Thread {
     public void printResultsToFile(String tag) throws IOException {
         File results = new File("Results\\" + tag + ".txt");
         int i = 0;
-        if(results.createNewFile()){
+        if (results.createNewFile()) {
             System.out.println("Created " + results.getPath());
         }
 
@@ -131,8 +134,8 @@ public class Timer extends Thread {
         writer.append("\nTest name: " + tag);
         writer.append("\nTest performed at: " + System.currentTimeMillis() + "\n");
 
-        for(Long time : laps)
-            writer.append(String.valueOf(time) + "\t");
+        for (Long time : laps)
+            writer.append(time + "\t");
 
         writer.append("\nTotal: " + getTotalTime() + "\n");
         writer.close();
@@ -146,7 +149,7 @@ public class Timer extends Thread {
      */
 
     public void stopAndPrint(String tag) throws IOException {
-        if(running){
+        if (running) {
             stopTimer();
         }
         printResultsToFile(tag);

@@ -1,7 +1,7 @@
 /**
  * Author: Seth Wolfgang
  * Date: 4/26/2022
- *
+ * <p>
  * For use in creating a standard constructor for FTP in this package
  */
 
@@ -12,7 +12,7 @@ import org.apache.commons.net.ftp.FTPClient;
 
 import java.io.*;
 
-public class easyFTPClient extends FTPClient{
+public class easyFTPClient extends FTPClient {
 
     /**
      * Constructor for the easy FTP Client
@@ -24,8 +24,8 @@ public class easyFTPClient extends FTPClient{
     private String address;
     private int port;
 
-    public easyFTPClient(String address, int port){
-        try{
+    public easyFTPClient(String address, int port) {
+        try {
             //connects to EdgeServer
             ftpClient.setConnectTimeout(5000);
             ftpClient.connect(address, port);
@@ -57,12 +57,12 @@ public class easyFTPClient extends FTPClient{
         BufferedInputStream inputStream = new BufferedInputStream(new FileInputStream(file));
         boolean success = ftpClient.storeFile(file.getName(), inputStream);
 
-        if (success){
+        if (success) {
             //Grabs file from server and ends stream
             System.out.println("\033[1;32m" + file.getName() + " transferred \033[0m");
             inputStream.close();
 
-        } else{
+        } else {
             inputStream.close();
             System.out.println("File transfer failed!");
         }
@@ -83,14 +83,14 @@ public class easyFTPClient extends FTPClient{
         BufferedOutputStream outputStream = new BufferedOutputStream(new FileOutputStream(file));
         boolean success = ftpClient.retrieveFile(fileName, outputStream);
 
-        if (success){
+        if (success) {
             //Grabs file from server and ends stream
             System.out.println("\033[1;32m" + fileName + " transferred \033[0m");
             outputStream.flush();
             outputStream.close();
             return file;
 
-        } else{
+        } else {
             outputStream.close();
             System.out.println("File transfer failed!");
             return null;

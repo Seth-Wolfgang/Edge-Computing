@@ -3,15 +3,16 @@ package Network;
 import java.io.BufferedInputStream;
 import java.io.DataInputStream;
 import java.io.IOException;
-import java.net.*;
+import java.net.ServerSocket;
+import java.net.Socket;
 
 
 public class Server extends Thread {
 
-    //initialize socket and input stream
-    private ServerSocket server;
-    private DataInputStream in;
     Socket socket;
+    //initialize socket and input stream
+    private final ServerSocket server;
+    private DataInputStream in;
 
     // constructor with port
     public Server(int port) throws IOException {
@@ -21,7 +22,7 @@ public class Server extends Thread {
         System.out.println("Waiting for a client ...");
 
 
-        while(true) {
+        while (true) {
             try {
                 // starts server and waits for a connection
                 socket = server.accept();
@@ -30,7 +31,7 @@ public class Server extends Thread {
                 in = new DataInputStream(new BufferedInputStream(socket.getInputStream()));
 
                 //Creates new thread when there is a new client
-                Thread newClient = new ClientHandler(socket, in, clientNum);
+                Thread newClient = new EdgeHandler(socket, in, clientNum);
                 newClient.start();
 
                 clientNum++;

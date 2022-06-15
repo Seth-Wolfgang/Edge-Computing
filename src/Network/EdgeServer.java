@@ -10,6 +10,7 @@ import java.io.File;
 import java.io.IOException;
 import java.io.UTFDataFormatException;
 import java.net.InetSocketAddress;
+import java.net.ServerSocket;
 import java.net.Socket;
 import java.net.SocketException;
 import java.util.ArrayList;
@@ -18,39 +19,56 @@ import java.util.regex.Pattern;
 
 public class EdgeServer {
 
+    Socket socket;
+    Socket clientSocket;
+    ServerSocket server;
     File dir = new File("filesToProcess");
     Timer timer = new Timer();
     int test = 3;
     int iterations;
+    int clients;
     ArrayList<String> outputString = new ArrayList<>();
 
-    public EdgeServer(String address, int port, int test, int iterations) throws IOException, InterruptedException {
+    public EdgeServer(String address, int port, int test, int size, int iterations, int clients) throws IOException, InterruptedException {
         this.iterations = iterations;
+        this.clients = clients;
+
 
         //initial networking
         Thread ftpServer = new easyFTPServer(address, 2221);
         ftpServer.start();
-        Socket socket = new Socket();
-        InetSocketAddress sa = new InetSocketAddress(address, port);
+        socket = new Socket();
+        clientSocket = new Socket();
+        InetSocketAddress serverSocketAddress = new InetSocketAddress(address, port);
+        server = new ServerSocket(5001);
+        int clientNum = 0;
 
         //initial connection to server
         int counter = 0;
-        while(!socket.isConnected()) {
+        while (!socket.isConnected()) {
             try {
                 counter++;
-                if(counter > 100){
+                if (counter > 100) {
                     System.out.println("Failed to connect to server");
                     cleanUp();
                     System.exit(-1);
                 }
-                socket.connect(sa);
+                socket.connect(serverSocketAddress);
 
             } catch (SocketException e) {
                 System.out.println("Connection failed! Trying again");
-                continue;
             }
         }
         System.out.println("Edge server connected to server");
+
+        while(clientNum < clients){
+            clientSocket = server.accept();
+            System.out.println("ES:Client accepted");
+            clientNum++;
+            Thread newClient = new ClientHandler(clientSocket, test, size, iterations, clientNum);
+            newClient.start();
+        }
+
 
         //determines which test is to be done
         switch (test) {
@@ -84,10 +102,10 @@ public class EdgeServer {
         timer.stopAndPrint("OCR Receive Files");
 
         timer.start();
-        for(int i = 0; i < iterations; i++){
-                timer.newLap();
-                processedText.add(ocr.readImage(images.get(i)));
-            }
+        for (int i = 0; i < iterations; i++) {
+            timer.newLap();
+            processedText.add(ocr.readImage(images.get(i)));
+        }
         timer.stopAndPrint("OCR");
         return processedText;
     }
@@ -122,9 +140,9 @@ public class EdgeServer {
             for (int i = 0; i < iterations; i++) {
                 timer.newLap();
                 SWOutput.add(new SWinitialiser().run(inputFiles.get(0).get(i).getAbsolutePath(),
-                                                     inputFiles.get(1).get(i).getAbsolutePath(),
-                                                     inputFiles.get(2).get(i).getAbsolutePath(),
-                                                     inputFiles.get(3).get(i).getAbsolutePath(), 1, 1));
+                        inputFiles.get(1).get(i).getAbsolutePath(),
+                        inputFiles.get(2).get(i).getAbsolutePath(),
+                        inputFiles.get(3).get(i).getAbsolutePath(), 1, 1));
             }//end of i loop
             timer.stopAndPrint("SW run");
 
@@ -206,7 +224,7 @@ public class EdgeServer {
 
         //times the transmission until it is done
         timer.start();
-        try{
+        try {
             dataOutput.writeUTF(outputString);
         } catch (UTFDataFormatException e) {
             throw new UTFDataFormatException("\033[1;30mOutput too big!\033[0m");
@@ -230,7 +248,7 @@ public class EdgeServer {
         //and adds them to the returned file ArrayList
         for (File file : dir.listFiles()) {
             if (pattern.asPredicate().test(file.getName())) {
-                if(files.size() < iterations * numOfInputs){
+                if (files.size() < iterations * numOfInputs) {
                     files.add(file);
                 } else {
                     break;
@@ -276,8 +294,8 @@ public class EdgeServer {
      * @param numOfInputFiles
      */
 
-    private void waitForFiles(int numOfInputFiles){
-        while(dir.listFiles().length < (this.iterations * numOfInputFiles)) {
+    private void waitForFiles(int numOfInputFiles) {
+        while (dir.listFiles().length < (this.iterations * this.clients * numOfInputFiles)) {
             try {
                 TimeUnit.MILLISECONDS.sleep(100);
             } catch (InterruptedException e) {

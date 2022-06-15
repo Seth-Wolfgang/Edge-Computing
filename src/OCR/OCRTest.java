@@ -1,7 +1,7 @@
 /**
  * Author: Seth Wolfgang
  * Date: 4/23/2022
- *
+ * <p>
  * Creates a streamlined OCR class for the purpose benchmarking
  */
 
@@ -16,13 +16,12 @@ import java.io.IOException;
 import java.util.ArrayList;
 
 public class OCRTest {
-    OCR.Timer timer = new Timer();
-
-    ITesseract tesseract = new Tesseract();
     private final String dataPath;
+    OCR.Timer timer = new Timer();
+    ITesseract tesseract = new Tesseract();
     private File image;
     private String output;
-    private ArrayList<String> manyOutput = new ArrayList<String>();
+    private final ArrayList<String> manyOutput = new ArrayList<String>();
 
     /**
      * Constructor for OCRTest with a given image.
@@ -31,7 +30,7 @@ public class OCRTest {
      * @param imagePath path of image to perform OCR
      */
 
-    public OCRTest(String dataDir, File imagePath){
+    public OCRTest(String dataDir, File imagePath) {
         dataPath = dataDir;
         image = imagePath;
 
@@ -44,7 +43,7 @@ public class OCRTest {
      * @param dataDir path of `tessdata` folder
      */
 
-    public OCRTest(String dataDir){
+    public OCRTest(String dataDir) {
         dataPath = dataDir;
 
         tesseract.setVariable("user_defined_dpi", "100");
@@ -62,7 +61,7 @@ public class OCRTest {
 
     public ArrayList performCompactBenchmark(int iterations) throws IOException {
         timer.start();
-        for(int i = 0; i < iterations; i++) {
+        for (int i = 0; i < iterations; i++) {
             manyOutput.add(readImage());
             timer.newLap();
         }
@@ -78,7 +77,7 @@ public class OCRTest {
      */
 
 
-    public void setImage(File imagePath){
+    public void setImage(File imagePath) {
         image = imagePath;
     }
 
@@ -87,7 +86,7 @@ public class OCRTest {
      * @param dpi
      */
 
-    public void setDPI(int dpi){
+    public void setDPI(int dpi) {
         tesseract.setVariable("user_defined_dpi", String.valueOf(dpi));
     }
 
@@ -97,7 +96,7 @@ public class OCRTest {
      * @throws TesseractException
      */
 
-    public String readImage(){
+    public String readImage() {
         try {
             return tesseract.doOCR(image);
         } catch (TesseractException e) {
@@ -112,7 +111,7 @@ public class OCRTest {
      * @throws TesseractException
      */
 
-    public String readImage(File file){
+    public String readImage(File file) {
         try {
             setImage(file);
             return tesseract.doOCR(image);
@@ -129,9 +128,9 @@ public class OCRTest {
      * @throws TesseractException
      */
 
-    public ArrayList<String> bulkOCR(int iteration){
+    public ArrayList<String> bulkOCR(int iteration) {
         try {
-            for(int i = 0; i < iteration; i++)
+            for (int i = 0; i < iteration; i++)
                 manyOutput.add(tesseract.doOCR(image));
         } catch (TesseractException e) {
             System.out.println("OCR FAILED");
