@@ -14,7 +14,7 @@ import java.io.IOException;
 
 public class Main extends Thread implements Runnable {
 
-    static int test = 3;
+    static int test = 1;
     static int iterations = 10;
     static int size = 3;
     static int clients = 2;

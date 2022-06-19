@@ -59,8 +59,8 @@ public class Client {
             case 1: //OCR Test
                 //sending image file
                 for (int i = 0; i < iterations; i++) {
-                    copiedFile = new File("ftpResources\\images\\woahman" + this.size + i + "C" + ID + ".png");
-                    file = new File("ftpResources\\images\\woahman" + this.size + ".png");
+                    copiedFile = new File("ftpResources" + File.separator + "images" + File.separator + "woahman" + this.size + i + "C" + ID + ".png");
+                    file = new File("ftpResources" + File.separator + "images" + File.separator + "woahman" + this.size + ".png");
                     copyAndSendFile(file, copiedFile);
                 }
                 break; //end of OCR test
@@ -70,8 +70,8 @@ public class Client {
 
                 for (int i = 0; i < iterations; i++) {
                     for (int j = 0; j < SWinputFiles.length; j++) {
-                        copiedFile = new File("ftpResources\\SW\\" + SWinputFiles[j] + this.size + i + "C" + ID + ".txt");
-                        file = new File("ftpResources\\SW\\" + SWinputFiles[j] + this.size + ".txt");
+                        copiedFile = new File("ftpResources" + File.separator + "SW" + File.separator + "" + SWinputFiles[j] + this.size + i + "C" + ID + ".txt");
+                        file = new File("ftpResources" + File.separator + "SW" + File.separator + "" + SWinputFiles[j] + this.size + ".txt");
                         copyAndSendFile(file, copiedFile);
                     }//end of j loop
                 }//end of i loop
@@ -82,8 +82,8 @@ public class Client {
 
                 for (int i = 0; i < iterations; i++) {
                     for (int j = 0; j < 2; j++) {
-                        copiedFile = new File("ftpResources\\LogRegression\\" + LGInputFiles[j] + this.size + i + "C" + ID + ".txt");
-                        file = new File("ftpResources\\LogRegression\\" + LGInputFiles[j] + this.size + ".txt");
+                        copiedFile = new File("ftpResources" + File.separator + "LogRegression" + File.separator + "" + LGInputFiles[j] + this.size + i + "C" + ID + ".txt");
+                        file = new File("ftpResources" + File.separator + "LogRegression" + File.separator + "" + LGInputFiles[j] + this.size + ".txt");
                         copyAndSendFile(file, copiedFile);
                     }
                 }
