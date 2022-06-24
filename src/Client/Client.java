@@ -29,13 +29,14 @@ public class Client {
         this.address = address;
         socket = new Socket();
         InetSocketAddress edgeServerSocketAddress = new InetSocketAddress(this.address, 5001);
-        socket.connect(edgeServerSocketAddress, 1000);
 
         try {
-            TimeUnit.SECONDS.sleep(2);
+            TimeUnit.SECONDS.sleep(1);
         } catch (InterruptedException e) {
             e.printStackTrace();
         }
+        socket.connect(edgeServerSocketAddress, 1000);
+
         //Setup before connection occurs
         ftpClient = new easyFTPClient(address, ftpPort);
         System.out.println("FTP:Client connected to edge server");

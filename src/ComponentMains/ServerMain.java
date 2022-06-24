@@ -1,7 +1,7 @@
 /**
  * Author: Seth Wolfgang
  * Date: 5/13/2022
- * <p>
+ *
  * ServerMain is to be run on server devices in the network. The purpose of
  * this file is to create an easy to use .jar file for server devices.
  */

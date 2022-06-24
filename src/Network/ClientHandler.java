@@ -1,3 +1,9 @@
+/**
+ * This lovely, short class should be a method, instead it needs to run on a
+ *  separate thread for the project to allow multiple clients.
+ *
+ */
+
 package Network;
 
 import java.io.DataOutputStream;

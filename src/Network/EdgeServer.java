@@ -24,7 +24,6 @@ public class EdgeServer {
     ServerSocket server;
     File dir = new File("filesToProcess");
     Timer timer = new Timer();
-    int test = 3;
     int iterations;
     int clients;
     ArrayList<String> outputString = new ArrayList<>();
@@ -114,7 +113,6 @@ public class EdgeServer {
     /**
      * Performs the Smith-Waterman algorithm to benchmark the system.
      * This sends results to the server.
-     *
      * @throws IOException
      * @throws InterruptedException
      */
@@ -277,7 +275,6 @@ public class EdgeServer {
 
     /**
      * Removes temporary files
-     * todo (May add to this method later?)
      */
 
     private void cleanUp() {
