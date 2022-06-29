@@ -35,7 +35,7 @@ public class Client {
         } catch (InterruptedException e) {
             e.printStackTrace();
         }
-        socket.connect(edgeServerSocketAddress, 1000);
+        socket.connect(edgeServerSocketAddress, 10000);
 
         //Setup before connection occurs
         ftpClient = new easyFTPClient(address, ftpPort);
@@ -90,6 +90,7 @@ public class Client {
                 }
                 break; //end of logistic regression
         }//end of switch
+
     }
 
     /**
@@ -126,4 +127,6 @@ public class Client {
 
         return configData;
     }
+
+
 }    // end of client

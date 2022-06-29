@@ -9,10 +9,7 @@ import java.io.DataOutputStream;
 import java.io.File;
 import java.io.IOException;
 import java.io.UTFDataFormatException;
-import java.net.InetSocketAddress;
-import java.net.ServerSocket;
-import java.net.Socket;
-import java.net.SocketException;
+import java.net.*;
 import java.util.ArrayList;
 import java.util.concurrent.TimeUnit;
 import java.util.regex.Pattern;
@@ -43,23 +40,9 @@ public class EdgeServer {
         int clientNum = 0;
 
         //initial connection to server
-        int counter = 0;
-        while (!socket.isConnected()) {
-            try {
-                counter++;
-                if (counter > 100) {
-                    System.out.println("Failed to connect to server");
-                    cleanUp();
-                    System.exit(-1);
-                }
-                socket.connect(serverSocketAddress);
+        connectToServer(serverSocketAddress);
 
-            } catch (SocketException e) {
-                System.out.println("Connection failed! Trying again");
-            }
-        }
-        System.out.println("Edge server connected to server");
-
+        //Program will not run until all clients connect
         while(clientNum < clients){
             clientSocket = server.accept();
             System.out.println("ES:Client accepted");
@@ -68,17 +51,17 @@ public class EdgeServer {
             newClient.start();
         }
 
-
         //determines which test is to be done
         switch (test) {
             case 1 -> outputString = OCRBench();
             case 2 -> outputString = SWBench();
             case 3 -> outputString = logRegressionBench();
         }
+
         individualTransmission(socket, outputString);
         compactTransmission(socket, outputString);
         cleanUp();
-        //closeConnection(socket);
+        closeConnection(socket);
     }
 
     /**
@@ -301,6 +284,24 @@ public class EdgeServer {
         }
     }
 
+    private void connectToServer(InetSocketAddress serverSocketAddress) throws IOException {
+        int counter = 0;
+        while (!socket.isConnected()) {
+            try {
+                counter++;
+                if (counter > 100) {
+                    System.out.println("Failed to connect to server");
+                    cleanUp();
+                    System.exit(-1);
+                }
+                socket.connect(serverSocketAddress);
+
+            } catch (SocketException e) {
+                System.out.println("Connection failed! Trying again");
+            }
+        }
+        System.out.println("Edge server connected to server");
+    }
 }//end of class
 
 
