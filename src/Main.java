@@ -11,6 +11,7 @@ import Network.EdgeServer;
 import Network.Server;
 
 import java.io.IOException;
+import java.util.concurrent.TimeUnit;
 
 public class Main extends Thread implements Runnable {
 
@@ -33,7 +34,24 @@ public class Main extends Thread implements Runnable {
                     e.printStackTrace();
                 }
             }).start();
+            //CLIENT
+            new Thread(() -> {
+                try {
+                    new Client(address, ftpPort);
+                } catch (IOException e) {
+                    e.printStackTrace();
+                }
+            }).start();
+            //CLIENT
+            new Thread(() -> {
+                try {
+                    new Client(address, ftpPort);
+                } catch (IOException e) {
+                    e.printStackTrace();
+                }
+            }).start();
             //EDGE
+            TimeUnit.MILLISECONDS.sleep(20000);
             new Thread(() -> {
                 try {
                     new EdgeServer(address, port, test, size, iterations, clients);
@@ -41,23 +59,6 @@ public class Main extends Thread implements Runnable {
                     e.printStackTrace();
                 }
             }).start();
-            //CLIENT
-            new Thread(() -> {
-                try {
-                    new Client(address, ftpPort);
-                } catch (IOException e) {
-                    e.printStackTrace();
-                }
-            }).start();
-            //CLIENT
-            new Thread(() -> {
-                try {
-                    new Client(address, ftpPort);
-                } catch (IOException e) {
-                    e.printStackTrace();
-                }
-            }).start();
-
 
         } catch (Exception e) {
             e.printStackTrace();

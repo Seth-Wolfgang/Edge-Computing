@@ -14,7 +14,6 @@ import java.io.File;
 import java.io.IOException;
 import java.net.InetSocketAddress;
 import java.net.Socket;
-import java.util.concurrent.TimeUnit;
 
 public class Client {
 
@@ -30,12 +29,8 @@ public class Client {
         socket = new Socket();
         InetSocketAddress edgeServerSocketAddress = new InetSocketAddress(this.address, 5001);
 
-        try {
-            TimeUnit.SECONDS.sleep(1);
-        } catch (InterruptedException e) {
-            e.printStackTrace();
-        }
-        socket.connect(edgeServerSocketAddress, 10000);
+        //connects to edge server
+        connectToEdgeServer(edgeServerSocketAddress);
 
         //Setup before connection occurs
         ftpClient = new easyFTPClient(address, ftpPort);
@@ -128,5 +123,20 @@ public class Client {
         return configData;
     }
 
+    private void connectToEdgeServer(InetSocketAddress edgeServerSocketAddress){
+        while (!socket.isConnected()) {
+            try {
+                socket = new Socket();
+                socket.connect(edgeServerSocketAddress); // try the connection
+            } catch (IOException e) {
+                // ignore we may have to try lots of times
+                try {
+                    Thread.sleep(1000);
+                } catch (InterruptedException ex) {
+                    // not sure how to handle this, maybe we should just give up.
+                }
+            }
+        }
+    }
 
 }    // end of client

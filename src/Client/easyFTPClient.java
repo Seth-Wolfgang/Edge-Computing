@@ -11,6 +11,7 @@ import org.apache.commons.net.ftp.FTP;
 import org.apache.commons.net.ftp.FTPClient;
 
 import java.io.*;
+import java.net.ConnectException;
 
 public class easyFTPClient extends FTPClient {
 
@@ -28,7 +29,16 @@ public class easyFTPClient extends FTPClient {
         try {
             //connects to EdgeServer
             ftpClient.setConnectTimeout(5000);
-            ftpClient.connect(address, port);
+
+            //ensures connection to FTP server
+            while(!ftpClient.isConnected()){
+                try{
+                    ftpClient.connect(address,port);
+                } catch (ConnectException e){
+                    //nothing needs to be done here
+                }
+            }
+
             ftpClient.login("user", "");
             ftpClient.enterLocalPassiveMode();
             ftpClient.setFileType(FTP.BINARY_FILE_TYPE);
