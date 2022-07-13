@@ -9,7 +9,10 @@ import java.io.DataOutputStream;
 import java.io.File;
 import java.io.IOException;
 import java.io.UTFDataFormatException;
-import java.net.*;
+import java.net.InetSocketAddress;
+import java.net.ServerSocket;
+import java.net.Socket;
+import java.net.SocketException;
 import java.util.ArrayList;
 import java.util.concurrent.TimeUnit;
 import java.util.regex.Pattern;
@@ -25,17 +28,16 @@ public class EdgeServer {
     int clients;
     ArrayList<String> outputString = new ArrayList<>();
 
-    public EdgeServer(String address, int port, int test, int size, int iterations, int clients) throws IOException, InterruptedException {
+    public EdgeServer(String deviceAddress, String address, int port, int test, int size, int iterations, int clients) throws IOException, InterruptedException {
         this.iterations = iterations;
         this.clients = clients;
 
-
         //initial networking
-        Thread ftpServer = new easyFTPServer(address, 2221);
+        Thread ftpServer = new easyFTPServer(deviceAddress, 2221);
         ftpServer.start();
         socket = new Socket();
         clientSocket = new Socket();
-        InetSocketAddress serverSocketAddress = new InetSocketAddress(address, port);
+        InetSocketAddress serverSocketAddress = new InetSocketAddress(address, 5000);
         server = new ServerSocket(5001);
         int clientNum = 0;
 
@@ -43,10 +45,12 @@ public class EdgeServer {
         connectToServer(serverSocketAddress);
 
         //Program will not run until all clients connect
+        System.out.println("Waiting for clients...");
         while(clientNum < clients){
             clientSocket = server.accept();
-            System.out.println("ES:Client accepted");
+            System.out.print("ES:Client accepted");
             clientNum++;
+            System.out.println(" | " + clientNum + " connected");
             Thread newClient = new ClientHandler(clientSocket, test, size, iterations, clientNum);
             newClient.start();
         }
@@ -289,7 +293,7 @@ public class EdgeServer {
         while (!socket.isConnected()) {
             try {
                 counter++;
-                if (counter > 100) {
+                if (counter > 3) {
                     System.out.println("Failed to connect to server");
                     cleanUp();
                     System.exit(-1);

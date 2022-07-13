@@ -1,7 +1,7 @@
 /**
  * This is meant as a placeholder for a real ComponentMains.CloudMain.java file. Used to easily
  * run every part of the program from a single file.
- * <p>
+ *
  * Author: Seth Wolfgang
  * Date 5/3/2022
  */
@@ -23,6 +23,7 @@ public class Main extends Thread implements Runnable {
     static int port = 5000;
     static int ftpPort = 2221;
     static String address = "127.0.0.1"; //likely should NOT change
+    static String deviceAddress = "127.0.0.1";
 
     public static void main(String[] args) throws Exception {
         try {
@@ -51,10 +52,10 @@ public class Main extends Thread implements Runnable {
                 }
             }).start();
             //EDGE
-            TimeUnit.MILLISECONDS.sleep(20000);
+            TimeUnit.MILLISECONDS.sleep(2000);
             new Thread(() -> {
                 try {
-                    new EdgeServer(address, port, test, size, iterations, clients);
+                    new EdgeServer(deviceAddress, address, port, test, size, iterations, clients);
                 } catch (IOException | InterruptedException e) {
                     e.printStackTrace();
                 }

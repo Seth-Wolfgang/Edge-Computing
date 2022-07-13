@@ -15,48 +15,48 @@ public class ProductionMain {
         if(args.length != 3 && type.equals("-c")) {
             System.out.println("""
                     Please use format for arguments:
-                    -c [IPV4] [FTP Port]
+                    -c [Edge IPV4] [FTP Port]
                     """);
         }
-        else if (args.length != 6 && type.equals("-e")){
+        else if (args.length != 7 && type.equals("-e")){
             System.out.println("""
                     Please use format for arguments:
-                    -e [IPV4] [FTP Port] [Test] [Size] [Iterations] [# of Clients]
+                    -e [Server IPV4] [FTP Port] [Device IPV4] [Test] [Size] [Iterations] [# of Clients]
                     """);
-        } else {
+        } else if(type.equals("help") || type.equals("-h")){
             System.out.println("""
                     Please use format for arguments:
                     [Type] [IPV4] [FTP Port]
                     Type:
-                    -c\t Client device
-                    -e\t Edge server device
+                    \t-c\t Client device
+                    \t-e\t Edge server device
                     Note:
                     Edge server devices need more arguments:
-                    -e [IPV4] [FTP Port] [Test] [Size] [Iterations] [# of Clients]
+                    \t-e [Server IPV4] [FTP Port] [Device IPV4] [Test] [Size] [Iterations] [# of Clients]
                     Test:
-                    1:\tTesseract OCR
-                    2:\tSmith Waterman Gene Sequencing
-                    3:\tLogistic Regression
+                    \t1:\tTesseract OCR
+                    \t2:\tSmith Waterman Gene Sequencing
+                    \t3:\tLogistic Regression
                     Size:
-                    1 is smallest size, 2 for medium, 3 for large
+                    \t1 is smallest size, 2 for medium, 3 for large
                     Iterations:
-                    The total number of times each client will send a file to edge device""");
+                    \tThe total number of times each client will send a file to edge device""");
         }
 
         switch (type){
             case "-c":
                 Client client = new Client(IP, ftpPort);
             case "-e":
-                int test = Integer.parseInt(args[3]);
-                int size = Integer.parseInt(args[4]);
-                int iterations = Integer.parseInt(args[5]);
-                int clients = Integer.parseInt(args[6]);
+                String deviceIP = args[3];
+                int test = Integer.parseInt(args[4]);
+                int size = Integer.parseInt(args[5]);
+                int iterations = Integer.parseInt(args[6]);
+                int clients = Integer.parseInt(args[7]);
                 try {
-                    EdgeServer edgeServer = new EdgeServer(IP, ftpPort, test, size, iterations, clients);
+                    EdgeServer edgeServer = new EdgeServer(deviceIP, IP, ftpPort, test, size, iterations, clients);
                 } catch (InterruptedException e) {
                     e.printStackTrace();
                 }
         }
-
     }
 }

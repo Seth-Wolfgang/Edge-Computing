@@ -11,22 +11,20 @@ public class Server extends Thread {
 
     Socket socket;
     //initialize socket and input stream
-    private final ServerSocket server;
+    private ServerSocket server;
     private DataInputStream in;
-
     // constructor with port
     public Server(int port) throws IOException {
         int clientNum = 1; // assigns client number
-        server = new ServerSocket(port);
+        server = new ServerSocket(5000);
         System.out.println("Server started");
-        System.out.println("Waiting for a client ...");
-
+        System.out.println("Waiting for a edge server ...");
 
         while (true) {
             try {
                 // starts server and waits for a connection
                 socket = server.accept();
-                System.out.println("Client accepted");
+                System.out.println("edge server accepted");
 
                 in = new DataInputStream(new BufferedInputStream(socket.getInputStream()));
 

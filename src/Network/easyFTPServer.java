@@ -60,6 +60,7 @@ public class easyFTPServer extends Thread implements Runnable {
             serverFactory.getUserManager().save(user);
             ftpServer = serverFactory.createServer();
             ftpServer.start();
+            System.out.println("FTP Started");
 
         } catch (
                 FtpException e) {
