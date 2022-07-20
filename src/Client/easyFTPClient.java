@@ -53,6 +53,16 @@ public class easyFTPClient extends FTPClient {
         sendFile(file);
     }
 
+    /**
+     * simple disconnection method
+     *
+     * @throws IOException
+     */
+
+    public void closeConnection() throws IOException {
+        ftpClient.disconnect();
+    }
+
 
     /**
      * Sends file to FTP server. Very similar to .storeFile method
@@ -69,7 +79,7 @@ public class easyFTPClient extends FTPClient {
 
         if (success) {
             //Grabs file from server and ends stream
-            System.out.println("\033[1;32m" + file.getName() + " transferred \033[0m");
+            //System.out.println("\033[1;32m" + file.getName() + " transferred \033[0m");
             inputStream.close();
 
         } else {

@@ -15,10 +15,10 @@ import java.util.concurrent.TimeUnit;
 
 public class Main extends Thread implements Runnable {
 
-    static int test = 2;
-    static int iterations = 5;
-    static int size = 1;
-    static int clients = 2;
+    static int test = 3;
+    static int iterations = 100;
+    static int size = 3;
+    static int clients = 15;
 
     static int port = 5000;
     static int ftpPort = 2221;
@@ -35,24 +35,8 @@ public class Main extends Thread implements Runnable {
                     e.printStackTrace();
                 }
             }).start();
-            //CLIENT
-            new Thread(() -> {
-                try {
-                    new Client(address, ftpPort);
-                } catch (IOException e) {
-                    e.printStackTrace();
-                }
-            }).start();
-            //CLIENT
-            new Thread(() -> {
-                try {
-                    new Client(address, ftpPort);
-                } catch (IOException e) {
-                    e.printStackTrace();
-                }
-            }).start();
+
             //EDGE
-            TimeUnit.MILLISECONDS.sleep(2000);
             new Thread(() -> {
                 try {
                     new EdgeServer(deviceAddress, address, port, test, size, iterations, clients);
@@ -60,6 +44,19 @@ public class Main extends Thread implements Runnable {
                     e.printStackTrace();
                 }
             }).start();
+
+            //CLIENT
+            for(int i = 0; i < clients; i++) {
+                TimeUnit.MILLISECONDS.sleep(100);
+                new Thread(() -> {
+                    try {
+                        new Client(address, ftpPort);
+                    } catch (IOException e) {
+                        e.printStackTrace();
+                    }
+                }).start();
+            }
+
 
         } catch (Exception e) {
             e.printStackTrace();

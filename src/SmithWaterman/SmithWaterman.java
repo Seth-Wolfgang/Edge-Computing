@@ -55,17 +55,17 @@ public class SmithWaterman {
         int j = getmaxcolumn(dp);
         while (i != 0 && j != 0 && dp[i][j] != 0) {
             if (dp[i - 1][j - 1] == dp[i][j] - getValues(matrix, seq1.charAt(i - 1), seq2.charAt(j - 1), alphabet)) {
-                outputseq1 = seq1.charAt(i - 1) + outputseq1;
-                outputseq2 = seq2.charAt(j - 1) + outputseq2;
+                //outputseq1 = seq1.charAt(i - 1) + outputseq1;
+                //outputseq2 = seq2.charAt(j - 1) + outputseq2;
                 i -= 1;
                 j -= 1;
             } else if (dp[i][j - 1] == dp[i][j] - gap_penalty) {
-                outputseq1 = "-" + outputseq1;
+                //outputseq1 = "-" + outputseq1;
                 outputseq2 = seq2.charAt(j - 1) + outputseq2;
                 j -= 1;
             } else {
                 outputseq1 = seq1.charAt(i - 1) + outputseq1;
-                outputseq2 = "-" + outputseq2;
+                //outputseq2 = "-" + outputseq2;
                 i -= 1;
             }
             start[0] = i;

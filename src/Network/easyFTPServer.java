@@ -34,7 +34,12 @@ public class easyFTPServer extends Thread implements Runnable {
         ListenerFactory lFactory = new ListenerFactory();
         FileSystemFactory fsf = new NativeFileSystemFactory();
         ConnectionConfigFactory cFactory = new ConnectionConfigFactory();
+
+
         cFactory.setAnonymousLoginEnabled(true);
+        cFactory.setMaxAnonymousLogins(1000);
+        cFactory.setMaxLogins(1000);
+        cFactory.setMaxThreads(100);
 
         //sets port and listener
         lFactory.setPort(port);
@@ -43,7 +48,6 @@ public class easyFTPServer extends Thread implements Runnable {
         serverFactory.setConnectionConfig(cFactory.createConnectionConfig());
 
         try {
-
             //basic user authorities
             List<Authority> authorities = new ArrayList<Authority>();
             authorities.add(new WritePermission());

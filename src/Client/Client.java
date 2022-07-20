@@ -38,7 +38,8 @@ public class Client {
         File copiedFile = null;
         File file = null;
 
-        int[] configData = receiveMessage();
+        //sets the parameters for what the client does
+        int[] configData = receiveParameters();
         int test = configData[0];
         int size = configData[1];
         int iterations = configData[2];
@@ -84,8 +85,10 @@ public class Client {
                     }
                 }
                 break; //end of logistic regression
-        }//end of switch
 
+        }//end of switch
+        this.ftpClient.closeConnection();
+        System.out.println("Client disconnected from FTP server");
     }
 
     /**
@@ -105,17 +108,29 @@ public class Client {
         }
     }
 
-    private int[] receiveMessage() throws IOException {
+    /**
+     * This method allows the client to receive the parameters of what
+     * is sent and how many times to send a file to the edge server.
+     * Data comes in a format of
+     * test + ";" + size + ";" + iterations + ";" + clientNum
+     *
+     * @return
+     * @throws IOException
+     */
+
+    private int[] receiveParameters() throws IOException {
         DataInputStream dataInputStream = new DataInputStream(this.socket.getInputStream());
         int[] configData = new int[4];
         String[] configDataString = new String[4];
         boolean messageReceived = false;
 
+        //formats data from edge server
         while(!messageReceived){
             configDataString = dataInputStream.readUTF().split(";");
             messageReceived = true;
         }
 
+        //parses the data sent from the edge server
         for(int i = 0; i < configDataString.length; i++){
             configData[i] = Integer.parseInt(configDataString[i]);
         }
@@ -123,17 +138,23 @@ public class Client {
         return configData;
     }
 
+
+    /**
+     * this method allows for redundancy in connecting to the edge server.
+     * The client may fail to connect an attempt to connect at startup.
+     *
+     * @param edgeServerSocketAddress
+     */
+
     private void connectToEdgeServer(InetSocketAddress edgeServerSocketAddress){
         while (!socket.isConnected()) {
             try {
                 socket = new Socket();
                 socket.connect(edgeServerSocketAddress); // try the connection
             } catch (IOException e) {
-                // ignore we may have to try lots of times
                 try {
                     Thread.sleep(1000);
                 } catch (InterruptedException ex) {
-                    // not sure how to handle this, maybe we should just give up.
                 }
             }
         }

@@ -48,9 +48,9 @@ public class EdgeServer {
         System.out.println("Waiting for clients...");
         while(clientNum < clients){
             clientSocket = server.accept();
-            System.out.print("ES:Client accepted");
             clientNum++;
-            System.out.println(" | " + clientNum + " connected");
+            System.out.println("ES:Client accepted | " + clientNum + " connected");
+            System.out.println("waiting");
             Thread newClient = new ClientHandler(clientSocket, test, size, iterations, clientNum);
             newClient.start();
         }
@@ -84,13 +84,15 @@ public class EdgeServer {
         //and adds them all to an array list for processing
         timer.start();
         waitForFiles(1);
+        System.out.println("flag 1");
         images = grabFiles("woah.*", 1);
         timer.stopAndPrint("OCR Receive Files");
 
         timer.start();
-        for (int i = 0; i < iterations; i++) {
+        for (int i = 0; i < iterations * clients; i++) {
             timer.newLap();
             processedText.add(ocr.readImage(images.get(i)));
+            System.out.println("flag2");
         }
         timer.stopAndPrint("OCR");
         return processedText;
@@ -122,7 +124,7 @@ public class EdgeServer {
 
         try {
             timer.start();
-            for (int i = 0; i < iterations; i++) {
+            for (int i = 0; i < iterations * clients; i++) {
                 timer.newLap();
                 SWOutput.add(new SWinitialiser().run(inputFiles.get(0).get(i).getAbsolutePath(),
                         inputFiles.get(1).get(i).getAbsolutePath(),
@@ -156,7 +158,7 @@ public class EdgeServer {
         timer.stopAndPrint("LR Receive Files");
 
         timer.start();
-        for (int i = 0; i < iterations; i++) {
+        for (int i = 0; i < iterations * clients; i++) {
             timer.newLap();
             logRegressOutput.add(logRegress.LogRegressionInitializer(inputFiles.get(0).get(i), inputFiles.get(1).get(i)));
         }//end of i loop
@@ -233,7 +235,7 @@ public class EdgeServer {
         //and adds them to the returned file ArrayList
         for (File file : dir.listFiles()) {
             if (pattern.asPredicate().test(file.getName())) {
-                if (files.size() < iterations * numOfInputs) {
+                if (files.size() < iterations * numOfInputs * clients) {
                     files.add(file);
                 } else {
                     break;
@@ -281,12 +283,20 @@ public class EdgeServer {
     private void waitForFiles(int numOfInputFiles) {
         while (dir.listFiles().length < (this.iterations * this.clients * numOfInputFiles)) {
             try {
+                System.out.println("waiting for files");
                 TimeUnit.MILLISECONDS.sleep(100);
             } catch (InterruptedException e) {
                 e.printStackTrace();
             }
         }
     }
+
+    /**
+     * Allows for redundancy in connecting to server.
+     *
+     * @param serverSocketAddress
+     * @throws IOException
+     */
 
     private void connectToServer(InetSocketAddress serverSocketAddress) throws IOException {
         int counter = 0;

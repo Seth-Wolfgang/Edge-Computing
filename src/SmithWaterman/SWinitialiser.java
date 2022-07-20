@@ -47,9 +47,14 @@ public class SWinitialiser {
         }
         for (int i = 0; i < k; i++) {
             int temp = pq.poll();
+            //just returns the score
+            output = String.valueOf(temp);
+
+            /* returns the score and gene sequence
             output = "score = " + temp +
-                    "\n" + "id1 " + idmap.get(temp)[0] + " " + offsetmap.get(temp)[0] + " " + offsetmap.get(temp)[1] + " " + smap.get(temp)[0] +
-                    "\n" + "id2 " + idmap.get(temp)[1] + " " + offsetmap.get(temp)[2] + " " + offsetmap.get(temp)[3] + " " + smap.get(temp)[1];
+            "\n " +smap.get(temp)[0] +
+            "\n " +smap.get(temp)[1];
+             */
         }
         return output;
     }
