@@ -5,7 +5,7 @@ import java.util.ArrayList;
 public class LogisticRegresion {
 
     //the number of epochs
-    private final int ITERATIONS = 1000;
+    private final int ITERATIONS = 100;
     //the learning step
     private double h;
     //the regularization parameter

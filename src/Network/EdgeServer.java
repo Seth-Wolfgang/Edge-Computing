@@ -196,6 +196,7 @@ public class EdgeServer {
 
     public void compactTransmission(Socket socket, ArrayList<String> manyOutput) throws IOException {
         DataOutputStream dataOutput = new DataOutputStream(socket.getOutputStream());
+        ArrayList<String> bigDataOutput = new ArrayList<>();
         String outputString = manyOutput.get(0); //Semicolon seperated values of manyOutput
         Timer timer = new Timer();
 
@@ -212,11 +213,36 @@ public class EdgeServer {
         //times the transmission until it is done
         timer.start();
         try {
-            dataOutput.writeUTF(outputString);
+            if(outputString.length() > 65535 ){
+                int counter = 1;
+
+                while(outputString.length() > 65535 ) {
+                    bigDataOutput.add(outputString.substring(0, 65535 ));
+                    outputString = outputString.substring(65535);
+
+                    //loop will not run after string size is less than writeUTF byte limit
+                    //this grabs the last of the output
+                    if(outputString.length() < 65535){
+                        bigDataOutput.add(outputString);
+                        counter++;
+                        break;
+                    }
+
+                    counter++;
+                }
+                System.out.println("Output is too big for compact transmission." +
+                        "Splitting output into " + counter + " large parts.");
+                individualTransmission(socket, bigDataOutput);
+
+            } else {
+                dataOutput.writeUTF(outputString);
+            }
         } catch (UTFDataFormatException e) {
-            throw new UTFDataFormatException("\033[1;30mOutput too big!\033[0m");
+
+
+        } finally {
+            timer.stopAndPrint("Compact Transmission Start");
         }
-        timer.stopAndPrint("Compact Transmission Start");
     }
 
     /**

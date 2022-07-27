@@ -59,7 +59,7 @@ public class LogRegressionInitializer {
         output += (";");
         int o = 0;
         for (int i = 0; i < examples.size(); i++) {
-            output += (";" + examples.get(i).getCategory() + " " + classifier.findProbability(examples.get(i).getAttributes()));
+            output += (";"+ String.format("%.3s", classifier.findProbability(examples.get(i).getAttributes())));
             if (((classifier.findProbability(examples.get(i).getAttributes()) > 0.5) && (examples.get(i).getCategory().equals("B"))) || (classifier.findProbability(examples.get(i).getAttributes()) < 0.5) && (examples.get(i).getCategory().equals("M")))
                 o++;
         }
@@ -89,13 +89,13 @@ public class LogRegressionInitializer {
                     attributes[i] = Double.parseDouble(attrs[i]);
                 }
                 if (classifier.findProbability(attributes) > 0.05) {
-                    output += (";" + cat + " " + classifier.findProbability(attributes));
+                    output += (";" + cat + " " + String.format("%.2s", String.valueOf(classifier.findProbability(attributes))));
                 }
                 if ((classifier.findProbability(attributes) > 0.5 && cat.equals("B")) || classifier.findProbability(attributes) < 0.5 && cat.equals("M"))
                     a++;
 
             }
-            output += (";" + a);
+            output += (";" + String.format("%.2s", a));
             scanner.close();
         } catch (Exception ex) {
             ex.printStackTrace();

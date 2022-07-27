@@ -16,7 +16,7 @@ import java.util.concurrent.TimeUnit;
 public class Main extends Thread implements Runnable {
 
     static int test = 3;
-    static int iterations = 100;
+    static int iterations = 300;
     static int size = 3;
     static int clients = 15;
 
@@ -47,7 +47,7 @@ public class Main extends Thread implements Runnable {
 
             //CLIENT
             for(int i = 0; i < clients; i++) {
-                TimeUnit.MILLISECONDS.sleep(100);
+                TimeUnit.MILLISECONDS.sleep(200);
                 new Thread(() -> {
                     try {
                         new Client(address, ftpPort);
