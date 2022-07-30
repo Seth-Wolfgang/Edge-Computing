@@ -124,20 +124,18 @@ public class Timer extends Thread {
      */
 
     public void printResultsToFile(String tag) throws IOException {
-        File results = new File("Results\\" + tag + ".txt");
+        File results = new File("Results\\" + tag + ".csv");
         int i = 0;
         if (results.createNewFile()) {
             System.out.println("Created " + results.getPath());
         }
 
         PrintWriter writer = new PrintWriter(new FileWriter(results, true));
-        writer.append("\nTest name: " + tag);
-        writer.append("\nTest performed at: " + System.currentTimeMillis() + "\n");
-
+        writer.append(tag).append(",");
         for (Long time : laps)
-            writer.append(time + "\t");
+            writer.append(String.valueOf(time)).append(",");
 
-        writer.append("\nTotal: " + getTotalTime() + "\n");
+        writer.append(",").append(String.valueOf(getTotalTime())).append("\n");
         writer.close();
     }
 

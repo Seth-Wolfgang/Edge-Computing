@@ -50,7 +50,7 @@ public class EdgeServer {
             clientSocket = server.accept();
             clientNum++;
             System.out.println("ES:Client accepted | " + clientNum + " connected");
-            System.out.println("waiting");
+            //System.out.println("waiting");   // for debugging
             Thread newClient = new ClientHandler(clientSocket, test, size, iterations, clientNum);
             newClient.start();
         }
@@ -63,7 +63,9 @@ public class EdgeServer {
         }
 
         individualTransmission(socket, outputString);
+        timer.stopAndPrint("Individual Transmission Start");
         compactTransmission(socket, outputString);
+        timer.stopAndPrint("Compact Transmission Start");
         cleanUp();
         closeConnection(socket);
     }
@@ -84,7 +86,6 @@ public class EdgeServer {
         //and adds them all to an array list for processing
         timer.start();
         waitForFiles(1);
-        System.out.println("flag 1");
         images = grabFiles("woah.*", 1);
         timer.stopAndPrint("OCR Receive Files");
 
@@ -92,7 +93,6 @@ public class EdgeServer {
         for (int i = 0; i < iterations * clients; i++) {
             timer.newLap();
             processedText.add(ocr.readImage(images.get(i)));
-            System.out.println("flag2");
         }
         timer.stopAndPrint("OCR");
         return processedText;
@@ -183,7 +183,6 @@ public class EdgeServer {
             timer.newLap();
             dataOutput.writeUTF(out);
         }
-        timer.stopAndPrint("Individual Transmission Start");
     }
 
     /**
@@ -241,7 +240,6 @@ public class EdgeServer {
 
 
         } finally {
-            timer.stopAndPrint("Compact Transmission Start");
         }
     }
 
@@ -309,7 +307,7 @@ public class EdgeServer {
     private void waitForFiles(int numOfInputFiles) {
         while (dir.listFiles().length < (this.iterations * this.clients * numOfInputFiles)) {
             try {
-                System.out.println("waiting for files");
+                //System.out.println("waiting for files");            // For debugging
                 TimeUnit.MILLISECONDS.sleep(100);
             } catch (InterruptedException e) {
                 e.printStackTrace();

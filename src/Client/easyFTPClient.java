@@ -33,7 +33,7 @@ public class easyFTPClient extends FTPClient {
             //ensures connection to FTP server
             while(!ftpClient.isConnected()){
                 try{
-                    ftpClient.connect(address,port);
+                    ftpClient.connect(address, port);
                 } catch (ConnectException e){
                     //nothing needs to be done here
                 }
@@ -48,7 +48,7 @@ public class easyFTPClient extends FTPClient {
         }
     }
 
-    public void sendFile(String fileName) throws IOException {
+    public void sendFile(String fileName) throws IOException, InterruptedException {
         File file = new File(fileName);
         sendFile(file);
     }
@@ -73,8 +73,9 @@ public class easyFTPClient extends FTPClient {
      * @throws IOException
      */
 
-    public void sendFile(File file) throws IOException {
+    public void sendFile(File file) throws IOException, InterruptedException {
         BufferedInputStream inputStream = new BufferedInputStream(new FileInputStream(file));
+
         boolean success = ftpClient.storeFile(file.getName(), inputStream);
 
         if (success) {

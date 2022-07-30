@@ -103,7 +103,7 @@ public class Client {
             FileUtils.copyFile(file, copiedFile);
             this.ftpClient.sendFile(copiedFile);
             copiedFile.delete();
-        } catch (IOException e) {
+        } catch (IOException | InterruptedException e) {
             e.printStackTrace();
         }
     }
