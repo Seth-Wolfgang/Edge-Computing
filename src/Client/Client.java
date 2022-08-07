@@ -45,6 +45,11 @@ public class Client {
         int iterations = configData[2];
         int ID = configData[3];
 
+        if(configData[4] < ID) {
+            this.ftpClient.closeConnection();
+            System.exit(1);
+        }
+
         //for size parameter -> used in input file names
         switch (size) {
             case 1 -> this.size = "Small";
@@ -120,8 +125,8 @@ public class Client {
 
     private int[] receiveParameters() throws IOException {
         DataInputStream dataInputStream = new DataInputStream(this.socket.getInputStream());
-        int[] configData = new int[4];
-        String[] configDataString = new String[4];
+        int[] configData = new int[5];
+        String[] configDataString = new String[5];
         boolean messageReceived = false;
 
         //formats data from edge server
@@ -145,7 +150,6 @@ public class Client {
      *
      * @param edgeServerSocketAddress
      */
-
     private void connectToEdgeServer(InetSocketAddress edgeServerSocketAddress){
         while (!socket.isConnected()) {
             try {

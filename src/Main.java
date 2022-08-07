@@ -15,11 +15,7 @@ import java.util.concurrent.TimeUnit;
 
 public class Main extends Thread implements Runnable {
 
-    static int test = 1;
-    static int iterations = 10;
-    static int size = 1;
-    static int clients = 15;
-
+    static int clients = 2;
     static int port = 5000;
     static int ftpPort = 2221;
     static String address = "127.0.0.1"; //likely should NOT change
@@ -39,24 +35,26 @@ public class Main extends Thread implements Runnable {
             //EDGE
             new Thread(() -> {
                 try {
-                    new EdgeServer(deviceAddress, address, port, test, size, iterations, clients);
+                    new EdgeServer(deviceAddress, address);
                 } catch (IOException | InterruptedException e) {
                     e.printStackTrace();
                 }
             }).start();
 
             //CLIENT
-            TimeUnit.SECONDS.sleep(5);
-
-            for(int i = 0; i < clients; i++) {
-                new Thread(() -> {
-                    try {
-                        new Client(address, ftpPort);
-                    } catch (IOException e) {
-                        e.printStackTrace();
-                    }
-                }).start();
+            for(int i = 0; i < 5; i++) {
+                TimeUnit.SECONDS.sleep(10);
+                for(int j = 0; j < clients; j++) {
+                    new Thread(() -> {
+                        try {
+                            new Client(address, ftpPort);
+                        } catch (IOException e) {
+                            e.printStackTrace();
+                        }
+                    }).start();
+                }
             }
+
 
         } catch (Exception e) {
             e.printStackTrace();

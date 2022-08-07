@@ -5,15 +5,13 @@ import OCR.OCRTest;
 import OCR.Timer;
 import SmithWaterman.SWinitialiser;
 
+import java.io.DataInputStream;
 import java.io.DataOutputStream;
 import java.io.File;
 import java.io.IOException;
-import java.io.UTFDataFormatException;
-import java.net.InetSocketAddress;
-import java.net.ServerSocket;
-import java.net.Socket;
-import java.net.SocketException;
+import java.net.*;
 import java.util.ArrayList;
+import java.util.Scanner;
 import java.util.concurrent.TimeUnit;
 import java.util.regex.Pattern;
 
@@ -26,11 +24,13 @@ public class EdgeServer {
     Timer timer = new Timer();
     int iterations;
     int clients;
+    int test;
+    int size;
     ArrayList<String> outputString = new ArrayList<>();
+    File tests = new File("C:\\Users\\wolfg\\IdeaProjects\\EdgeComputing\\trials.txt");
+    Scanner reader = new Scanner(tests);
 
-    public EdgeServer(String deviceAddress, String address, int port, int test, int size, int iterations, int clients) throws IOException, InterruptedException {
-        this.iterations = iterations;
-        this.clients = clients;
+    public EdgeServer(String deviceAddress, String address) throws IOException, InterruptedException {
 
         //initial networking
         Thread ftpServer = new easyFTPServer(deviceAddress, 2221);
@@ -43,30 +43,39 @@ public class EdgeServer {
 
         //initial connection to server
         connectToServer(serverSocketAddress);
+        loadNextTrial(reader.nextLine());
 
+        while(reader.hasNextLine()){    //int test, int size, int iterations, int clients
+            System.out.println("Waiting for clients...");
+
+            //Handles clients connecting
+            while (clientNum < clients) {
+                clientSocket = server.accept();
+                clientNum++;
+                System.out.println("ES:Client accepted | " + clientNum + " connected");
+                System.out.println("waiting");   // for debugging
+                Thread newClient = new ClientHandler(clientSocket, test, size, iterations, clientNum, clients);
+                newClient.start();
+            }
+
+            //determines which test is to be done
+            switch (test) {
+                case 1 -> outputString = OCRBench();
+                case 2 -> outputString = SWBench();
+                case 3 -> outputString = logRegressionBench();
+            }
+
+            individualTransmission(socket, outputString);
+            timer.stopAndPrint("Individual Transmission Start");
+            compactTransmission(socket, outputString);
+            timer.stopAndPrint("Compact Transmission Start");
+            cleanUp();
+
+            loadNextTrial(reader.nextLine());
+            clientNum = 0;
+        }
         //Program will not run until all clients connect
-        System.out.println("Waiting for clients...");
-        while(clientNum < clients){
-            clientSocket = server.accept();
-            clientNum++;
-            System.out.println("ES:Client accepted | " + clientNum + " connected");
-            //System.out.println("waiting");   // for debugging
-            Thread newClient = new ClientHandler(clientSocket, test, size, iterations, clientNum);
-            newClient.start();
-        }
 
-        //determines which test is to be done
-        switch (test) {
-            case 1 -> outputString = OCRBench();
-            case 2 -> outputString = SWBench();
-            case 3 -> outputString = logRegressionBench();
-        }
-
-        individualTransmission(socket, outputString);
-        timer.stopAndPrint("Individual Transmission Start");
-        compactTransmission(socket, outputString);
-        timer.stopAndPrint("Compact Transmission Start");
-        cleanUp();
         closeConnection(socket);
     }
 
@@ -102,6 +111,7 @@ public class EdgeServer {
     /**
      * Performs the Smith-Waterman algorithm to benchmark the system.
      * This sends results to the server.
+     *
      * @throws IOException
      * @throws InterruptedException
      */
@@ -110,7 +120,7 @@ public class EdgeServer {
         //NOTE: run time is affected most by query
         String[] inputFilesName = {"query.*", "database.*", "alphabet.*", "scoringmatrix.*"};
         Timer timer = new Timer();
-        ArrayList<ArrayList<File>> inputFiles = new ArrayList();
+        ArrayList<ArrayList<File>> inputFiles = new ArrayList<>();
         ArrayList<String> SWOutput = new ArrayList<>();
 
         //waits for files to be sent to this device
@@ -196,33 +206,33 @@ public class EdgeServer {
     public void compactTransmission(Socket socket, ArrayList<String> manyOutput) throws IOException {
         DataOutputStream dataOutput = new DataOutputStream(socket.getOutputStream());
         ArrayList<String> bigDataOutput = new ArrayList<>();
-        String outputString = manyOutput.get(0); //Semicolon seperated values of manyOutput
+        StringBuilder outputString = new StringBuilder(manyOutput.get(0)); //Semicolon seperated values of manyOutput
         Timer timer = new Timer();
 
         //allows for proper formatting
         manyOutput.remove(0);
         //Converts ArrayList to semicolon seperated values
         for (String output : manyOutput) {
-            outputString = outputString + ";" + output;
+            outputString.append(";").append(output);
         }
 
         //removes unnecessary new lines
-        outputString = outputString.replace("\n", "").replace("\r", "");
+        outputString = new StringBuilder(outputString.toString().replace("\n", "").replace("\r", ""));
 
         //times the transmission until it is done
         timer.start();
         try {
-            if(outputString.length() > 65535 ){
+            if (outputString.length() > 65535) {
                 int counter = 1;
 
-                while(outputString.length() > 65535 ) {
-                    bigDataOutput.add(outputString.substring(0, 65535 ));
-                    outputString = outputString.substring(65535);
+                while (outputString.length() > 65535) {
+                    bigDataOutput.add(outputString.substring(0, 65535));
+                    outputString = new StringBuilder(outputString.substring(65535));
 
                     //loop will not run after string size is less than writeUTF byte limit
                     //this grabs the last of the output
-                    if(outputString.length() < 65535){
-                        bigDataOutput.add(outputString);
+                    if (outputString.length() < 65535) {
+                        bigDataOutput.add(outputString.toString());
                         counter++;
                         break;
                     }
@@ -234,12 +244,10 @@ public class EdgeServer {
                 individualTransmission(socket, bigDataOutput);
 
             } else {
-                dataOutput.writeUTF(outputString);
+                dataOutput.writeUTF(outputString.toString());
             }
-        } catch (UTFDataFormatException e) {
-
-
-        } finally {
+        } catch (IOException e) {
+            e.printStackTrace();
         }
     }
 
@@ -270,6 +278,44 @@ public class EdgeServer {
     }
 
     /**
+     * Loads next trial into testing parameters
+     *
+     * @param nextTrial
+     */
+
+    public void loadNextTrial(String nextTrial){
+        String[] trialConfig = nextTrial.split(";");
+        this.test = Integer.parseInt(trialConfig[0]);
+        this.size = Integer.parseInt(trialConfig[1]);
+        this.iterations = Integer.parseInt(trialConfig[2]);
+        this.clients = Integer.parseInt(trialConfig[3]);
+
+        System.out.println("New Trial:\ntest = " + test + "\nsize = " + size + "\nIterations = " + iterations + "\nClients = " + clients);
+    }
+
+
+    private int[] receiveParameters() throws IOException {
+        DataInputStream dataInputStream = new DataInputStream(this.socket.getInputStream());
+        int[] configData = new int[5];
+        String[] configDataString = new String[5];
+        boolean messageReceived = false;
+
+        //formats data from edge server
+        while(!messageReceived){
+            configDataString = dataInputStream.readUTF().split(";");
+            messageReceived = true;
+        }
+
+        //parses the data sent from the edge server
+        for(int i = 0; i < configDataString.length; i++){
+            configData[i] = Integer.parseInt(configDataString[i]);
+        }
+
+        return configData;
+    }
+
+
+    /**
      * Sends the message to close connection with server and then closes the socket
      *
      * @param socket
@@ -295,6 +341,7 @@ public class EdgeServer {
             file.delete();
         }
     }
+
 
     /**
      * Puts thread to sleep for .1 seconds if there are not
