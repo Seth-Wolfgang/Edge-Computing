@@ -2,6 +2,7 @@
  * This lovely, short class should be a method, instead it needs to run on a
  *  separate thread for the project to allow multiple clients.
  *
+ * Method sends a string of parameters to each client.
  */
 
 package Network;
@@ -19,6 +20,7 @@ public class ClientHandler extends Thread {
         DataOutputStream dataOutput = new DataOutputStream(this.socket.getOutputStream());
         System.out.println("ES:Client connected");
         String message = test + ";" + size + ";" + iterations + ";" + clientNum + ";" + activeClients;
+
         dataOutput.writeUTF(message);
         dataOutput.flush();
     } //end of ClientHandler

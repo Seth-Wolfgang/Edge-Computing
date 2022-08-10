@@ -1,3 +1,11 @@
+/**
+ * Author: Seth Wolfgang
+ *
+ * easyFTPServer is a simple FTP server used for transferring files to the edge server
+ *
+ */
+
+
 package Network;
 
 import org.apache.ftpserver.ConnectionConfigFactory;
@@ -35,7 +43,7 @@ public class easyFTPServer extends Thread implements Runnable {
         FileSystemFactory fsf = new NativeFileSystemFactory();
         ConnectionConfigFactory cFactory = new ConnectionConfigFactory();
 
-
+        //settings to allow for many clients working at once
         cFactory.setAnonymousLoginEnabled(true);
         cFactory.setMaxAnonymousLogins(1000);
         cFactory.setMaxLogins(1000);

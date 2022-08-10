@@ -21,13 +21,11 @@ public class Client {
     easyFTPClient ftpClient;
     String size;
     Socket socket;
-    String address;
 
     // constructor to put ip address, port, test, and iterations.
     public Client(String address, int ftpPort) throws IOException {
-        this.address = address;
         socket = new Socket();
-        InetSocketAddress edgeServerSocketAddress = new InetSocketAddress(this.address, 5001);
+        InetSocketAddress edgeServerSocketAddress = new InetSocketAddress(address, 5001);
 
         //connects to edge server
         connectToEdgeServer(edgeServerSocketAddress);
@@ -45,6 +43,13 @@ public class Client {
         int iterations = configData[2];
         int ID = configData[3];
 
+        /*
+        Test to see if this needs to send data to edge server
+        If more than the necessary amount of clients connect to the server,
+        this will disconnect the client if the ID is greater than
+        the requested number of clients.
+        */
+
         if(configData[4] < ID) {
             this.ftpClient.closeConnection();
             System.exit(1);
@@ -57,6 +62,9 @@ public class Client {
             case 3 -> this.size = "Large";
         }
 
+        /*
+        Each case duplicates a specific file for each iteration in the config
+         */
         switch (test) {
             case 1: //OCR Test
                 //sending image file
@@ -159,9 +167,9 @@ public class Client {
                 try {
                     Thread.sleep(1000);
                 } catch (InterruptedException ex) {
+                    ex.printStackTrace();
                 }
             }
         }
     }
-
 }    // end of client

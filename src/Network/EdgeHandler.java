@@ -28,7 +28,7 @@ class EdgeHandler extends Thread {
 
         while (!socket.isClosed()) {
             try {
-                if (notRunning) {
+                if (notRunning) { //starts timer
                     timer.start();
                     notRunning = false;
                 }
@@ -41,8 +41,12 @@ class EdgeHandler extends Thread {
                 if (line.compareTo("") != 0 && !line.equals("over")) {
                     timer.newLap();
                     counter++;
+
+                    //the blue text when something is sent to server
                     System.out.println("\033[1;34mEdge Server " + this.clientNum + " iteration # " + counter + " done.\033[0m");
-                } else if (line.equals("over")) {
+                }
+                //meant to break loop so server will safely disconnect
+                else if (line.equals("over")) {
                     timer.stopTimer();
                     break;
                 }

@@ -5,11 +5,13 @@ import OCR.OCRTest;
 import OCR.Timer;
 import SmithWaterman.SWinitialiser;
 
-import java.io.DataInputStream;
 import java.io.DataOutputStream;
 import java.io.File;
 import java.io.IOException;
-import java.net.*;
+import java.net.InetSocketAddress;
+import java.net.ServerSocket;
+import java.net.Socket;
+import java.net.SocketException;
 import java.util.ArrayList;
 import java.util.Scanner;
 import java.util.concurrent.TimeUnit;
@@ -27,7 +29,7 @@ public class EdgeServer {
     int test;
     int size;
     ArrayList<String> outputString = new ArrayList<>();
-    File tests = new File("C:\\Users\\wolfg\\IdeaProjects\\EdgeComputing\\trials.txt");
+    File tests = new File("trials.txt");
     Scanner reader = new Scanner(tests);
 
     public EdgeServer(String deviceAddress, String address) throws IOException, InterruptedException {
@@ -69,8 +71,9 @@ public class EdgeServer {
             timer.stopAndPrint("Individual Transmission Start");
             compactTransmission(socket, outputString);
             timer.stopAndPrint("Compact Transmission Start");
-            cleanUp();
+            cleanUp(); //deletes files that may be left over
 
+            //starts the next trial. Clients remain connected between trials
             loadNextTrial(reader.nextLine());
             clientNum = 0;
         }
@@ -118,7 +121,7 @@ public class EdgeServer {
 
     public ArrayList<String> SWBench() throws IOException, InterruptedException {
         //NOTE: run time is affected most by query
-        String[] inputFilesName = {"query.*", "database.*", "alphabet.*", "scoringmatrix.*"};
+        String[] inputFilesName = {"query.*", "database.*", "alphabet.*", "scoringmatrix.*"}; //regex
         Timer timer = new Timer();
         ArrayList<ArrayList<File>> inputFiles = new ArrayList<>();
         ArrayList<String> SWOutput = new ArrayList<>();
@@ -132,6 +135,7 @@ public class EdgeServer {
         }
         timer.stopAndPrint("SW Receive Files");
 
+        //This runs Smith Waterman and records the time for each iteration
         try {
             timer.start();
             for (int i = 0; i < iterations * clients; i++) {
@@ -293,28 +297,6 @@ public class EdgeServer {
         System.out.println("New Trial:\ntest = " + test + "\nsize = " + size + "\nIterations = " + iterations + "\nClients = " + clients);
     }
 
-
-    private int[] receiveParameters() throws IOException {
-        DataInputStream dataInputStream = new DataInputStream(this.socket.getInputStream());
-        int[] configData = new int[5];
-        String[] configDataString = new String[5];
-        boolean messageReceived = false;
-
-        //formats data from edge server
-        while(!messageReceived){
-            configDataString = dataInputStream.readUTF().split(";");
-            messageReceived = true;
-        }
-
-        //parses the data sent from the edge server
-        for(int i = 0; i < configDataString.length; i++){
-            configData[i] = Integer.parseInt(configDataString[i]);
-        }
-
-        return configData;
-    }
-
-
     /**
      * Sends the message to close connection with server and then closes the socket
      *
@@ -354,7 +336,7 @@ public class EdgeServer {
     private void waitForFiles(int numOfInputFiles) {
         while (dir.listFiles().length < (this.iterations * this.clients * numOfInputFiles)) {
             try {
-                //System.out.println("waiting for files");            // For debugging
+                //System.out.println("waiting for files");    //For debugging
                 TimeUnit.MILLISECONDS.sleep(100);
             } catch (InterruptedException e) {
                 e.printStackTrace();
@@ -373,6 +355,7 @@ public class EdgeServer {
         int counter = 0;
         while (!socket.isConnected()) {
             try {
+                TimeUnit.SECONDS.sleep(2);
                 counter++;
                 if (counter > 3) {
                     System.out.println("Failed to connect to server");
@@ -381,7 +364,7 @@ public class EdgeServer {
                 }
                 socket.connect(serverSocketAddress);
 
-            } catch (SocketException e) {
+            } catch (SocketException | InterruptedException e) {
                 System.out.println("Connection failed! Trying again");
             }
         }

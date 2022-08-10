@@ -48,10 +48,6 @@ public class easyFTPClient extends FTPClient {
         }
     }
 
-    public void sendFile(String fileName) throws IOException, InterruptedException {
-        File file = new File(fileName);
-        sendFile(file);
-    }
 
     /**
      * simple disconnection method
@@ -90,32 +86,17 @@ public class easyFTPClient extends FTPClient {
     }//end of sendFile
 
     /**
-     * Returns a file from the FTP server using FTPClient's retrieveFile method
-     * This method is a fix for a NullPointerException thrown by this class when
-     * using retrieveFile in Client.java
+     * Overloaded method for sending files by using the path instead of a file object
      *
-     * @param fileName name of file you want
-     * @return file from FTP server
+     * @param fileName file path
      * @throws IOException
+     * @throws InterruptedException
      */
 
-    public File getFile(String fileName) throws IOException {
+    public void sendFile(String fileName) throws IOException, InterruptedException {
         File file = new File(fileName);
-        BufferedOutputStream outputStream = new BufferedOutputStream(new FileOutputStream(file));
-        boolean success = ftpClient.retrieveFile(fileName, outputStream);
+        sendFile(file);
+    }
 
-        if (success) {
-            //Grabs file from server and ends stream
-            System.out.println("\033[1;32m" + fileName + " transferred \033[0m");
-            outputStream.flush();
-            outputStream.close();
-            return file;
-
-        } else {
-            outputStream.close();
-            System.out.println("File transfer failed!");
-            return null;
-        }
-    }//end of getFile
 
 }//end of class
