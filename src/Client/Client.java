@@ -23,16 +23,40 @@ public class Client {
     Socket socket;
 
     // constructor to put ip address, port, test, and iterations.
-    public Client(String address, int ftpPort) throws IOException {
+    public Client(String address) throws IOException {
         socket = new Socket();
         InetSocketAddress edgeServerSocketAddress = new InetSocketAddress(address, 5001);
 
         //connects to edge server
-        connectToEdgeServer(edgeServerSocketAddress);
+        //connectToEdgeServer(edgeServerSocketAddress);
 
         //Setup before connection occurs
-        ftpClient = new easyFTPClient(address, ftpPort);
-        System.out.println("FTP:Client connected to edge server");
+        //ftpClient = new easyFTPClient(address, 12221);
+        //System.out.println("FTP:Client connected to edge server");
+
+
+        /*
+        Each case duplicates a specific file for each iteration in the config
+         */
+
+        while(true){
+            connectToEdgeServer(edgeServerSocketAddress);
+            ftpClient = new easyFTPClient(address, 12221);
+            System.out.println("FTP:Client connected to edge server");
+            System.out.println("flag connecting");
+            try{
+                fileSendHelper();
+                this.socket = new Socket();
+                //this.ftpClient.closeConnection();
+            } catch (Exception e){
+                System.out.println("Connection with edge server forcibly ended");
+                e.printStackTrace();
+                System.exit(1);
+            }
+        }
+    }
+
+    public void fileSendHelper() throws IOException {
         File copiedFile = null;
         File file = null;
 
@@ -62,9 +86,6 @@ public class Client {
             case 3 -> this.size = "Large";
         }
 
-        /*
-        Each case duplicates a specific file for each iteration in the config
-         */
         switch (test) {
             case 1: //OCR Test
                 //sending image file
@@ -100,8 +121,7 @@ public class Client {
                 break; //end of logistic regression
 
         }//end of switch
-        this.ftpClient.closeConnection();
-        System.out.println("Client disconnected from FTP server");
+
     }
 
     /**
@@ -114,6 +134,7 @@ public class Client {
     private void copyAndSendFile(File file, File copiedFile) {
         try {
             FileUtils.copyFile(file, copiedFile);
+            System.out.println("Sending " + copiedFile.getAbsolutePath()); //debugging
             this.ftpClient.sendFile(copiedFile);
             copiedFile.delete();
         } catch (IOException | InterruptedException e) {
@@ -141,6 +162,11 @@ public class Client {
         while(!messageReceived){
             configDataString = dataInputStream.readUTF().split(";");
             messageReceived = true;
+        }
+
+        if(configDataString[0].equals("0")){
+            System.out.println("Client parameters set to stop.");
+            System.exit(1);
         }
 
         //parses the data sent from the edge server

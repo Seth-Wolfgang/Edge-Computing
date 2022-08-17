@@ -13,15 +13,41 @@ import java.net.Socket;
 
 public class ClientHandler extends Thread {
 
+    boolean isSent = false;
     Socket socket;
-    // constructor with port
+    int test;
+    int size;
+    int iterations;
+    int clientNum;
+    int activeClients;
+
+    //constructor with port
     public ClientHandler(Socket socket, int test, int size, int iterations, int clientNum, int activeClients) throws IOException {
         this.socket = socket;
-        DataOutputStream dataOutput = new DataOutputStream(this.socket.getOutputStream());
+        this.test = test;
+        this.size = size;
+        this.iterations = iterations;
+        this.clientNum = clientNum;
+        this.activeClients = activeClients;
         System.out.println("ES:Client connected");
-        String message = test + ";" + size + ";" + iterations + ";" + clientNum + ";" + activeClients;
+
+    } //end of ClientHandler
+
+    public boolean getStatus(){
+        return this.isSent;
+    }
+
+    public void sendConfigData() throws IOException {
+        DataOutputStream dataOutput = new DataOutputStream(this.socket.getOutputStream());
+
+        String message = this.test + ";" + this.size + ";" + this.iterations + ";" + this.clientNum + ";" + this.activeClients;
 
         dataOutput.writeUTF(message);
         dataOutput.flush();
-    } //end of ClientHandler
+
+        isSent = true;
+        System.out.println("Sent configuration data to client");
+        //dataOutput.close();
+
+    }
 }

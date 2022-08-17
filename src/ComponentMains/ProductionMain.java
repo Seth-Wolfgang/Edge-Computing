@@ -2,6 +2,7 @@ package ComponentMains;
 
 import Client.Client;
 import Network.EdgeServer;
+import Network.Server;
 
 import java.io.IOException;
 
@@ -12,42 +13,53 @@ public class ProductionMain {
         String IP = args[1];
 
         //prints out instructions for client if typed wrong
-        if(args.length != 3 && type.equals("-c")) {
+        if (args.length != 2 && type.equals("-c")) {
             System.out.println("""
                     Please use format for arguments:
                     -c [Edge IPV4] [FTP Port]
                     """);
         }
         //instructions for edge server
-        else if (args.length != 7 && type.equals("-e")){
+        else if (args.length != 3 && type.equals("-e")) {
             System.out.println("""
                     Please use format for arguments:
                     -e [Server IPV4] [Device IPV4]
                     """);
         }
         //Prints out help when run
-        else if(type.equals("help") || type.equals("-h")){
+        else if (type.equals("help") || type.equals("-h")) {
             System.out.println("""
                     Type:
                     \t-c\t Client device
                     \t-e\t Edge server device
                     Please use format for client arguments:
-                    \t-c [IPV4] [FTP Port]
+                    \t-c [IPV4]
                     Edge server devices needs different arguments:
                     \t-e [Server IPV4] [Device IPV4]""");
         }
 
-        switch (type){
-            case "-c":
-                int ftpPort = Integer.parseInt(args[2]);
-                Client client = new Client(IP, ftpPort);
-            case "-e":
-                String deviceIP = args[2];
-                try {
-                    EdgeServer edgeServer = new EdgeServer(deviceIP, IP);
-                } catch (InterruptedException e) {
-                    e.printStackTrace();
-                }
+        if (args[0].equals("-c")) {
+            Client client = new Client(IP);
+        }
+        else if (args[0].equals("-e")) {
+            String deviceIP = args[2];
+            try {
+                EdgeServer edgeServer = new EdgeServer(deviceIP, IP);
+            } catch (InterruptedException e) {
+                e.printStackTrace();
+            }
+        }
+        else if(args[0].equals("-s")){
+            Server server = new Server(5000);
+        }
+        else {
+            System.out.println("""
+            \t-c\t Client device
+            \t-e\t Edge server device
+            Please use format for client arguments:
+            \t-c [IPV4]
+            Edge server devices needs different arguments:
+            \t-e [Server IPV4] [Device IPV4]""");
         }
     }
 }

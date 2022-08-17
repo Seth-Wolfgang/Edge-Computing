@@ -33,53 +33,61 @@ public class EdgeServer {
     Scanner reader = new Scanner(tests);
 
     public EdgeServer(String deviceAddress, String address) throws IOException, InterruptedException {
+       try {
+           //initial networking
+           Thread ftpServer = new easyFTPServer(deviceAddress, 12221);
+           ftpServer.start();
+           socket = new Socket();
+           clientSocket = new Socket();
+           InetSocketAddress serverSocketAddress = new InetSocketAddress(address, 5000);
+           server = new ServerSocket(5001);
+           int clientNum = 0;
 
-        //initial networking
-        Thread ftpServer = new easyFTPServer(deviceAddress, 2221);
-        ftpServer.start();
-        socket = new Socket();
-        clientSocket = new Socket();
-        InetSocketAddress serverSocketAddress = new InetSocketAddress(address, 5000);
-        server = new ServerSocket(5001);
-        int clientNum = 0;
+           cleanUp();
 
-        //initial connection to server
-        connectToServer(serverSocketAddress);
-        loadNextTrial(reader.nextLine());
+           //initial connection to server
+           connectToServer(serverSocketAddress);
+           loadNextTrial(reader.nextLine());
 
-        while(reader.hasNextLine()){    //int test, int size, int iterations, int clients
-            System.out.println("Waiting for clients...");
+           while (reader.hasNextLine()) {    //int test, int size, int iterations, int clients
+               System.out.println("Waiting for clients...");
+               boolean configDataSent = false;
 
-            //Handles clients connecting
-            while (clientNum < clients) {
-                clientSocket = server.accept();
-                clientNum++;
-                System.out.println("ES:Client accepted | " + clientNum + " connected");
-                System.out.println("waiting");   // for debugging
-                Thread newClient = new ClientHandler(clientSocket, test, size, iterations, clientNum, clients);
-                newClient.start();
-            }
+               //Handles clients connecting
+               while (clientNum < this.clients) {
+                   clientSocket = server.accept();
+                   clientNum++;
+                   System.out.println("ES:Client accepted | " + clientNum + " connected");
+                   System.out.println("waiting");   // for debugging
+                   Thread newClient = new ClientHandler(clientSocket, test, size, iterations, clientNum, clients);
+                   newClient.start();
+                   ((ClientHandler) newClient).sendConfigData();
+                   System.out.println("flag " + configDataSent + " " + clientNum);
+               }
 
-            //determines which test is to be done
-            switch (test) {
-                case 1 -> outputString = OCRBench();
-                case 2 -> outputString = SWBench();
-                case 3 -> outputString = logRegressionBench();
-            }
+               //determines which test is to be done
+               switch (test) {
+                   case 1 -> outputString = OCRBench();
+                   case 2 -> outputString = SWBench();
+                   case 3 -> outputString = logRegressionBench();
+               }
 
-            individualTransmission(socket, outputString);
-            timer.stopAndPrint("Individual Transmission Start");
-            compactTransmission(socket, outputString);
-            timer.stopAndPrint("Compact Transmission Start");
-            cleanUp(); //deletes files that may be left over
+               individualTransmission(socket, outputString);
+               timer.stopAndPrint("Individual Transmission Start");
+               compactTransmission(socket, outputString);
+               timer.stopAndPrint("Compact Transmission Start");
+               cleanUp(); //deletes files that may be left over
 
-            //starts the next trial. Clients remain connected between trials
-            loadNextTrial(reader.nextLine());
-            clientNum = 0;
-        }
-        //Program will not run until all clients connect
+               //starts the next trial. Clients remain connected between trials
+               loadNextTrial(reader.nextLine());
+               clientNum = 0;
+           }
+           //Program will not run until all clients connect
 
-        closeConnection(socket);
+           closeConnection(socket);
+       } catch (Exception e){
+           e.printStackTrace();
+       }
     }
 
     /**
@@ -90,7 +98,7 @@ public class EdgeServer {
      */
 
     public ArrayList<String> OCRBench() throws IOException {
-        OCRTest ocr = new OCRTest("tessdata");
+        OCRTest ocr = new OCRTest("~/Desktop/tessdata");
         ArrayList<String> processedText = new ArrayList<>();
         ArrayList<File> images;
 
@@ -294,7 +302,10 @@ public class EdgeServer {
         this.iterations = Integer.parseInt(trialConfig[2]);
         this.clients = Integer.parseInt(trialConfig[3]);
 
-        System.out.println("New Trial:\ntest = " + test + "\nsize = " + size + "\nIterations = " + iterations + "\nClients = " + clients);
+        if(this.test == 0)
+            System.out.println("Testing Complete!");
+        else
+            System.out.println("New Trial:\ntest = " + test + "\nsize = " + size + "\nIterations = " + iterations + "\nClients = " + clients);
     }
 
     /**
@@ -334,6 +345,10 @@ public class EdgeServer {
      */
 
     private void waitForFiles(int numOfInputFiles) {
+        if(!dir.exists()){
+            new File(dir.getName()).mkdirs();
+        }
+
         while (dir.listFiles().length < (this.iterations * this.clients * numOfInputFiles)) {
             try {
                 //System.out.println("waiting for files");    //For debugging

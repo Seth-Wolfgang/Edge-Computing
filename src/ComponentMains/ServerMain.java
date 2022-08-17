@@ -15,7 +15,7 @@ import java.io.IOException;
 public class ServerMain {
 
     public static void main(String[] args) throws IOException {
-        final int port = 5000; //todo make arg?
+        final int port = 5000;
         Server server = new Server(port);
 
     }

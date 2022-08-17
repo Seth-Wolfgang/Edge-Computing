@@ -7,53 +7,60 @@
  */
 
 import Client.Client;
-import Network.EdgeServer;
-import Network.Server;
+import Cloud.Cloud;
 
 import java.io.IOException;
 import java.util.concurrent.TimeUnit;
 
 public class Main extends Thread implements Runnable {
 
-    static int clients = 30;
+    static int clients = 15;
     static int port = 5000;
-    static int ftpPort = 2221;
+    static int ftpPort = 12221;
     static String address = "127.0.0.1"; //likely should NOT change
     static String deviceAddress = "127.0.0.1";
 
     public static void main(String[] args) throws Exception {
+        //CLOUD
         try {
-            //SERVER
             new Thread(() -> {
                 try {
-                    new Server(port);
-                } catch (IOException e) {
-                    e.printStackTrace();
-                }
-            }).start();
-
-            //EDGE
-            new Thread(() -> {
-                try {
-                    new EdgeServer(deviceAddress, address);
+                    new Cloud(deviceAddress);
                 } catch (IOException | InterruptedException e) {
                     e.printStackTrace();
                 }
             }).start();
 
+
+            //SERVER
+//            new Thread(() -> {
+//                try {
+//                    new Server(port);
+//                } catch (IOException e) {
+//                    e.printStackTrace();
+//                }
+//            }).start();
+//
+//            //EDGE
+//            new Thread(() -> {
+//                try {
+//                    new EdgeServer(deviceAddress, address);
+//                } catch (IOException | InterruptedException e) {
+//                    e.printStackTrace();
+//                }
+//            }).start();
+
             //CLIENT
-            for(int i = 0; i < 5; i++) {
-                TimeUnit.SECONDS.sleep(10);
+                TimeUnit.SECONDS.sleep(2);
                 for(int j = 0; j < clients; j++) {
                     new Thread(() -> {
                         try {
-                            new Client(address, ftpPort);
+                            new Client(address);
                         } catch (IOException e) {
                             e.printStackTrace();
                         }
                     }).start();
                 }
-            }
 
 
         } catch (Exception e) {
