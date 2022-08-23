@@ -3,7 +3,6 @@ package ComponentMains;
 import Client.Client;
 import Network.EdgeServer;
 import Network.Server;
-
 import java.io.IOException;
 
 public class ProductionMain {
@@ -38,28 +37,32 @@ public class ProductionMain {
                     \t-e [Server IPV4] [Device IPV4]""");
         }
 
-        if (args[0].equals("-c")) {
-            Client client = new Client(IP);
-        }
-        else if (args[0].equals("-e")) {
-            String deviceIP = args[2];
-            try {
-                EdgeServer edgeServer = new EdgeServer(deviceIP, IP);
-            } catch (InterruptedException e) {
-                e.printStackTrace();
-            }
-        }
-        else if(args[0].equals("-s")){
-            Server server = new Server(5000);
-        }
-        else {
-            System.out.println("""
-            \t-c\t Client device
-            \t-e\t Edge server device
-            Please use format for client arguments:
-            \t-c [IPV4]
-            Edge server devices needs different arguments:
-            \t-e [Server IPV4] [Device IPV4]""");
+        switch (args[0]) {
+            case "-c":
+                Client client = new Client(IP);
+                break;
+            case "-e":
+                String deviceIP = args[2];
+                try {
+                    EdgeServer edgeServer = new EdgeServer(deviceIP, IP);
+                } catch (InterruptedException e) {
+                    e.printStackTrace();
+                }
+                break;
+            case "-s":
+                Server server = new Server(5000);
+                break;
+            default:
+                System.out.println("""
+                        \t-c\t Client device
+                        \t-e\t Edge server device
+                        Please use format for client arguments:
+                        \t-c [IPV4]
+                        Edge server devices needs different arguments:
+                        \t-e [Server IPV4] [Device IPV4]""");
+                break;
+            case "install":
+
         }
     }
 }

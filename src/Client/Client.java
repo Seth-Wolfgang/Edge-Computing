@@ -28,10 +28,10 @@ public class Client {
         InetSocketAddress edgeServerSocketAddress = new InetSocketAddress(address, 5001);
 
         //connects to edge server
-        //connectToEdgeServer(edgeServerSocketAddress);
+        connectToEdgeServer(edgeServerSocketAddress);
 
         //Setup before connection occurs
-        //ftpClient = new easyFTPClient(address, 12221);
+        ftpClient = new easyFTPClient(address, 12221);
         //System.out.println("FTP:Client connected to edge server");
 
 
@@ -40,13 +40,12 @@ public class Client {
          */
 
         while(true){
-            connectToEdgeServer(edgeServerSocketAddress);
-            ftpClient = new easyFTPClient(address, 12221);
-            System.out.println("FTP:Client connected to edge server");
-            System.out.println("flag connecting");
+            //connectToEdgeServer(edgeServerSocketAddress);
+            //ftpClient = new easyFTPClient(address, 12221);
+            //System.out.println("FTP:Client connected to edge server");
             try{
                 fileSendHelper();
-                this.socket = new Socket();
+                //this.socket = new Socket();
                 //this.ftpClient.closeConnection();
             } catch (Exception e){
                 System.out.println("Connection with edge server forcibly ended");
