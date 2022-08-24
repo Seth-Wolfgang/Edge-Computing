@@ -62,6 +62,7 @@ public class EdgeServer {
                    //System.out.println("flag " + configDataSent + " " + clientNum);
                }
                 for(Thread thread : newClient) {
+                    ((ClientHandler) thread).updateConfigData(test, size, iterations);
                     ((ClientHandler) thread).sendConfigData();
 
                 }

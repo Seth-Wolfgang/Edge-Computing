@@ -47,7 +47,11 @@ public class ClientHandler extends Thread {
 
         isSent = true;
         System.out.println("Sent configuration data to client");
-        //dataOutput.close();
+    }
 
+    public void updateConfigData(int test, int size, int iterations) {
+        this.test = test;
+        this.size = size;
+        this.iterations = iterations;
     }
 }
