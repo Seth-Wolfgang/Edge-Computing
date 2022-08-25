@@ -14,7 +14,7 @@ import java.util.concurrent.TimeUnit;
 
 public class Main extends Thread implements Runnable {
 
-    static int clients = 15;
+    static int clients = 1;
     static int port = 5000;
     static int ftpPort = 12221;
     static String address = "127.0.0.1"; //likely should NOT change

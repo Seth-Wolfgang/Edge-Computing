@@ -42,7 +42,7 @@ public class EdgeServer {
            InetSocketAddress serverSocketAddress = new InetSocketAddress(address, 5000);
            server = new ServerSocket(5001);
            int clientNum = 0;
-
+           ArrayList<Thread> newClient = new ArrayList<>();
            cleanUp();
 
            //initial connection to server
@@ -50,21 +50,21 @@ public class EdgeServer {
            loadNextTrial(reader.nextLine());
 
            while (reader.hasNextLine()) {    //int test, int size, int iterations, int clients
-               System.out.println("Waiting for clients...");
-               boolean configDataSent = false;
-
+               System.out.println("Waiting for clients... " + clientNum + " currently connected");
+                cleanUp();
                //Handles clients connecting
                while (clientNum < this.clients) {
                    clientSocket = server.accept();
                    clientNum++;
                    System.out.println("ES:Client accepted | " + clientNum + " connected");
-                   System.out.println("waiting");   // for debugging
-                   Thread newClient = new ClientHandler(clientSocket, test, size, iterations, clientNum, clients);
-                   newClient.start();
-                   ((ClientHandler) newClient).sendConfigData();
-                   System.out.println("flag " + configDataSent + " " + clientNum);
+                   newClient.add(new ClientHandler(clientSocket, test, size, iterations, clientNum, clients));
+                   newClient.get(clientNum - 1).start();
+                   //System.out.println("flag " + configDataSent + " " + clientNum);
                }
+                for(Thread thread : newClient) {
+                    ((ClientHandler) thread).sendConfigData();
 
+                }
                //determines which test is to be done
                switch (test) {
                    case 1 -> outputString = OCRBench();
@@ -80,7 +80,6 @@ public class EdgeServer {
 
                //starts the next trial. Clients remain connected between trials
                loadNextTrial(reader.nextLine());
-               clientNum = 0;
            }
            //Program will not run until all clients connect
 
@@ -329,10 +328,22 @@ public class EdgeServer {
      * Removes temporary files
      */
 
-    private void cleanUp() {
-        for (File file : dir.listFiles()) {
-            file.delete();
+    private void cleanUp() throws IOException {
+        if (dir.exists()) {
+            for (File file : dir.listFiles()) {
+                file.delete();
+            }
         }
+        else {
+            if(dir.createNewFile()) {
+                System.out.println("Created new directory: filesToProcess");
+            }
+            else {
+                System.out.println("Failed to create filesToProcess directory");
+                System.exit(-1);
+            }
+        }
+
     }
 
 
