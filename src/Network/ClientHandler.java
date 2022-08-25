@@ -7,13 +7,14 @@
 
 package Network;
 
+import java.io.DataInputStream;
 import java.io.DataOutputStream;
 import java.io.IOException;
 import java.net.Socket;
 
 public class ClientHandler extends Thread {
 
-    boolean isSent = false;
+    boolean isConfirmed = false;
     Socket socket;
     int test;
     int size;
@@ -34,24 +35,31 @@ public class ClientHandler extends Thread {
     } //end of ClientHandler
 
     public boolean getStatus(){
-        return this.isSent;
+        return this.isConfirmed;
     }
 
     public void sendConfigData() throws IOException {
         DataOutputStream dataOutput = new DataOutputStream(this.socket.getOutputStream());
+        DataInputStream dataInputStream = new DataInputStream(this.socket.getInputStream());
+        boolean confirmation = false;
 
         String message = this.test + ";" + this.size + ";" + this.iterations + ";" + this.clientNum + ";" + this.activeClients;
 
         dataOutput.writeUTF(message);
         dataOutput.flush();
 
-        isSent = true;
         System.out.println("Sent configuration data to client");
+
+        while(!this.isConfirmed){
+            this.isConfirmed = dataInputStream.readBoolean();
+        }
+
     }
 
-    public void updateConfigData(int test, int size, int iterations) {
+    public void updateConfigData(int test, int size, int iterations, int activeClients) {
         this.test = test;
         this.size = size;
         this.iterations = iterations;
+        this.activeClients = activeClients;
     }
 }

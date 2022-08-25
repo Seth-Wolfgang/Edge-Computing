@@ -33,61 +33,81 @@ public class EdgeServer {
     Scanner reader = new Scanner(tests);
 
     public EdgeServer(String deviceAddress, String address) throws IOException, InterruptedException {
-       try {
-           //initial networking
-           Thread ftpServer = new easyFTPServer(deviceAddress, 12221);
-           ftpServer.start();
-           socket = new Socket();
-           clientSocket = new Socket();
-           InetSocketAddress serverSocketAddress = new InetSocketAddress(address, 5000);
-           server = new ServerSocket(5001);
-           int clientNum = 0;
-           ArrayList<Thread> newClient = new ArrayList<>();
-           cleanUp();
+        try {
+            //initial networking
+            Thread ftpServer = new easyFTPServer(deviceAddress, 12221);
+            ftpServer.start();
+            socket = new Socket();
+            clientSocket = new Socket();
+            InetSocketAddress serverSocketAddress = new InetSocketAddress(address, 5000);
+            server = new ServerSocket(5001);
+            int clientNum = 0;
+            ArrayList<Thread> newClient = new ArrayList<>();
 
-           //initial connection to server
-           connectToServer(serverSocketAddress);
-           loadNextTrial(reader.nextLine());
+            //initial connection to server
+            connectToServer(serverSocketAddress);
+            loadNextTrial(reader.nextLine());
+            cleanUp();
 
-           while (reader.hasNextLine()) {    //int test, int size, int iterations, int clients
-               System.out.println("Waiting for clients... " + clientNum + " currently connected");
+            while (reader.hasNextLine()) {    //int test, int size, int iterations, int clients
+                System.out.println("Waiting for clients... " + clientNum + " currently connected");
                 cleanUp();
-               //Handles clients connecting
-               while (clientNum < this.clients) {
-                   clientSocket = server.accept();
-                   clientNum++;
-                   System.out.println("ES:Client accepted | " + clientNum + " connected");
-                   newClient.add(new ClientHandler(clientSocket, test, size, iterations, clientNum, clients));
-                   newClient.get(clientNum - 1).start();
-                   //System.out.println("flag " + configDataSent + " " + clientNum);
-               }
-                for(Thread thread : newClient) {
-                    ((ClientHandler) thread).updateConfigData(test, size, iterations);
-                    ((ClientHandler) thread).sendConfigData();
+                //Handles clients connecting
+                while (newClient.size() < this.clients) {
+                    clientSocket = server.accept();
+                    System.out.println("ES:Client accepted | " + newClient.size() + " connected");
+                    newClient.add(new ClientHandler(clientSocket, test, size, iterations, newClient.size() + 1, clients));
 
+                    if(!newClient.get(newClient.size() - 1).isAlive()){
+                        newClient.get(newClient.size() - 1).start();
+                    }
                 }
-               //determines which test is to be done
-               switch (test) {
-                   case 1 -> outputString = OCRBench();
-                   case 2 -> outputString = SWBench();
-                   case 3 -> outputString = logRegressionBench();
-               }
+                //sends message to clients so they know what to send back to the server
+                for (Thread thread : newClient) {
+                    ((ClientHandler) thread).updateConfigData(test, size, iterations, clients);
+                    ((ClientHandler) thread).sendConfigData();
+                }
 
-               individualTransmission(socket, outputString);
-               timer.stopAndPrint("Individual Transmission Start");
-               compactTransmission(socket, outputString);
-               timer.stopAndPrint("Compact Transmission Start");
-               cleanUp(); //deletes files that may be left over
+                boolean allTrue = false;
+                while(!allTrue){
+                    int counter = 0;
+                    for(Thread thread : newClient){
+                        if(!((ClientHandler) thread).getStatus()) {
+                            counter = 0;
+                        }
+                        else {
+                            counter++;
+                        }
 
-               //starts the next trial. Clients remain connected between trials
-               loadNextTrial(reader.nextLine());
-           }
-           //Program will not run until all clients connect
+                    }
+                    if(counter == newClient.size()){
+                        break;
+                    }
+                    System.out.println(counter + " " + newClient.size());
+                }
 
-           closeConnection(socket);
-       } catch (Exception e){
-           e.printStackTrace();
-       }
+                //determines which test is to be done
+                switch (test) {
+                    case 1 -> outputString = OCRBench();
+                    case 2 -> outputString = SWBench();
+                    case 3 -> outputString = logRegressionBench();
+                }
+
+                individualTransmission(socket, outputString);
+                timer.stopAndPrint("Individual Transmission Start");
+                compactTransmission(socket, outputString);
+                timer.stopAndPrint("Compact Transmission Start");
+                //cleanUp(); //deletes files that may be left over
+
+                //starts the next trial. Clients remain connected between trials
+                loadNextTrial(reader.nextLine());
+            }
+            //Program will not run until all clients connect
+
+            closeConnection(socket);
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
     }
 
     /**
@@ -106,7 +126,7 @@ public class EdgeServer {
         //and adds them all to an array list for processing
         timer.start();
         waitForFiles(1);
-        images = grabFiles("woah.*", 1);
+        images = grabFiles("^woah", 1);
         timer.stopAndPrint("OCR Receive Files");
 
         timer.start();
@@ -115,6 +135,7 @@ public class EdgeServer {
             processedText.add(ocr.readImage(images.get(i)));
         }
         timer.stopAndPrint("OCR");
+        filteredCleanUp("^woah");
         return processedText;
     }
 
@@ -129,7 +150,7 @@ public class EdgeServer {
 
     public ArrayList<String> SWBench() throws IOException, InterruptedException {
         //NOTE: run time is affected most by query
-        String[] inputFilesName = {"query.*", "database.*", "alphabet.*", "scoringmatrix.*"}; //regex
+        String[] inputFilesName = {"^query", "^database", "^alphabet", "^scoringmatrix"}; //regex
         Timer timer = new Timer();
         ArrayList<ArrayList<File>> inputFiles = new ArrayList<>();
         ArrayList<String> SWOutput = new ArrayList<>();
@@ -152,12 +173,14 @@ public class EdgeServer {
                         inputFiles.get(1).get(i).getAbsolutePath(),
                         inputFiles.get(2).get(i).getAbsolutePath(),
                         inputFiles.get(3).get(i).getAbsolutePath(), 1, 1));
+
             }//end of i loop
             timer.stopAndPrint("SW run");
 
         } catch (Exception e) {
             e.printStackTrace();
         }
+        filteredCleanUp("[(^query)(^database)(^alphabet)(^scoringmatrix)]");
         return SWOutput;
     }
 
@@ -175,8 +198,8 @@ public class EdgeServer {
         //and adds them all to an array list for processing
         timer.start();
         waitForFiles(2);
-        inputFiles.add(grabFiles("B.*", 2));
-        inputFiles.add(grabFiles("t.*", 2));
+        inputFiles.add(grabFiles("^Breast", 2));
+        inputFiles.add(grabFiles("^test", 2));
         timer.stopAndPrint("LR Receive Files");
 
         timer.start();
@@ -185,6 +208,7 @@ public class EdgeServer {
             logRegressOutput.add(logRegress.LogRegressionInitializer(inputFiles.get(0).get(i), inputFiles.get(1).get(i)));
         }//end of i loop
         timer.stopAndPrint("Logistic Regression");
+        filteredCleanUp("[(^test)(^Breast)]");
         return logRegressOutput;
     }
 
@@ -281,6 +305,7 @@ public class EdgeServer {
             if (pattern.asPredicate().test(file.getName())) {
                 if (files.size() < iterations * numOfInputs * clients) {
                     files.add(file);
+                    System.out.println("grabbing " + file.getAbsolutePath());
                 } else {
                     break;
                 }
@@ -295,14 +320,14 @@ public class EdgeServer {
      * @param nextTrial
      */
 
-    public void loadNextTrial(String nextTrial){
+    public void loadNextTrial(String nextTrial) {
         String[] trialConfig = nextTrial.split(";");
         this.test = Integer.parseInt(trialConfig[0]);
         this.size = Integer.parseInt(trialConfig[1]);
         this.iterations = Integer.parseInt(trialConfig[2]);
         this.clients = Integer.parseInt(trialConfig[3]);
 
-        if(this.test == 0)
+        if (this.test == 0)
             System.out.println("Testing Complete!");
         else
             System.out.println("New Trial:\ntest = " + test + "\nsize = " + size + "\nIterations = " + iterations + "\nClients = " + clients);
@@ -330,16 +355,44 @@ public class EdgeServer {
      */
 
     private void cleanUp() throws IOException {
+        int counter = 0;
         if (dir.exists()) {
             for (File file : dir.listFiles()) {
-                file.delete();
+                if (file.delete()) {
+                    counter++;
+                }
+            }
+            System.out.println("Deleted " + counter + " files");
+        } else {
+            if (dir.createNewFile()) {
+                System.out.println("Created new directory: filesToProcess");
+            } else {
+                System.out.println("Failed to create filesToProcess directory");
+                System.exit(-1);
             }
         }
-        else {
-            if(dir.createNewFile()) {
-                System.out.println("Created new directory: filesToProcess");
+    }
+
+    private void filteredCleanUp(String regex) throws IOException {
+        Pattern pattern = Pattern.compile(regex);
+        ArrayList<File> files = new ArrayList<>();
+        int counter = 0;
+
+        //looks through the directory for files that match the regex
+        //and adds them to the returned file ArrayList
+        if (dir.exists()) {
+            for (File file : dir.listFiles()) {
+                if (pattern.asPredicate().test(file.getName())) {
+                    System.out.println("Deleting" + file.getAbsolutePath());
+                    if (file.delete()) {
+                        counter++;
+                    }
+                }
             }
-            else {
+        } else {
+            if (dir.createNewFile()) {
+                System.out.println("Created new directory: filesToProcess");
+            } else {
                 System.out.println("Failed to create filesToProcess directory");
                 System.exit(-1);
             }
@@ -357,13 +410,12 @@ public class EdgeServer {
      */
 
     private void waitForFiles(int numOfInputFiles) {
-        if(!dir.exists()){
+        if (!dir.exists()) {
             new File(dir.getName()).mkdirs();
         }
 
-        while (dir.listFiles().length < (this.iterations * this.clients * numOfInputFiles)) {
+        while (dir.listFiles().length != (this.iterations * this.clients * numOfInputFiles)) {
             try {
-                //System.out.println("waiting for files");    //For debugging
                 TimeUnit.MILLISECONDS.sleep(100);
             } catch (InterruptedException e) {
                 e.printStackTrace();
@@ -386,7 +438,7 @@ public class EdgeServer {
                 counter++;
                 if (counter > 3) {
                     System.out.println("Failed to connect to server");
-                    cleanUp();
+                    //cleanUp();
                     System.exit(-1);
                 }
                 socket.connect(serverSocketAddress);

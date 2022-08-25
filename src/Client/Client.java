@@ -10,10 +10,12 @@ package Client;
 import org.apache.commons.io.FileUtils;
 
 import java.io.DataInputStream;
+import java.io.DataOutputStream;
 import java.io.File;
 import java.io.IOException;
 import java.net.InetSocketAddress;
 import java.net.Socket;
+import java.util.Arrays;
 
 public class Client {
 
@@ -65,17 +67,17 @@ public class Client {
         int size = configData[1];
         int iterations = configData[2];
         int ID = configData[3];
+        int activeClients = configData[4];
 
         /*
         Test to see if this needs to send data to edge server
         If more than the necessary amount of clients connect to the server,
-        this will disconnect the client if the ID is greater than
-        the requested number of clients.
+        this will return from this method
         */
 
-        if(configData[4] < ID) {
-            this.ftpClient.closeConnection();
-            System.exit(1);
+        if(activeClients < ID) {
+            System.out.println("\033[1;30mClient not needed on this trial \033[0m");
+            return;
         }
 
         //for size parameter -> used in input file names
@@ -119,8 +121,20 @@ public class Client {
                 }
                 break; //end of logistic regression
 
-        }//end of switch
 
+        }//end of switch
+        sendCompletionStatus();
+    }
+
+    /**
+     *
+     * @throws IOException
+     */
+    public void sendCompletionStatus() throws IOException {
+        DataOutputStream dataOutput = new DataOutputStream(this.socket.getOutputStream());
+        dataOutput.writeBoolean(true);
+        dataOutput.flush();
+        System.out.println("Sent confirmation of all files being sent");
     }
 
     /**
@@ -162,6 +176,7 @@ public class Client {
             configDataString = dataInputStream.readUTF().split(";");
             messageReceived = true;
         }
+        System.out.println(Arrays.toString(configDataString));
 
         if(configDataString[0].equals("0")){
             System.out.println("Client parameters set to stop.");
@@ -172,7 +187,7 @@ public class Client {
         for(int i = 0; i < configDataString.length; i++){
             configData[i] = Integer.parseInt(configDataString[i]);
         }
-
+        System.out.println("New parameters received!");
         return configData;
     }
 
