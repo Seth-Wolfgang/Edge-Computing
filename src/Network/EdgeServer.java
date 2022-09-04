@@ -229,6 +229,7 @@ public class EdgeServer {
             timer.newLap();
             dataOutput.writeUTF(out);
         }
+        timer.stopAndPrint("Individual Transmission Start");
     }
 
     /**
@@ -305,7 +306,7 @@ public class EdgeServer {
             if (pattern.asPredicate().test(file.getName())) {
                 if (files.size() < iterations * numOfInputs * clients) {
                     files.add(file);
-                    System.out.println("grabbing " + file.getAbsolutePath());
+                    //System.out.println("grabbing " + file.getAbsolutePath());
                 } else {
                     break;
                 }
@@ -362,7 +363,7 @@ public class EdgeServer {
                     counter++;
                 }
             }
-            System.out.println("Deleted " + counter + " files");
+            //System.out.println("Deleted " + counter + " files");
         } else {
             if (dir.createNewFile()) {
                 System.out.println("Created new directory: filesToProcess");
@@ -372,6 +373,13 @@ public class EdgeServer {
             }
         }
     }
+
+    /**
+     * Implemenets regex to remove files
+     *
+     * @param regex
+     * @throws IOException
+     */
 
     private void filteredCleanUp(String regex) throws IOException {
         Pattern pattern = Pattern.compile(regex);
@@ -383,7 +391,7 @@ public class EdgeServer {
         if (dir.exists()) {
             for (File file : dir.listFiles()) {
                 if (pattern.asPredicate().test(file.getName())) {
-                    System.out.println("Deleting" + file.getAbsolutePath());
+                    //System.out.println("Deleting" + file.getAbsolutePath());
                     if (file.delete()) {
                         counter++;
                     }

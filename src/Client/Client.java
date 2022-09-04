@@ -15,7 +15,6 @@ import java.io.File;
 import java.io.IOException;
 import java.net.InetSocketAddress;
 import java.net.Socket;
-import java.util.Arrays;
 
 public class Client {
 
@@ -147,7 +146,7 @@ public class Client {
     private void copyAndSendFile(File file, File copiedFile) {
         try {
             FileUtils.copyFile(file, copiedFile);
-            System.out.println("Sending " + copiedFile.getAbsolutePath()); //debugging
+            //System.out.println("Sending " + copiedFile.getAbsolutePath()); //debugging
             this.ftpClient.sendFile(copiedFile);
             copiedFile.delete();
         } catch (IOException | InterruptedException e) {
@@ -176,10 +175,11 @@ public class Client {
             configDataString = dataInputStream.readUTF().split(";");
             messageReceived = true;
         }
-        System.out.println(Arrays.toString(configDataString));
+        //System.out.println(Arrays.toString(configDataString));
 
         if(configDataString[0].equals("0")){
             System.out.println("Client parameters set to stop.");
+            this.socket.close();
             System.exit(1);
         }
 

@@ -3,7 +3,7 @@ import java.io.FileWriter;
 import java.io.IOException;
 import java.io.PrintWriter;
 
-class Scratch {
+class TestScriptWriter {
     public static void main(String[] args) throws IOException {
         String cFileName = "client";
         String eFileName = "trials.txt";
@@ -21,8 +21,8 @@ class Scratch {
 
         for(int test = 1; test <= 3; test++){
             for(int size = 1; size <= 3; size++){
-                for(int iterations = 10; iterations <= 10; iterations+=10){
-                    for(int clients = 1; clients <= 5; clients++){
+                for(int iterations = 10; iterations <= 30; iterations+=10){
+                    for(int clients = 1; clients <= 3; clients++){
                         edgeWriter.append(test + ";" + size + ";" + iterations + ";" + clients + "\n");
                         clientWriter.append("java -jar ProductionMain.jar -c $1 2221 &&\n");
                     }
