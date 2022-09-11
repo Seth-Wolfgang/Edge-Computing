@@ -7,6 +7,7 @@
 
 package Client;
 
+import OCR.Timer;
 import org.apache.commons.io.FileUtils;
 
 import java.io.DataInputStream;
@@ -22,6 +23,7 @@ public class Client {
     easyFTPClient ftpClient;
     String size;
     Socket socket;
+    Timer timer = new Timer();
 
     // constructor to put ip address, port, test, and iterations.
     public Client(String address) throws IOException {
@@ -41,13 +43,8 @@ public class Client {
          */
 
         while(true){
-            //connectToEdgeServer(edgeServerSocketAddress);
-            //ftpClient = new easyFTPClient(address, 12221);
-            //System.out.println("FTP:Client connected to edge server");
             try{
                 fileSendHelper();
-                //this.socket = new Socket();
-                //this.ftpClient.closeConnection();
             } catch (Exception e){
                 System.out.println("Connection with edge server forcibly ended");
                 e.printStackTrace();
@@ -86,6 +83,7 @@ public class Client {
             case 3 -> this.size = "Large";
         }
 
+        timer.start();
         switch (test) {
             case 1: //OCR Test
                 //sending image file
@@ -123,6 +121,8 @@ public class Client {
 
         }//end of switch
         sendCompletionStatus();
+        timer.stopAndPrint("Sending input files");
+
     }
 
     /**
@@ -149,6 +149,7 @@ public class Client {
             //System.out.println("Sending " + copiedFile.getAbsolutePath()); //debugging
             this.ftpClient.sendFile(copiedFile);
             copiedFile.delete();
+            timer.newLap();
         } catch (IOException | InterruptedException e) {
             e.printStackTrace();
         }

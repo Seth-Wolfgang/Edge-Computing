@@ -50,15 +50,17 @@ public class EdgeServer {
             cleanUp();
 
             while (reader.hasNextLine()) {    //int test, int size, int iterations, int clients
+
                 System.out.println("Waiting for clients... " + clientNum + " currently connected");
                 cleanUp();
+
                 //Handles clients connecting
                 while (newClient.size() < this.clients) {
                     clientSocket = server.accept();
                     System.out.println("ES:Client accepted | " + newClient.size() + " connected");
                     newClient.add(new ClientHandler(clientSocket, test, size, iterations, newClient.size() + 1, clients));
 
-                    if(!newClient.get(newClient.size() - 1).isAlive()){
+                    if (!newClient.get(newClient.size() - 1).isAlive()) {
                         newClient.get(newClient.size() - 1).start();
                     }
                 }
@@ -67,20 +69,20 @@ public class EdgeServer {
                     ((ClientHandler) thread).updateConfigData(test, size, iterations, clients);
                     ((ClientHandler) thread).sendConfigData();
                 }
+                timer.start();
 
                 boolean allTrue = false;
-                while(!allTrue){
+                while (!allTrue) {
                     int counter = 0;
-                    for(Thread thread : newClient){
-                        if(!((ClientHandler) thread).getStatus()) {
+                    for (Thread thread : newClient) {
+                        if (!((ClientHandler) thread).getStatus()) {
                             counter = 0;
-                        }
-                        else {
+                        } else {
                             counter++;
                         }
 
                     }
-                    if(counter == newClient.size()){
+                    if (counter == newClient.size()) {
                         break;
                     }
                     System.out.println(counter + " " + newClient.size());
@@ -124,7 +126,6 @@ public class EdgeServer {
 
         //waits for files to be sent to this device
         //and adds them all to an array list for processing
-        timer.start();
         waitForFiles(1);
         images = grabFiles("^woah", 1);
         timer.stopAndPrint("OCR Receive Files");
@@ -157,7 +158,6 @@ public class EdgeServer {
 
         //waits for files to be sent to this device
         //and adds them all to an array list for processing
-        timer.start();
         waitForFiles(4);
         for (int i = 0; i < 4; i++) {
             inputFiles.add(grabFiles(inputFilesName[i], 4));
@@ -196,7 +196,6 @@ public class EdgeServer {
 
         //waits for files to be sent to this device
         //and adds them all to an array list for processing
-        timer.start();
         waitForFiles(2);
         inputFiles.add(grabFiles("^Breast", 2));
         inputFiles.add(grabFiles("^test", 2));
@@ -419,7 +418,7 @@ public class EdgeServer {
 
     private void waitForFiles(int numOfInputFiles) {
         if (!dir.exists()) {
-            new File(dir.getName()).mkdirs();
+            dir.mkdirs();
         }
 
         while (dir.listFiles().length != (this.iterations * this.clients * numOfInputFiles)) {

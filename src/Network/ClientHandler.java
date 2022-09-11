@@ -7,6 +7,8 @@
 
 package Network;
 
+import OCR.Timer;
+
 import java.io.DataInputStream;
 import java.io.DataOutputStream;
 import java.io.IOException;
@@ -21,7 +23,7 @@ public class ClientHandler extends Thread {
     int iterations;
     int clientNum;
     int activeClients;
-
+    Timer timer = new Timer();
     //constructor with port
     public ClientHandler(Socket socket, int test, int size, int iterations, int clientNum, int activeClients) throws IOException {
         this.socket = socket;
@@ -41,7 +43,6 @@ public class ClientHandler extends Thread {
     public void sendConfigData() throws IOException {
         DataOutputStream dataOutput = new DataOutputStream(this.socket.getOutputStream());
         DataInputStream dataInputStream = new DataInputStream(this.socket.getInputStream());
-        boolean confirmation = false;
 
         String message = this.test + ";" + this.size + ";" + this.iterations + ";" + this.clientNum + ";" + this.activeClients;
 

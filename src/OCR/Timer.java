@@ -125,7 +125,7 @@ public class Timer extends Thread {
 
     public void printResultsToFile(String tag) throws IOException {
         File results = new File("Results\\" + tag + ".csv");
-        int i = 0;
+
         if (results.createNewFile()) {
             System.out.println("Created " + results.getPath());
         }
