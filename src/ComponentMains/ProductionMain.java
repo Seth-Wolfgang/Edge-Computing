@@ -9,7 +9,7 @@ public class ProductionMain {
 
     public static void main(String[] args) throws IOException {
         String type = args[0];
-        String IP = args[1];
+        String IP;
 
         //prints out instructions for client if typed wrong
         if (args.length != 2 && type.equals("-c")) {
@@ -31,19 +31,24 @@ public class ProductionMain {
                     Type:
                     \t-c\t Client device
                     \t-e\t Edge server device
+                    \t-s\t server device
                     Please use format for client arguments:
                     \t-c [IPV4]
                     Edge server devices needs different arguments:
-                    \t-e [Server IPV4] [Device IPV4]""");
+                    \t-e [Server IPV4] [Device IPV4]
+                    Server needs no extra arguments:
+                    \t-s""");
         }
 
         switch (args[0]) {
             case "-c":
+                IP = args[1];
                 Client client = new Client(IP);
                 break;
             case "-e":
                 String deviceIP = args[2];
                 try {
+                    IP = args[1];
                     EdgeServer edgeServer = new EdgeServer(deviceIP, IP);
                 } catch (InterruptedException e) {
                     e.printStackTrace();
@@ -54,12 +59,16 @@ public class ProductionMain {
                 break;
             default:
                 System.out.println("""
-                        \t-c\t Client device
-                        \t-e\t Edge server device
-                        Please use format for client arguments:
-                        \t-c [IPV4]
-                        Edge server devices needs different arguments:
-                        \t-e [Server IPV4] [Device IPV4]""");
+                    Type:
+                    \t-c\t Client device
+                    \t-e\t Edge server device
+                    \t-s\t server device
+                    Please use format for client arguments:
+                    \t-c [IPV4]
+                    Edge server devices needs different arguments:
+                    \t-e [Server IPV4] [Device IPV4]
+                    Server needs no extra arguments:
+                    \t-s""");
                 break;
             case "install":
 

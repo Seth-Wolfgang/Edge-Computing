@@ -151,6 +151,13 @@ public class Timer extends Thread {
             stopTimer();
         }
         printResultsToFile(tag);
+
+        this.laps.clear();
+        this.initialTime = 0;
+        this.initialLapTime = 0;
+        this.totalTime = 0;
+        this.running = false;
+
     }
 
 }//end of class

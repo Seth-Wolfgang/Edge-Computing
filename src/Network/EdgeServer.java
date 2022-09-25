@@ -65,11 +65,11 @@ public class EdgeServer {
                     }
                 }
                 //sends message to clients so they know what to send back to the server
+                timer.start();
                 for (Thread thread : newClient) {
                     ((ClientHandler) thread).updateConfigData(test, size, iterations, clients);
                     ((ClientHandler) thread).sendConfigData();
                 }
-                timer.start();
 
                 boolean allTrue = false;
                 while (!allTrue) {
@@ -94,9 +94,11 @@ public class EdgeServer {
                     case 2 -> outputString = SWBench();
                     case 3 -> outputString = logRegressionBench();
                 }
-
+                timer.start();
                 individualTransmission(socket, outputString);
                 timer.stopAndPrint("Individual Transmission Start");
+                timer.stopTimer();
+                timer.start();
                 compactTransmission(socket, outputString);
                 timer.stopAndPrint("Compact Transmission Start");
                 //cleanUp(); //deletes files that may be left over
@@ -152,7 +154,6 @@ public class EdgeServer {
     public ArrayList<String> SWBench() throws IOException, InterruptedException {
         //NOTE: run time is affected most by query
         String[] inputFilesName = {"^query", "^database", "^alphabet", "^scoringmatrix"}; //regex
-        Timer timer = new Timer();
         ArrayList<ArrayList<File>> inputFiles = new ArrayList<>();
         ArrayList<String> SWOutput = new ArrayList<>();
 
@@ -221,9 +222,8 @@ public class EdgeServer {
 
     public void individualTransmission(Socket socket, ArrayList<String> manyOutput) throws IOException {
         DataOutputStream dataOutput = new DataOutputStream(socket.getOutputStream());
-        Timer timer = new Timer();
+        //Timer timer = new Timer();
 
-        timer.start();
         for (String out : manyOutput) {
             timer.newLap();
             dataOutput.writeUTF(out);
@@ -243,8 +243,8 @@ public class EdgeServer {
         DataOutputStream dataOutput = new DataOutputStream(socket.getOutputStream());
         ArrayList<String> bigDataOutput = new ArrayList<>();
         StringBuilder outputString = new StringBuilder(manyOutput.get(0)); //Semicolon seperated values of manyOutput
-        Timer timer = new Timer();
-
+        Timer ctimer = new Timer();
+        ctimer.start();
         //allows for proper formatting
         manyOutput.remove(0);
         //Converts ArrayList to semicolon seperated values
@@ -256,7 +256,6 @@ public class EdgeServer {
         outputString = new StringBuilder(outputString.toString().replace("\n", "").replace("\r", ""));
 
         //times the transmission until it is done
-        timer.start();
         try {
             if (outputString.length() > 65535) {
                 int counter = 1;
@@ -282,6 +281,7 @@ public class EdgeServer {
             } else {
                 dataOutput.writeUTF(outputString.toString());
             }
+            ctimer.stopAndPrint("compact");
         } catch (IOException e) {
             e.printStackTrace();
         }

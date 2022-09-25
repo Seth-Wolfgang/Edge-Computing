@@ -7,7 +7,8 @@
  */
 
 import Client.Client;
-import Cloud.Cloud;
+import Network.EdgeServer;
+import Network.Server;
 
 import java.io.IOException;
 import java.util.concurrent.TimeUnit;
@@ -23,32 +24,32 @@ public class Main extends Thread implements Runnable {
     public static void main(String[] args) throws Exception {
         //CLOUD
         try {
-            new Thread(() -> {
-                try {
-                    new Cloud(deviceAddress);
-                } catch (IOException | InterruptedException e) {
-                    e.printStackTrace();
-                }
-            }).start();
-
-
-            //SERVER
 //            new Thread(() -> {
 //                try {
-//                    new Server(port);
-//                } catch (IOException e) {
-//                    e.printStackTrace();
-//                }
-//            }).start();
-//
-//            //EDGE
-//            new Thread(() -> {
-//                try {
-//                    new EdgeServer(deviceAddress, address);
+//                    new Cloud(deviceAddress);
 //                } catch (IOException | InterruptedException e) {
 //                    e.printStackTrace();
 //                }
 //            }).start();
+
+
+            //SERVER
+            new Thread(() -> {
+                try {
+                    new Server(port);
+                } catch (IOException e) {
+                    e.printStackTrace();
+                }
+            }).start();
+
+            //EDGE
+            new Thread(() -> {
+                try {
+                    new EdgeServer(deviceAddress, address);
+                } catch (IOException | InterruptedException e) {
+                    e.printStackTrace();
+                }
+            }).start();
 
             //CLIENT
                 TimeUnit.SECONDS.sleep(2);
