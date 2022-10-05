@@ -121,7 +121,7 @@ public class Client {
 
         }//end of switch
         sendCompletionStatus();
-        timer.stopAndPrint("Sending input files");
+        timer.stopAndPrint("Sending input files", test, size, iterations, activeClients);
 
     }
 

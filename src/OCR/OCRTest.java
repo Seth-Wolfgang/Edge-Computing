@@ -65,7 +65,6 @@ public class OCRTest {
             manyOutput.add(readImage());
             timer.newLap();
         }
-        timer.stopAndPrint("OCR Compact");
         return timer.getLaps();
     }
 

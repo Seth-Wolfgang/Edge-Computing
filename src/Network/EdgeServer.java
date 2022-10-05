@@ -64,15 +64,14 @@ public class EdgeServer {
                         newClient.get(newClient.size() - 1).start();
                     }
                 }
-                //sends message to clients so they know what to send back to the server
+                //sends message to clients, so they know what to send back to the server
                 timer.start();
                 for (Thread thread : newClient) {
                     ((ClientHandler) thread).updateConfigData(test, size, iterations, clients);
                     ((ClientHandler) thread).sendConfigData();
                 }
 
-                boolean allTrue = false;
-                while (!allTrue) {
+                while (true) {
                     int counter = 0;
                     for (Thread thread : newClient) {
                         if (!((ClientHandler) thread).getStatus()) {
@@ -80,7 +79,6 @@ public class EdgeServer {
                         } else {
                             counter++;
                         }
-
                     }
                     if (counter == newClient.size()) {
                         break;
@@ -94,14 +92,10 @@ public class EdgeServer {
                     case 2 -> outputString = SWBench();
                     case 3 -> outputString = logRegressionBench();
                 }
-                timer.start();
-                individualTransmission(socket, outputString);
-                timer.stopAndPrint("Individual Transmission Start");
-                timer.stopTimer();
+
                 timer.start();
                 compactTransmission(socket, outputString);
-                timer.stopAndPrint("Compact Transmission Start");
-                //cleanUp(); //deletes files that may be left over
+                timer.stopAndPrint("Compact Transmission Start", test, size, iterations, clients);
 
                 //starts the next trial. Clients remain connected between trials
                 loadNextTrial(reader.nextLine());
@@ -130,14 +124,14 @@ public class EdgeServer {
         //and adds them all to an array list for processing
         waitForFiles(1);
         images = grabFiles("^woah", 1);
-        timer.stopAndPrint("OCR Receive Files");
+        timer.stopAndPrint("OCR Receive Files", test, size, iterations, clients);
 
         timer.start();
         for (int i = 0; i < iterations * clients; i++) {
             timer.newLap();
             processedText.add(ocr.readImage(images.get(i)));
         }
-        timer.stopAndPrint("OCR");
+        timer.stopAndPrint("OCR", test, size, iterations, clients);
         filteredCleanUp("^woah");
         return processedText;
     }
@@ -163,7 +157,7 @@ public class EdgeServer {
         for (int i = 0; i < 4; i++) {
             inputFiles.add(grabFiles(inputFilesName[i], 4));
         }
-        timer.stopAndPrint("SW Receive Files");
+        timer.stopAndPrint("SW Receive Files", test, size, iterations, clients);
 
         //This runs Smith Waterman and records the time for each iteration
         try {
@@ -176,7 +170,7 @@ public class EdgeServer {
                         inputFiles.get(3).get(i).getAbsolutePath(), 1, 1));
 
             }//end of i loop
-            timer.stopAndPrint("SW run");
+            timer.stopAndPrint("SW run", test, size, iterations, clients);
 
         } catch (Exception e) {
             e.printStackTrace();
@@ -200,14 +194,14 @@ public class EdgeServer {
         waitForFiles(2);
         inputFiles.add(grabFiles("^Breast", 2));
         inputFiles.add(grabFiles("^test", 2));
-        timer.stopAndPrint("LR Receive Files");
+        timer.stopAndPrint("LR Receive Files", test, size, iterations, clients);
 
         timer.start();
         for (int i = 0; i < iterations * clients; i++) {
             timer.newLap();
             logRegressOutput.add(logRegress.LogRegressionInitializer(inputFiles.get(0).get(i), inputFiles.get(1).get(i)));
         }//end of i loop
-        timer.stopAndPrint("Logistic Regression");
+        timer.stopAndPrint("Logistic Regression", test, size, iterations, clients);
         filteredCleanUp("[(^test)(^Breast)]");
         return logRegressOutput;
     }
@@ -228,7 +222,7 @@ public class EdgeServer {
             timer.newLap();
             dataOutput.writeUTF(out);
         }
-        timer.stopAndPrint("Individual Transmission Start");
+        timer.stopAndPrint("Individual Transmission Start", test, size, iterations, clients);
     }
 
     /**
@@ -281,7 +275,7 @@ public class EdgeServer {
             } else {
                 dataOutput.writeUTF(outputString.toString());
             }
-            ctimer.stopAndPrint("compact");
+            ctimer.stopAndPrint("compact", test, size, iterations, clients);
         } catch (IOException e) {
             e.printStackTrace();
         }
@@ -404,7 +398,6 @@ public class EdgeServer {
                 System.exit(-1);
             }
         }
-
     }
 
 

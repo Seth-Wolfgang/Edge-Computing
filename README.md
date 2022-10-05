@@ -22,5 +22,4 @@ git, tesseract-ocr, and openjdk-17. It is meant to be any easy to use download t
 getting the required software for this project, but also a lightweight download tool for the project
 itself.
 
-For up-to-date progress, see my Trello board for this project
-https://trello.com/b/y01w4qjI/research-tasks
+

@@ -121,17 +121,36 @@ public class Timer extends Thread {
      *
      * @param tag a name for the method to print before results are printed
      * @throws IOException
+     *
      */
 
-    public void printResultsToFile(String tag) throws IOException {
+    public void printResultsToFile(String tag, int test, int size, int iterations, int clients) throws IOException {
         File results = new File("Results\\" + tag + ".csv");
-
         if (results.createNewFile()) {
             System.out.println("Created " + results.getPath());
         }
 
         PrintWriter writer = new PrintWriter(new FileWriter(results, true));
-        writer.append(tag).append(",");
+        writer.append(String.valueOf(test)).append(",")
+                .append(String.valueOf(size)).append(",")
+                .append(String.valueOf(iterations)).append(",")
+                .append(String.valueOf(clients)).append(",");
+
+        for (Long time : laps)
+            writer.append(String.valueOf(time)).append(",");
+
+        writer.append(",").append(String.valueOf(getTotalTime())).append("\n");
+        writer.close();
+    }
+
+    public void printResultsToFile(String tag) throws IOException {
+        File results = new File("Results\\" + tag + ".csv");
+        if (results.createNewFile()) {
+            System.out.println("Created " + results.getPath());
+        }
+
+        PrintWriter writer = new PrintWriter(new FileWriter(results, true));
+
         for (Long time : laps)
             writer.append(String.valueOf(time)).append(",");
 
@@ -140,17 +159,20 @@ public class Timer extends Thread {
     }
 
     /**
+
+
+    /**
      * Quality of life method to stop timer and run printResultsToFile() method
      *
      * @param tag a name for the method to print before results are printed
      * @throws IOException
      */
 
-    public void stopAndPrint(String tag) throws IOException {
+    public void stopAndPrint(String tag, int test, int size, int iterations, int clients) throws IOException {
         if (running) {
             stopTimer();
         }
-        printResultsToFile(tag);
+        printResultsToFile(tag, test, size, iterations, clients);
 
         this.laps.clear();
         this.initialTime = 0;

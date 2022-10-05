@@ -1,8 +1,13 @@
-package Cloud;
+/**
+ * Author: Seth Wolfgang
+ * Date: 4/19/2022
+ * This program serves as the client/gatherer of the network.
+ * It sends an image from the `middle` layer
+ */
+
+package Client;
 
 import LogisticRegression.LogRegressionInitializer;
-import Network.ClientHandler;
-import Network.easyFTPServer;
 import OCR.OCRTest;
 import OCR.Timer;
 import SmithWaterman.SWinitialiser;
@@ -11,7 +16,6 @@ import java.io.DataOutputStream;
 import java.io.File;
 import java.io.IOException;
 import java.net.InetSocketAddress;
-import java.net.ServerSocket;
 import java.net.Socket;
 import java.net.SocketException;
 import java.util.ArrayList;
@@ -19,91 +23,111 @@ import java.util.Scanner;
 import java.util.concurrent.TimeUnit;
 import java.util.regex.Pattern;
 
-public class Cloud {
+public class ClientCompute {
 
-    Socket socket;
-    Socket clientSocket;
-    ServerSocket server;
+    //Initial vars
     File dir = new File("filesToProcess");
+    int size;
+    Socket socket;
     Timer timer = new Timer();
     int iterations;
-    int clients;
     int test;
-    int size;
+    int clients;
     ArrayList<String> outputString = new ArrayList<>();
+
     File tests = new File("trials.txt");
     Scanner reader = new Scanner(tests);
 
-    public Cloud(String deviceAddress) throws IOException, InterruptedException {
-        try {
-            //initial networking
-            Thread ftpServer = new easyFTPServer(deviceAddress, 12221);
-            ftpServer.start();
-            clientSocket = new Socket();
-            server = new ServerSocket(5001);
-            int clientNum = 0;
-            ArrayList<Thread> newClient = new ArrayList<>();
 
-            //initial connection to server
-            loadNextTrial(reader.nextLine());
-            cleanUp();
+    // constructor to put ip address, port, test, and iterations.
+    public ClientCompute(String address) throws IOException {
+        socket = new Socket();
+        loadNextTrial(reader.nextLine());
+        cleanUp();
+        InetSocketAddress serverAddress = new InetSocketAddress(address, 12221);
+        connectToServer(serverAddress);
 
-            while (reader.hasNextLine()) {    //int test, int size, int iterations, int clients
-                System.out.println("Waiting for clients... " + clientNum + " currently connected");
-                cleanUp();
-                //Handles clients connecting
-                while (newClient.size() < this.clients) {
-                    clientSocket = server.accept();
-                    System.out.println("ES:Client accepted | " + newClient.size() + " connected");
-                    newClient.add(new ClientHandler(clientSocket, test, size, iterations, newClient.size() + 1, clients));
 
-                    if(!newClient.get(newClient.size() - 1).isAlive()){
-                        newClient.get(newClient.size() - 1).start();
-                    }
-                }
-                //sends message to clients so they know what to send back to the server
-                for (Thread thread : newClient) {
-                    ((ClientHandler) thread).updateConfigData(test, size, iterations, clients);
-                    ((ClientHandler) thread).sendConfigData();
-                }
+        while (reader.hasNextLine()) {
+            try {
+                loadNextTrial(reader.nextLine());
+                fileDuplicator(this.test, this.size, this.iterations);
 
-                boolean allTrue = false;
-                while(!allTrue){
-                    int counter = 0;
-                    for(Thread thread : newClient){
-                        if(!((ClientHandler) thread).getStatus()) {
-                            counter = 0;
-                        }
-                        else {
-                            counter++;
-                        }
-                    }
-                    if(counter == newClient.size()){
-                        break;
-                    }
-                    //System.out.println(counter + " " + newClient.size());
-                }
-
-                //determines which test is to be done
                 switch (test) {
                     case 1 -> outputString = OCRBench();
                     case 2 -> outputString = SWBench();
                     case 3 -> outputString = logRegressionBench();
                 }
 
-                individualTransmission(outputString);
-                compactTransmission(outputString);
+                timer.start();
+                compactTransmission(socket, outputString);
+                timer.stopAndPrint("Client Computing", test, size, iterations, 0);
 
-                //starts the next trial. Clients remain connected between trials
-                loadNextTrial(reader.nextLine());
+            } catch (Exception e) {
+                System.out.println("Connection with edge server forcibly ended");
+                e.printStackTrace();
+                System.exit(1);
             }
-            //Program will not run until all clients connect
-            
-
-        } catch (Exception e) {
-            e.printStackTrace();
         }
+    closeConnection(socket);
     }
+
+    public void fileDuplicator(int test, int size, int iterations) throws IOException {
+        File copiedFile = null;
+        File file = null;
+        String inputSize = "";
+
+
+        //for size parameter -> used in input file names
+        switch (size) {
+            case 1 -> inputSize = "Small";
+            case 2 -> inputSize = "Medium";
+            case 3 -> inputSize = "Large";
+        }
+
+        int mult = 0;
+        switch (test) {
+            case 1 -> mult = 1;
+            case 2 -> mult = 4;
+            case 3 -> mult = 2;
+            default ->
+                    throw new IllegalArgumentException("Client Compute: Mult requires a value");
+        }
+
+        timer.start();
+        switch (test) {
+            case 1:
+                for (int i = 0; i < iterations; i++) {
+                    copiedFile = new File("ftpResources" + File.separator + "images" + File.separator + "woahman" + inputSize + i + ".txt");
+                    file = new File("ftpResources" + File.separator + "images" + File.separator + "woahman" + inputSize + ".png");
+                }
+                break;
+
+            case 2:
+                String[] SWinputFiles = {"query", "database", "alphabet", "scoringmatrix"};
+
+                for (int i = 0; i < iterations; i++) {
+                    for (int j = 0; j < SWinputFiles.length; j++) {
+                        copiedFile = new File("ftpResources" + File.separator + "SW" + File.separator + "" + SWinputFiles[j] + inputSize + i +".txt");
+                        file = new File("ftpResources" + File.separator + "SW" + File.separator + "" + SWinputFiles[j] + inputSize + ".txt");
+                    }
+                }
+                break;
+
+            case 3:
+                String[] LGInputFiles = {"BreastCancer", "testData"};
+
+                for (int i = 0; i < iterations; i++) {
+                    for (int j = 0; j < 2; j++) {
+                        copiedFile = new File("ftpResources" + File.separator + "LogRegression" + File.separator + "" + LGInputFiles[j] + inputSize + i + ".txt");
+                        file = new File("ftpResources" + File.separator + "LogRegression" + File.separator + "" + LGInputFiles[j] + inputSize + ".txt");
+                    }
+                }
+                break;
+        }//end of switch
+        timer.stopAndPrint("Duplicating Files", test, size, iterations, 1);
+    }
+
 
     /**
      * Performs the Optical Character Recognition Benchmark and sends the results
@@ -119,21 +143,18 @@ public class Cloud {
 
         //waits for files to be sent to this device
         //and adds them all to an array list for processing
-        timer.start();
-        waitForFiles(1);
         images = grabFiles("^woah", 1);
-        timer.stopAndPrint("OCR Receive Files", test, size, iterations, clients);
+        timer.stopAndPrint("OCR Receive Files", test, size, iterations, 0);
 
         timer.start();
-        for (int i = 0; i < iterations * clients; i++) {
+        for (int i = 0; i < iterations; i++) {
             timer.newLap();
             processedText.add(ocr.readImage(images.get(i)));
         }
-        timer.stopAndPrint("OCR", test, size, iterations, clients);
+        timer.stopAndPrint("OCR", test, size, iterations, 0);
         filteredCleanUp("^woah");
         return processedText;
     }
-
 
     /**
      * Performs the Smith-Waterman algorithm to benchmark the system.
@@ -146,23 +167,19 @@ public class Cloud {
     public ArrayList<String> SWBench() throws IOException, InterruptedException {
         //NOTE: run time is affected most by query
         String[] inputFilesName = {"^query", "^database", "^alphabet", "^scoringmatrix"}; //regex
-        Timer timer = new Timer();
         ArrayList<ArrayList<File>> inputFiles = new ArrayList<>();
         ArrayList<String> SWOutput = new ArrayList<>();
 
-        //waits for files to be sent to this device
         //and adds them all to an array list for processing
-        timer.start();
-        waitForFiles(4);
         for (int i = 0; i < 4; i++) {
             inputFiles.add(grabFiles(inputFilesName[i], 4));
         }
-        timer.stopAndPrint("SW Receive Files", test, size, iterations, clients);
+        timer.stopAndPrint("SW Receive Files", test, size, iterations, 0);
 
         //This runs Smith Waterman and records the time for each iteration
         try {
             timer.start();
-            for (int i = 0; i < iterations * clients; i++) {
+            for (int i = 0; i < iterations; i++) {
                 timer.newLap();
                 SWOutput.add(new SWinitialiser().run(inputFiles.get(0).get(i).getAbsolutePath(),
                         inputFiles.get(1).get(i).getAbsolutePath(),
@@ -170,7 +187,7 @@ public class Cloud {
                         inputFiles.get(3).get(i).getAbsolutePath(), 1, 1));
 
             }//end of i loop
-            timer.stopAndPrint("SW run", test, size, iterations, clients);
+            timer.stopAndPrint("SW run", test, size, iterations, 0);
 
         } catch (Exception e) {
             e.printStackTrace();
@@ -189,52 +206,38 @@ public class Cloud {
         ArrayList<String> logRegressOutput = new ArrayList<>();
         ArrayList<ArrayList<File>> inputFiles = new ArrayList<>(2);
 
-        //waits for files to be sent to this device
         //and adds them all to an array list for processing
-        timer.start();
-        waitForFiles(2);
         inputFiles.add(grabFiles("^Breast", 2));
         inputFiles.add(grabFiles("^test", 2));
-        timer.stopAndPrint("LR Receive Files", test, size, iterations, clients);
+        timer.stopAndPrint("LR Receive Files", test, size, iterations, 0);
 
         timer.start();
-        for (int i = 0; i < iterations * clients; i++) {
+        for (int i = 0; i < iterations; i++) {
             timer.newLap();
             logRegressOutput.add(logRegress.LogRegressionInitializer(inputFiles.get(0).get(i), inputFiles.get(1).get(i)));
-        }//end of i loop
-        timer.stopAndPrint("Logistic Regression", test, size, iterations, clients);
+        }
+
+        timer.stopAndPrint("Logistic Regression", test, size, iterations, 0);
         filteredCleanUp("[(^test)(^Breast)]");
         return logRegressOutput;
     }
 
-    /**
-     * Sends data separately to the server.
-     *
-     * @param manyOutput
-     * @throws IOException
-     */
+    //utility for if compactTransmission() goes above 2^16 bytes
+    public void individualTransmission(Socket socket, ArrayList<String> manyOutput) throws IOException {
+        DataOutputStream dataOutput = new DataOutputStream(socket.getOutputStream());
 
-    public void individualTransmission(ArrayList<String> manyOutput) throws IOException {
-        Timer timer = new Timer();
-
-        timer.start();
         for (String out : manyOutput) {
             timer.newLap();
-            System.out.println(out);
+            dataOutput.writeUTF(out);
         }
-        timer.stopAndPrint("Individual Transmission Start", test, size, iterations, clients);
+        timer.stopAndPrint("Individual Transmission Start", test, size, iterations, 0);
     }
 
-    /**
-     * prints all data at once
-     *
-     * @param manyOutput
-     * @throws IOException
-     */
-    public void compactTransmission(ArrayList<String> manyOutput) throws IOException {
-        StringBuilder outputString = new StringBuilder(manyOutput.get(0)); //Semicolon seperated values of manyOutput
-        Timer timer = new Timer();
 
+    public void compactTransmission(Socket socket, ArrayList<String> manyOutput) throws IOException {
+        DataOutputStream dataOutput = new DataOutputStream(socket.getOutputStream());
+        ArrayList<String> bigDataOutput = new ArrayList<>();
+        StringBuilder outputString = new StringBuilder(manyOutput.get(0)); //Semicolon seperated values of manyOutput
         //allows for proper formatting
         manyOutput.remove(0);
         //Converts ArrayList to semicolon seperated values
@@ -246,9 +249,47 @@ public class Cloud {
         outputString = new StringBuilder(outputString.toString().replace("\n", "").replace("\r", ""));
 
         //times the transmission until it is done
-        timer.start();
-        System.out.println(outputString);
-        timer.stopAndPrint("Cloud bulk print", test, size, iterations, clients);
+        try {
+            if (outputString.length() > 65535) {
+                int counter = 1;
+
+                while (outputString.length() > 65535) {
+                    bigDataOutput.add(outputString.substring(0, 65535));
+                    outputString = new StringBuilder(outputString.substring(65535));
+
+                    //loop will not run after string size is less than writeUTF byte limit
+                    //this grabs the last of the output
+                    if (outputString.length() < 65535) {
+                        bigDataOutput.add(outputString.toString());
+                        counter++;
+                        break;
+                    }
+
+                    counter++;
+                }
+                System.out.println("Output is too big for compact transmission." +
+                        "Splitting output into " + counter + " large parts.");
+                individualTransmission(socket, bigDataOutput);
+
+            } else {
+                dataOutput.writeUTF(outputString.toString());
+            }
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+    }
+
+
+    public void loadNextTrial(String nextTrial) {
+        String[] trialConfig = nextTrial.split(";");
+        this.test = Integer.parseInt(trialConfig[0]);
+        this.size = Integer.parseInt(trialConfig[1]);
+        this.iterations = Integer.parseInt(trialConfig[2]);
+
+        if (this.test == 0)
+            System.out.println("Testing Complete!");
+        else
+            System.out.println("New Trial:\ntest = " + test + "\nsize = " + size + "\nIterations = " + iterations + "\nClients = " + clients);
     }
 
     public ArrayList<File> grabFiles(String regex, int numOfInputs) throws IOException {
@@ -259,7 +300,7 @@ public class Cloud {
         //and adds them to the returned file ArrayList
         for (File file : dir.listFiles()) {
             if (pattern.asPredicate().test(file.getName())) {
-                if (files.size() < iterations * numOfInputs * clients) {
+                if (files.size() < iterations * numOfInputs) {
                     files.add(file);
                     //System.out.println("grabbing " + file.getAbsolutePath());
                 } else {
@@ -269,46 +310,6 @@ public class Cloud {
         }
         return files;
     }
-
-    /**
-     * Loads next trial into testing parameters
-     *
-     * @param nextTrial
-     */
-
-    public void loadNextTrial(String nextTrial) {
-        String[] trialConfig = nextTrial.split(";");
-        this.test = Integer.parseInt(trialConfig[0]);
-        this.size = Integer.parseInt(trialConfig[1]);
-        this.iterations = Integer.parseInt(trialConfig[2]);
-        this.clients = Integer.parseInt(trialConfig[3]);
-
-        if (this.test == 0)
-            System.out.println("Testing Complete!");
-        else
-            System.out.println("New Trial:\ntest = " + test + "\nsize = " + size + "\nIterations = " + iterations + "\nClients = " + clients);
-    }
-
-    /**
-     * Sends the message to close connection with server and then closes the socket
-     *
-     * @param socket
-     */
-
-    public void closeConnection(Socket socket) {
-        try {
-            DataOutputStream outputStream = new DataOutputStream(socket.getOutputStream());
-            outputStream.writeUTF("over");
-            outputStream.close();
-            socket.close();
-        } catch (IOException e) {
-            e.printStackTrace();
-        }
-    }
-
-    /**
-     * Removes temporary files
-     */
 
     private void cleanUp() throws IOException {
         int counter = 0;
@@ -328,13 +329,6 @@ public class Cloud {
             }
         }
     }
-
-    /**
-     * Implemenets regex to remove files
-     *
-     * @param regex
-     * @throws IOException
-     */
 
     private void filteredCleanUp(String regex) throws IOException {
         Pattern pattern = Pattern.compile(regex);
@@ -360,39 +354,15 @@ public class Cloud {
                 System.exit(-1);
             }
         }
-
     }
 
 
     /**
-     * Puts thread to sleep for .1 seconds if there are not
-     * iterations * numOfInputFiles in the directory for
-     * files to be processed.
-     *
-     * @param numOfInputFiles
-     */
-
-    private void waitForFiles(int numOfInputFiles) {
-        if (!dir.exists()) {
-            new File(dir.getName()).mkdirs();
-        }
-
-        while (dir.listFiles().length != (this.iterations * this.clients * numOfInputFiles)) {
-            try {
-                TimeUnit.MILLISECONDS.sleep(100);
-            } catch (InterruptedException e) {
-                e.printStackTrace();
-            }
-        }
-    }
-
-    /**
-     * Allows for redundancy in connecting to server.
+     * this method allows for redundancy in connecting to the edge server.
+     * The client may fail to connect an attempt to connect at startup.
      *
      * @param serverSocketAddress
-     * @throws IOException
      */
-
     private void connectToServer(InetSocketAddress serverSocketAddress) throws IOException {
         int counter = 0;
         while (!socket.isConnected()) {
@@ -412,7 +382,15 @@ public class Cloud {
         }
         System.out.println("Edge server connected to server");
     }
-}//end of class
 
-
-
+    public void closeConnection(Socket socket) {
+        try {
+            DataOutputStream outputStream = new DataOutputStream(socket.getOutputStream());
+            outputStream.writeUTF("over");
+            outputStream.close();
+            socket.close();
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+    }
+}    // end of client
