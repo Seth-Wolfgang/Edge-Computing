@@ -6,12 +6,10 @@
  * Date 5/3/2022
  */
 
-import Client.Client;
-import Network.EdgeServer;
+import Client.ClientCompute;
 import Network.Server;
 
 import java.io.IOException;
-import java.util.concurrent.TimeUnit;
 
 public class Main extends Thread implements Runnable {
 
@@ -31,8 +29,13 @@ public class Main extends Thread implements Runnable {
 //                    e.printStackTrace();
 //                }
 //            }).start();
-
-
+            new Thread(() -> {
+                try{
+                    new ClientCompute(address);
+                } catch (IOException e) {
+                    throw new RuntimeException(e);
+                }
+            });
             //SERVER
             new Thread(() -> {
                 try {
@@ -42,26 +45,29 @@ public class Main extends Thread implements Runnable {
                 }
             }).start();
 
-            //EDGE
-            new Thread(() -> {
-                try {
-                    new EdgeServer(deviceAddress, address);
-                } catch (IOException | InterruptedException e) {
-                    e.printStackTrace();
-                }
-            }).start();
 
-            //CLIENT
-                TimeUnit.SECONDS.sleep(2);
-                for(int j = 0; j < clients; j++) {
-                    new Thread(() -> {
-                        try {
-                            new Client(address);
-                        } catch (IOException e) {
-                            e.printStackTrace();
-                        }
-                    }).start();
-                }
+
+
+            //EDGE
+//            new Thread(() -> {
+//                try {
+//                    new EdgeServer(deviceAddress, address);
+//                } catch (IOException | InterruptedException e) {
+//                    e.printStackTrace();
+//                }
+//            }).start();
+//
+//            //CLIENT
+//                TimeUnit.SECONDS.sleep(2);
+//                for(int j = 0; j < clients; j++) {
+//                    new Thread(() -> {
+//                        try {
+//                            new Client(address);
+//                        } catch (IOException e) {
+//                            e.printStackTrace();
+//                        }
+//                    }).start();
+//                }
 
 
         } catch (Exception e) {

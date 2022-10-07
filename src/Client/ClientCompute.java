@@ -18,6 +18,7 @@ import java.io.IOException;
 import java.net.InetSocketAddress;
 import java.net.Socket;
 import java.net.SocketException;
+import java.nio.file.Files;
 import java.util.ArrayList;
 import java.util.Scanner;
 import java.util.concurrent.TimeUnit;
@@ -34,7 +35,6 @@ public class ClientCompute {
     int test;
     int clients;
     ArrayList<String> outputString = new ArrayList<>();
-
     File tests = new File("trials.txt");
     Scanner reader = new Scanner(tests);
 
@@ -43,8 +43,9 @@ public class ClientCompute {
     public ClientCompute(String address) throws IOException {
         socket = new Socket();
         loadNextTrial(reader.nextLine());
+
         cleanUp();
-        InetSocketAddress serverAddress = new InetSocketAddress(address, 12221);
+        InetSocketAddress serverAddress = new InetSocketAddress(address, 5000);
         connectToServer(serverAddress);
 
 
@@ -98,8 +99,8 @@ public class ClientCompute {
         switch (test) {
             case 1:
                 for (int i = 0; i < iterations; i++) {
-                    copiedFile = new File("ftpResources" + File.separator + "images" + File.separator + "woahman" + inputSize + i + ".txt");
                     file = new File("ftpResources" + File.separator + "images" + File.separator + "woahman" + inputSize + ".png");
+                    Files.copy(file.toPath(), new File("filesToProcess" + File.separator + "woahman" + inputSize + i + ".png").toPath());
                 }
                 break;
 
@@ -108,19 +109,19 @@ public class ClientCompute {
 
                 for (int i = 0; i < iterations; i++) {
                     for (int j = 0; j < SWinputFiles.length; j++) {
-                        copiedFile = new File("ftpResources" + File.separator + "SW" + File.separator + "" + SWinputFiles[j] + inputSize + i +".txt");
                         file = new File("ftpResources" + File.separator + "SW" + File.separator + "" + SWinputFiles[j] + inputSize + ".txt");
+                        Files.copy(file.toPath(), new File("filesToProcess" + File.separator + SWinputFiles[j] + inputSize + i +".txt").toPath());
                     }
                 }
-                break;
 
+                break;
             case 3:
                 String[] LGInputFiles = {"BreastCancer", "testData"};
 
                 for (int i = 0; i < iterations; i++) {
                     for (int j = 0; j < 2; j++) {
-                        copiedFile = new File("ftpResources" + File.separator + "LogRegression" + File.separator + "" + LGInputFiles[j] + inputSize + i + ".txt");
                         file = new File("ftpResources" + File.separator + "LogRegression" + File.separator + "" + LGInputFiles[j] + inputSize + ".txt");
+                        Files.copy(file.toPath(), new File("filesToProcess" + File.separator + LGInputFiles[j] + inputSize + i + ".txt").toPath());
                     }
                 }
                 break;

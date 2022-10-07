@@ -1,8 +1,10 @@
 package ComponentMains;
 
 import Client.Client;
+import Client.ClientCompute;
 import Network.EdgeServer;
 import Network.Server;
+
 import java.io.IOException;
 
 public class ProductionMain {
@@ -29,6 +31,7 @@ public class ProductionMain {
         else if (type.equals("help") || type.equals("-h")) {
             System.out.println("""
                     Type:
+                    \t-cc\t Client computer
                     \t-c\t Client device
                     \t-e\t Edge server device
                     \t-s\t server device
@@ -54,12 +57,17 @@ public class ProductionMain {
                     e.printStackTrace();
                 }
                 break;
+            case "-cc":
+                IP = args[1];
+                ClientCompute cc = new ClientCompute(IP);
+                break;
             case "-s":
                 Server server = new Server(5000);
                 break;
             default:
                 System.out.println("""
                     Type:
+                    \t-cc\t Client computer
                     \t-c\t Client device
                     \t-e\t Edge server device
                     \t-s\t server device
