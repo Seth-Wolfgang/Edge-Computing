@@ -29,14 +29,7 @@ public class Main extends Thread implements Runnable {
 //                    e.printStackTrace();
 //                }
 //            }).start();
-            new Thread(() -> {
-                try{
-                    new ClientCompute(address);
-                } catch (IOException e) {
-                    throw new RuntimeException(e);
-                }
-            });
-            //SERVER
+
             new Thread(() -> {
                 try {
                     new Server(port);
@@ -45,6 +38,14 @@ public class Main extends Thread implements Runnable {
                 }
             }).start();
 
+            new Thread(() -> {
+                try{
+                    new ClientCompute(address);
+                } catch (IOException e) {
+                    throw new RuntimeException(e);
+                }
+            }).start();
+            //SERVER
 
 
 

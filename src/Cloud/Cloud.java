@@ -91,9 +91,9 @@ public class Cloud {
                     case 3 -> outputString = logRegressionBench();
                 }
 
-                individualTransmission(outputString);
+                timer.start();
                 compactTransmission(outputString);
-
+                timer.stopAndPrint("C: Print Output", test, size, iterations, clients);
                 //starts the next trial. Clients remain connected between trials
                 loadNextTrial(reader.nextLine());
             }
@@ -121,16 +121,16 @@ public class Cloud {
         //and adds them all to an array list for processing
         timer.start();
         waitForFiles(1);
-        images = grabFiles("^woah", 1);
-        timer.stopAndPrint("OCR Receive Files", test, size, iterations, clients);
+        images = grabFiles("^image", 1);
+        timer.stopAndPrint("Cloud: OCR Receive Files", test, size, iterations, clients);
 
         timer.start();
         for (int i = 0; i < iterations * clients; i++) {
             timer.newLap();
             processedText.add(ocr.readImage(images.get(i)));
         }
-        timer.stopAndPrint("OCR", test, size, iterations, clients);
-        filteredCleanUp("^woah");
+        timer.stopAndPrint("Cloud: OCR", test, size, iterations, clients);
+        filteredCleanUp("^image");
         return processedText;
     }
 
@@ -157,7 +157,7 @@ public class Cloud {
         for (int i = 0; i < 4; i++) {
             inputFiles.add(grabFiles(inputFilesName[i], 4));
         }
-        timer.stopAndPrint("SW Receive Files", test, size, iterations, clients);
+        timer.stopAndPrint("C: SW Receive Files", test, size, iterations, clients);
 
         //This runs Smith Waterman and records the time for each iteration
         try {
@@ -170,7 +170,7 @@ public class Cloud {
                         inputFiles.get(3).get(i).getAbsolutePath(), 1, 1));
 
             }//end of i loop
-            timer.stopAndPrint("SW run", test, size, iterations, clients);
+            timer.stopAndPrint("C: SW run", test, size, iterations, clients);
 
         } catch (Exception e) {
             e.printStackTrace();
@@ -195,14 +195,14 @@ public class Cloud {
         waitForFiles(2);
         inputFiles.add(grabFiles("^Breast", 2));
         inputFiles.add(grabFiles("^test", 2));
-        timer.stopAndPrint("LR Receive Files", test, size, iterations, clients);
+        timer.stopAndPrint("C: LR Receive Files", test, size, iterations, clients);
 
         timer.start();
         for (int i = 0; i < iterations * clients; i++) {
             timer.newLap();
             logRegressOutput.add(logRegress.LogRegressionInitializer(inputFiles.get(0).get(i), inputFiles.get(1).get(i)));
         }//end of i loop
-        timer.stopAndPrint("Logistic Regression", test, size, iterations, clients);
+        timer.stopAndPrint("C: Logistic Regression", test, size, iterations, clients);
         filteredCleanUp("[(^test)(^Breast)]");
         return logRegressOutput;
     }
@@ -222,7 +222,7 @@ public class Cloud {
             timer.newLap();
             System.out.println(out);
         }
-        timer.stopAndPrint("Individual Transmission Start", test, size, iterations, clients);
+        timer.stopAndPrint("C: Individual Transmission Start", test, size, iterations, clients);
     }
 
     /**
@@ -248,7 +248,7 @@ public class Cloud {
         //times the transmission until it is done
         timer.start();
         System.out.println(outputString);
-        timer.stopAndPrint("Cloud bulk print", test, size, iterations, clients);
+        timer.stopAndPrint("C: Cloud bulk print", test, size, iterations, clients);
     }
 
     public ArrayList<File> grabFiles(String regex, int numOfInputs) throws IOException {

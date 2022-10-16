@@ -2,6 +2,7 @@ package ComponentMains;
 
 import Client.Client;
 import Client.ClientCompute;
+import Cloud.Cloud;
 import Network.EdgeServer;
 import Network.Server;
 
@@ -9,7 +10,7 @@ import java.io.IOException;
 
 public class ProductionMain {
 
-    public static void main(String[] args) throws IOException {
+    public static void main(String[] args) throws IOException, InterruptedException {
         String type = args[0];
         String IP;
 
@@ -44,12 +45,15 @@ public class ProductionMain {
         }
 
         switch (args[0]) {
+            case "-cl":
+                String deviceIP = args[1];
+                Cloud cloud = new Cloud(deviceIP);
             case "-c":
                 IP = args[1];
                 Client client = new Client(IP);
                 break;
             case "-e":
-                String deviceIP = args[2];
+                deviceIP = args[2];
                 try {
                     IP = args[1];
                     EdgeServer edgeServer = new EdgeServer(deviceIP, IP);

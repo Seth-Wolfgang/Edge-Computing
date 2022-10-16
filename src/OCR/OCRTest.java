@@ -34,7 +34,7 @@ public class OCRTest {
         dataPath = dataDir;
         image = imagePath;
 
-        tesseract.setVariable("user_defined_dpi", "100");
+        tesseract.setVariable("user_defined_dpi", "1000");
         tesseract.setDatapath("tessdata");
     }
 
@@ -46,7 +46,7 @@ public class OCRTest {
     public OCRTest(String dataDir) {
         dataPath = dataDir;
 
-        tesseract.setVariable("user_defined_dpi", "100");
+        tesseract.setVariable("user_defined_dpi", "1000");
         tesseract.setDatapath("tessdata");
     }
 

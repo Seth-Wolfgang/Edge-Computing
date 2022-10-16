@@ -57,7 +57,7 @@ public class EdgeServer {
                 //Handles clients connecting
                 while (newClient.size() < this.clients) {
                     clientSocket = server.accept();
-                    System.out.println("ES:Client accepted | " + newClient.size() + " connected");
+                    System.out.println("ES:Client accepted | " + newClient.size()+1 + " connected");
                     newClient.add(new ClientHandler(clientSocket, test, size, iterations, newClient.size() + 1, clients));
 
                     if (!newClient.get(newClient.size() - 1).isAlive()) {
@@ -95,7 +95,7 @@ public class EdgeServer {
 
                 timer.start();
                 compactTransmission(socket, outputString);
-                timer.stopAndPrint("Compact Transmission Start", test, size, iterations, clients);
+                timer.stopAndPrint("E: Compact Transmission Start", test, size, iterations, clients);
 
                 //starts the next trial. Clients remain connected between trials
                 loadNextTrial(reader.nextLine());
@@ -123,7 +123,7 @@ public class EdgeServer {
         //waits for files to be sent to this device
         //and adds them all to an array list for processing
         waitForFiles(1);
-        images = grabFiles("^woah", 1);
+        images = grabFiles("^image", 1);
         timer.stopAndPrint("OCR Receive Files", test, size, iterations, clients);
 
         timer.start();
@@ -131,7 +131,7 @@ public class EdgeServer {
             timer.newLap();
             processedText.add(ocr.readImage(images.get(i)));
         }
-        timer.stopAndPrint("OCR", test, size, iterations, clients);
+        timer.stopAndPrint("E: OCR", test, size, iterations, clients);
         filteredCleanUp("^woah");
         return processedText;
     }
@@ -170,7 +170,7 @@ public class EdgeServer {
                         inputFiles.get(3).get(i).getAbsolutePath(), 1, 1));
 
             }//end of i loop
-            timer.stopAndPrint("SW run", test, size, iterations, clients);
+            timer.stopAndPrint("E: SW run", test, size, iterations, clients);
 
         } catch (Exception e) {
             e.printStackTrace();
@@ -194,14 +194,14 @@ public class EdgeServer {
         waitForFiles(2);
         inputFiles.add(grabFiles("^Breast", 2));
         inputFiles.add(grabFiles("^test", 2));
-        timer.stopAndPrint("LR Receive Files", test, size, iterations, clients);
+        timer.stopAndPrint("E: LR Receive Files", test, size, iterations, clients);
 
         timer.start();
         for (int i = 0; i < iterations * clients; i++) {
             timer.newLap();
             logRegressOutput.add(logRegress.LogRegressionInitializer(inputFiles.get(0).get(i), inputFiles.get(1).get(i)));
         }//end of i loop
-        timer.stopAndPrint("Logistic Regression", test, size, iterations, clients);
+        timer.stopAndPrint("E: Logistic Regression", test, size, iterations, clients);
         filteredCleanUp("[(^test)(^Breast)]");
         return logRegressOutput;
     }
@@ -222,7 +222,7 @@ public class EdgeServer {
             timer.newLap();
             dataOutput.writeUTF(out);
         }
-        timer.stopAndPrint("Individual Transmission Start", test, size, iterations, clients);
+        timer.stopAndPrint("E: Individual Transmission Start", test, size, iterations, clients);
     }
 
     /**
@@ -275,7 +275,7 @@ public class EdgeServer {
             } else {
                 dataOutput.writeUTF(outputString.toString());
             }
-            ctimer.stopAndPrint("compact", test, size, iterations, clients);
+            ctimer.stopAndPrint("E: compact", test, size, iterations, clients);
         } catch (IOException e) {
             e.printStackTrace();
         }

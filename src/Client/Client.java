@@ -88,8 +88,8 @@ public class Client {
             case 1: //OCR Test
                 //sending image file
                 for (int i = 0; i < iterations; i++) {
-                    copiedFile = new File("ftpResources" + File.separator + "images" + File.separator + "woahman" + this.size + i + "C" + ID + ".png");
-                    file = new File("ftpResources" + File.separator + "images" + File.separator + "woahman" + this.size + ".png");
+                    copiedFile = new File("ftpResources" + File.separator + "images" + File.separator + "image" + this.size + i + "C" + ID + ".jpg");
+                    file = new File("ftpResources" + File.separator + "images" + File.separator + "image" + this.size + ".jpg");
                     copyAndSendFile(file, copiedFile);
                 }
                 break; //end of OCR test

@@ -1,8 +1,7 @@
 /**
  * Author: Seth Wolfgang
- * Date: 4/19/2022
- * This program serves as the client/gatherer of the network.
- * It sends an image from the `middle` layer
+ * 10/9/2022
+ * this was hodgepodged together quickly
  */
 
 package Client;
@@ -42,7 +41,6 @@ public class ClientCompute {
     // constructor to put ip address, port, test, and iterations.
     public ClientCompute(String address) throws IOException {
         socket = new Socket();
-        loadNextTrial(reader.nextLine());
 
         cleanUp();
         InetSocketAddress serverAddress = new InetSocketAddress(address, 5000);
@@ -62,7 +60,7 @@ public class ClientCompute {
 
                 timer.start();
                 compactTransmission(socket, outputString);
-                timer.stopAndPrint("Client Computing", test, size, iterations, 0);
+                timer.stopAndPrint("CC: Compact Transmission", test, size, iterations, 0);
 
             } catch (Exception e) {
                 System.out.println("Connection with edge server forcibly ended");
@@ -88,6 +86,7 @@ public class ClientCompute {
 
         int mult = 0;
         switch (test) {
+            case 0 -> System.exit(1);
             case 1 -> mult = 1;
             case 2 -> mult = 4;
             case 3 -> mult = 2;
@@ -99,8 +98,8 @@ public class ClientCompute {
         switch (test) {
             case 1:
                 for (int i = 0; i < iterations; i++) {
-                    file = new File("ftpResources" + File.separator + "images" + File.separator + "woahman" + inputSize + ".png");
-                    Files.copy(file.toPath(), new File("filesToProcess" + File.separator + "woahman" + inputSize + i + ".png").toPath());
+                    file = new File("ftpResources" + File.separator + "images" + File.separator + "image" + inputSize + ".jpg");
+                    Files.copy(file.toPath(), new File("filesToProcess" + File.separator + "image" + inputSize + i + ".jpg").toPath());
                 }
                 break;
 
@@ -126,7 +125,7 @@ public class ClientCompute {
                 }
                 break;
         }//end of switch
-        timer.stopAndPrint("Duplicating Files", test, size, iterations, 1);
+        timer.stopAndPrint("CC: Duplicating Files", test, size, iterations, 1);
     }
 
 
@@ -144,16 +143,16 @@ public class ClientCompute {
 
         //waits for files to be sent to this device
         //and adds them all to an array list for processing
-        images = grabFiles("^woah", 1);
-        timer.stopAndPrint("OCR Receive Files", test, size, iterations, 0);
+        images = grabFiles("^image", 1);
 
         timer.start();
         for (int i = 0; i < iterations; i++) {
             timer.newLap();
             processedText.add(ocr.readImage(images.get(i)));
+            System.out.println("file read!");
         }
-        timer.stopAndPrint("OCR", test, size, iterations, 0);
-        filteredCleanUp("^woah");
+        timer.stopAndPrint("CC: OCR", test, size, iterations, 0);
+        filteredCleanUp("^image");
         return processedText;
     }
 
@@ -175,7 +174,6 @@ public class ClientCompute {
         for (int i = 0; i < 4; i++) {
             inputFiles.add(grabFiles(inputFilesName[i], 4));
         }
-        timer.stopAndPrint("SW Receive Files", test, size, iterations, 0);
 
         //This runs Smith Waterman and records the time for each iteration
         try {
@@ -188,7 +186,7 @@ public class ClientCompute {
                         inputFiles.get(3).get(i).getAbsolutePath(), 1, 1));
 
             }//end of i loop
-            timer.stopAndPrint("SW run", test, size, iterations, 0);
+            timer.stopAndPrint("CC: SW run", test, size, iterations, 0);
 
         } catch (Exception e) {
             e.printStackTrace();
@@ -210,7 +208,6 @@ public class ClientCompute {
         //and adds them all to an array list for processing
         inputFiles.add(grabFiles("^Breast", 2));
         inputFiles.add(grabFiles("^test", 2));
-        timer.stopAndPrint("LR Receive Files", test, size, iterations, 0);
 
         timer.start();
         for (int i = 0; i < iterations; i++) {
@@ -218,7 +215,7 @@ public class ClientCompute {
             logRegressOutput.add(logRegress.LogRegressionInitializer(inputFiles.get(0).get(i), inputFiles.get(1).get(i)));
         }
 
-        timer.stopAndPrint("Logistic Regression", test, size, iterations, 0);
+        timer.stopAndPrint("CC: Logistic Regression", test, size, iterations, 0);
         filteredCleanUp("[(^test)(^Breast)]");
         return logRegressOutput;
     }
@@ -231,7 +228,7 @@ public class ClientCompute {
             timer.newLap();
             dataOutput.writeUTF(out);
         }
-        timer.stopAndPrint("Individual Transmission Start", test, size, iterations, 0);
+        timer.stopAndPrint("CC: Individual Transmission Start", test, size, iterations, 0);
     }
 
 
@@ -372,7 +369,6 @@ public class ClientCompute {
                 counter++;
                 if (counter > 3) {
                     System.out.println("Failed to connect to server");
-                    //cleanUp();
                     System.exit(-1);
                 }
                 socket.connect(serverSocketAddress);
