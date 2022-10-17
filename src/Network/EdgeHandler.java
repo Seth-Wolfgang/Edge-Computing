@@ -39,9 +39,10 @@ class EdgeHandler extends Thread {
                 /*if statements break loop if they receive a certain
                 number of inputs or receive an input reading 'over' */
                 if (line.compareTo("") != 0 && !line.equals("over")) {
-                    timer.newLap();
                     counter++;
-
+                    timer.newLap();
+                    timer.printResultsToFile("Transmission Received");
+                    timer.clearLaps();
                     //the blue text when something is sent to server
                     System.out.println("\033[1;34mEdge Server " + this.clientNum + " iteration # " + counter + " done.\033[0m");
                 }

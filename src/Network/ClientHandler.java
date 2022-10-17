@@ -13,6 +13,7 @@ import java.io.DataInputStream;
 import java.io.DataOutputStream;
 import java.io.IOException;
 import java.net.Socket;
+import java.util.concurrent.TimeUnit;
 
 public class ClientHandler extends Thread {
 
@@ -32,6 +33,7 @@ public class ClientHandler extends Thread {
         this.iterations = iterations;
         this.clientNum = clientNum;
         this.activeClients = activeClients;
+        this.socket.setKeepAlive(true);
         System.out.println("ES:Client connected");
 
     } //end of ClientHandler
@@ -40,7 +42,7 @@ public class ClientHandler extends Thread {
         return this.isConfirmed;
     }
 
-    public void sendConfigData() throws IOException {
+    public void sendConfigData() throws IOException, InterruptedException {
         DataOutputStream dataOutput = new DataOutputStream(this.socket.getOutputStream());
         DataInputStream dataInputStream = new DataInputStream(this.socket.getInputStream());
 
@@ -52,6 +54,7 @@ public class ClientHandler extends Thread {
         System.out.println("Sent configuration data to client");
 
         while(!this.isConfirmed){
+            TimeUnit.MILLISECONDS.sleep(100);
             this.isConfirmed = dataInputStream.readBoolean();
         }
 

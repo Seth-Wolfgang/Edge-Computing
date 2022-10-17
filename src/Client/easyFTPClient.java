@@ -10,8 +10,12 @@ package Client;
 import org.apache.commons.net.ftp.FTP;
 import org.apache.commons.net.ftp.FTPClient;
 
-import java.io.*;
+import java.io.BufferedInputStream;
+import java.io.File;
+import java.io.FileInputStream;
+import java.io.IOException;
 import java.net.ConnectException;
+import java.net.SocketException;
 
 public class easyFTPClient extends FTPClient {
 
@@ -26,9 +30,21 @@ public class easyFTPClient extends FTPClient {
     private int port;
 
     public easyFTPClient(String address, int port) {
+        this.address = address;
+        this.port = port;
+    }
+
+    public void refreshConnection() throws IOException {
+        closeConnection();
+        connectToFTP(this.address, this.port);
+    }
+
+
+    public void connectToFTP(String address, int port) {
         try {
             //connects to EdgeServer
             ftpClient.setConnectTimeout(5000);
+
 
             //ensures connection to FTP server
             while(!ftpClient.isConnected()){
@@ -42,11 +58,13 @@ public class easyFTPClient extends FTPClient {
             ftpClient.login("user", "");
             ftpClient.enterLocalPassiveMode();
             ftpClient.setFileType(FTP.BINARY_FILE_TYPE);
+            ftpClient.setKeepAlive(true);
         } catch (IOException e) {
             System.out.println("FTP Setup Failed");
             e.printStackTrace();
         }
     }
+
 
 
     /**
@@ -72,7 +90,16 @@ public class easyFTPClient extends FTPClient {
     public void sendFile(File file) throws IOException, InterruptedException {
         BufferedInputStream inputStream = new BufferedInputStream(new FileInputStream(file));
 
-        boolean success = ftpClient.storeFile(file.getName(), inputStream);
+        boolean success = false;
+        try {
+            success = ftpClient.storeFile(file.getName(), inputStream);
+        }
+        catch (SocketException e){
+            closeConnection();
+            ftpClient.connect(address, port);
+            inputStream = new BufferedInputStream(new FileInputStream(file));
+            success = ftpClient.storeFile(file.getName(), inputStream);
+        }
 
         if (success) {
             //Grabs file from server and ends stream
@@ -83,7 +110,7 @@ public class easyFTPClient extends FTPClient {
             inputStream.close();
             System.out.println("File transfer failed!");
         }
-    }//end of sendFile
+    }
 
     /**
      * Overloaded method for sending files by using the path instead of a file object

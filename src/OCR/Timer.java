@@ -136,10 +136,7 @@ public class Timer extends Thread {
                 .append(String.valueOf(iterations)).append(",")
                 .append(String.valueOf(clients)).append(",");
 
-        for (Long time : laps)
-            writer.append(String.valueOf(time)).append(",");
-
-        writer.append(",").append(String.valueOf(getTotalTime())).append("\n");
+        writer.append(String.valueOf(getTotalTime())).append("\n");
         writer.close();
     }
 
@@ -148,13 +145,12 @@ public class Timer extends Thread {
         if (results.createNewFile()) {
             System.out.println("Created " + results.getPath());
         }
-
         PrintWriter writer = new PrintWriter(new FileWriter(results, true));
+        for ( Long lap : laps){
+            writer.append(String.valueOf(laps)).append(",");
 
-        for (Long time : laps)
-            writer.append(String.valueOf(time)).append(",");
-
-        writer.append(",").append(String.valueOf(getTotalTime())).append("\n");
+        }
+        writer.append(String.valueOf(getTotalTime())).append("\n");
         writer.close();
     }
 

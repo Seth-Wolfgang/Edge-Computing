@@ -16,6 +16,7 @@ import java.io.File;
 import java.io.IOException;
 import java.net.InetSocketAddress;
 import java.net.Socket;
+import java.util.concurrent.TimeUnit;
 
 public class Client {
 
@@ -28,6 +29,7 @@ public class Client {
     // constructor to put ip address, port, test, and iterations.
     public Client(String address) throws IOException {
         socket = new Socket();
+        socket.setKeepAlive(true);
         InetSocketAddress edgeServerSocketAddress = new InetSocketAddress(address, 5001);
 
         //connects to edge server
@@ -53,9 +55,10 @@ public class Client {
         }
     }
 
-    public void fileSendHelper() throws IOException {
+    public void fileSendHelper() throws IOException, InterruptedException {
         File copiedFile = null;
         File file = null;
+        File dir = new File("toSend");
 
         //sets the parameters for what the client does
         int[] configData = receiveParameters();
@@ -64,6 +67,7 @@ public class Client {
         int iterations = configData[2];
         int ID = configData[3];
         int activeClients = configData[4];
+        ftpClient.refreshConnection();
 
         /*
         Test to see if this needs to send data to edge server
@@ -88,7 +92,7 @@ public class Client {
             case 1: //OCR Test
                 //sending image file
                 for (int i = 0; i < iterations; i++) {
-                    copiedFile = new File("ftpResources" + File.separator + "images" + File.separator + "image" + this.size + i + "C" + ID + ".jpg");
+                    copiedFile = new File("toSend" + File.separator + "image" +this.size + i + "C" + ID + ".jpg");
                     file = new File("ftpResources" + File.separator + "images" + File.separator + "image" + this.size + ".jpg");
                     copyAndSendFile(file, copiedFile);
                 }
@@ -99,7 +103,7 @@ public class Client {
 
                 for (int i = 0; i < iterations; i++) {
                     for (int j = 0; j < SWinputFiles.length; j++) {
-                        copiedFile = new File("ftpResources" + File.separator + "SW" + File.separator + "" + SWinputFiles[j] + this.size + i + "C" + ID + ".txt");
+                        copiedFile = new File("toSend" + File.separator + SWinputFiles[j] + this.size + i + "C" + ID + ".txt");
                         file = new File("ftpResources" + File.separator + "SW" + File.separator + "" + SWinputFiles[j] + this.size + ".txt");
                         copyAndSendFile(file, copiedFile);
                     }//end of j loop
@@ -111,7 +115,7 @@ public class Client {
 
                 for (int i = 0; i < iterations; i++) {
                     for (int j = 0; j < 2; j++) {
-                        copiedFile = new File("ftpResources" + File.separator + "LogRegression" + File.separator + "" + LGInputFiles[j] + this.size + i + "C" + ID + ".txt");
+                        copiedFile = new File("toSend"  + File.separator + LGInputFiles[j] + this.size + i + "C" + ID + ".txt");
                         file = new File("ftpResources" + File.separator + "LogRegression" + File.separator + "" + LGInputFiles[j] + this.size + ".txt");
                         copyAndSendFile(file, copiedFile);
                     }
@@ -120,6 +124,9 @@ public class Client {
 
 
         }//end of switch
+        while(dir.listFiles().length != 0){
+            TimeUnit.MILLISECONDS.sleep(10);
+        }
         sendCompletionStatus();
         timer.stopAndPrint("Sending input files", test, size, iterations, activeClients);
 

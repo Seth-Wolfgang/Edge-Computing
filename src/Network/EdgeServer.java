@@ -41,6 +41,7 @@ public class EdgeServer {
             clientSocket = new Socket();
             InetSocketAddress serverSocketAddress = new InetSocketAddress(address, 5000);
             server = new ServerSocket(5001);
+            clientSocket.setKeepAlive(true);
             int clientNum = 0;
             ArrayList<Thread> newClient = new ArrayList<>();
 
@@ -251,16 +252,16 @@ public class EdgeServer {
 
         //times the transmission until it is done
         try {
-            if (outputString.length() > 65535) {
+            if (outputString.length() > 55000) {
                 int counter = 1;
 
-                while (outputString.length() > 65535) {
-                    bigDataOutput.add(outputString.substring(0, 65535));
-                    outputString = new StringBuilder(outputString.substring(65535));
+                while (outputString.length() > 55000) {
+                    bigDataOutput.add(outputString.substring(0, 55000));
+                    outputString = new StringBuilder(outputString.substring(55000));
 
                     //loop will not run after string size is less than writeUTF byte limit
                     //this grabs the last of the output
-                    if (outputString.length() < 65535) {
+                    if (outputString.length() < 55000) {
                         bigDataOutput.add(outputString.toString());
                         counter++;
                         break;
