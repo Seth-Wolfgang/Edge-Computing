@@ -1,3 +1,6 @@
+This is not mine, see: 
+https://github.com/Agelos369/Logistic-Regression-JAVA
+
 # Logistic-Regression-JAVA
 
 Implementation of the logistic regression algorithm in java
