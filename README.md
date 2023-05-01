@@ -1,1 +1,1 @@
-This project is for research/learning purposes. 
+This project is meant to benchmark the feasability of Raspberry Pis as an edge computing device.
