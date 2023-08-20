@@ -1,5 +1,6 @@
 This project is meant to benchmark the feasability of Raspberry Pis as an edge computing device.
 
+https://ieeexplore.ieee.org/document/10187384
 
 The tests to be run should be loaded into `trials.txt`
 Usage for trials.txt:
